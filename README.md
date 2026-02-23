@@ -1,198 +1,104 @@
-# @ai-coders/context
+# MAPA Narrative Ecosystem - System Guidelines & Design Rules
 
-[![npm version](https://badge.fury.io/js/@ai-coders%2Fcontext.svg)](https://www.npmjs.com/package/@ai-coders/context)
-[![CI](https://github.com/vinilana/ai-coders-context/actions/workflows/ci.yml/badge.svg)](https://github.com/vinilana/ai-coders-context/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+> **System Guidelines**
+> This file provides the AI and Figma Agents with the absolute rules and guidelines for generating and componentizing the MAPA UI.
+> This is the ultimate Source of Truth. Any conflicting legacy instructions must be overridden by this document.
 
-<img width="663" height="192" alt="image" src="https://github.com/user-attachments/assets/4b07f61d-6800-420a-ae91-6e952cbc790d" />
+---
 
+## 1. GENERAL & LANGUAGE GUIDELINES (CRITICAL)
 
-A lightweight CLI that scaffolds living documentation and AI-agent playbooks for any repository—no LLMs or API keys required. The generated structure gives teams a consistent starting point for knowledge sharing while keeping everything under version control.
+**[CRITICAL LANGUAGE INSTRUCTION]:** ALL UI CONTENT, TEXT, LABELS, AND DATA MUST BE GENERATED AND MAINTAINED IN PORTUGUESE (PT-BR). Do not translate the interface content to English, even though these system instructions are in English. This includes placeholder text, empty states, and technical error messages (e.g., use "Nenhum dado encontrado" instead of "No data found").
 
-## ⚙️ Requirements
+* **Layout Architecture & Boundaries:** Only use absolute positioning when absolutely necessary (e.g., floating tooltips, specific decorative glass orbs). Opt for responsive, robust, and fluid layouts. **CRITICAL:** Maintain a unified layout structure across ALL pages. Use a centralized container with a maximum width (e.g., `max-w-7xl mx-auto` or `max-w-screen-xl`) to keep the content aligned. Prevent cards and grids from breaking these boundaries to avoid a "patchwork quilt" (colcha de retalhos) look. The centralized Dashboard layout is the definitive standard for the ecosystem's alignment.
+* **Whitespace as a Premium Asset:** "Breathing room is luxury". The MAPA ecosystem must feel premium, unhurried, and deliberate. Always use generous margins and paddings (e.g., Tailwind's `p-8`, `gap-12`). Avoid dense, cluttered layouts typical of legacy CRMs. Let the typography and the glass surfaces breathe.
 
-- Node.js 20+ (we currently test on 20, 22, 23, and 24)
+---
 
-## ✨ What You Get
+## 2. PRODUCT OVERVIEW & DESIGN DIRECTION
 
-- 📚 `docs/` folder with a documentation index plus ready-to-edit guides (overview, architecture, workflow, testing)
-- 🤖 `agents/` folder containing playbooks for common engineering agents and a handy index
-- 🔁 Repeatable scaffolding that you can re-run as the project evolves
-- 🧭 Repository-aware templates that highlight top-level directories for quick orientation
-- 🧠 AI-ready front matter and `agent-update` markers so assistants know exactly what to refresh
+* **The Pitch:** An immersive, high-fidelity operating system for sales consultancy. It actively transforms dry, overwhelming CRM data spreadsheets into a compelling, readable narrative of growth and strategy. It bridges the gap between tactical execution and C-level governance.
+* **Target Audience:** High-performance Revenue Operations (RevOps) teams, VP of Sales, and C-Suite executives. They suffer from "dashboard fatigue" and need strategic storytelling, not just raw data dumps.
+* **Design Direction:** Liquid Narrative. This is a strict rejection of the rigid, boxy SaaS grid.
+* **Visual Style:** Light, ethereal backgrounds meet frosted glass surfaces (glassmorphism).
+* **Typography:** Typography is the hero element, creating an editorial feel. The interface must feel less like a conventional software tool and more like a dynamic, interactive high-end financial magazine spread (inspired by Monocle Magazine or Bloomberg Businessweek).
+* **Motion:** Fluid, liquid transitions. No harsh snapping. Elements should glide, fade, and blur into existence.
+* **Device & Viewport:** Desktop-first (Optimized for 1440px+ and Ultrawide Presentation displays). Mobile responsiveness is not the primary focus for the core dashboard views, but graceful degradation on standard laptops (13") is required (e.g., collapsing sidebars, stacking narrative columns).
 
-## 📦 Installation
+---
 
-Use `npx` to run the CLI without installing globally:
+## 3. STRICT DESIGN SYSTEM GUIDELINES (NORMALIZED)
 
-```bash
-npx @ai-coders/context
-```
+**[OVERRIDE WARNING]:** Do NOT use solid white cards (`#FFFFFF`) with standard drop shadows under any circumstances. All functional surfaces must follow the Glassmorphism rules detailed below to maintain the "Liquid" aesthetic.
 
-Or add it to your dev dependencies:
+### 3.1 Design Tokens (Variables & Palette)
+Configure local variables strictly using these values. Do not introduce unauthorized shades of gray.
 
-```bash
-npm install --save-dev @ai-coders/context
-```
+* **color/primary:** `#1A1A1A` (Deep Charcoal) - Used for all main editorial text, primary headings, and high-contrast icons.
+* **color/background:** `#F5F5F7` (Soft Aluminum) - Application base background. **Mandatory:** Add a full-viewport absolute fill layer with a fine "Noise" texture at 2% to 3% opacity to prevent color banding and add physical texture.
+* **color/surface-glass:** `rgba(255, 255, 255, 0.65)` - Used for all readable cards, sidebars, and navigation panels.
+* **color/accent-human:** `#C64928` (Burnt Sienna) - The strategic accent. Use sparingly for Primary CTAs, critical alerts, "Human" touchpoints (like subjective AI recommendations), and selected states.
+* **color/success-growth:** `#2E4C3B` (Deep Forest Green) - Used exclusively to denote positive progress, OKR completion, and positive ROI trajectories.
+* **color/border-glass:** `rgba(255, 255, 255, 0.4)` - The edge highlight. Apply as an inner stroke (1px) on all glass cards/panels to catch the light and separate the glass from the background.
 
-## 🚀 Quick Start
+### 3.2 Typography Rules (Strict Hierarchy)
+Typography replaces traditional borders and dividers to establish hierarchy.
 
-```bash
-# Launch the interactive wizard
-npx @ai-coders/context
+* **Heading/H1 - Editorial:** Playfair Display, SemiBold (600), Auto Line-Height. MUST be used for all main page titles, major metric labels, and the C-Level Narrative text. Use sentence case or Title Case for elegance.
+* **UI/Body:** Satoshi (or Inter/Geist as fallback), Medium (500), Line-Height 150%. Used for supporting text, data table headers, and general UI labels.
+* **UI/Button:** Satoshi, SemiBold (600), UPPERCASE, Letter Spacing: 4% to 6%. Gives interactive elements a confident, grounded feel.
+* **Data/Numbers:** Space Mono, Regular (400). MUST be used for all financial figures, percentages, KPIs, and data readouts. Ensure `tabular-nums` CSS property is active so numbers align perfectly in vertical columns without shifting.
 
+### 3.3 Structure, Radii & Effects (The Physics of MAPA)
 
-# Scaffold docs and agents into ./.context
-npx @ai-coders/context init ./my-repo
+* **radius/card:** `24px` - Aggressive rounding for all major structural panels, data cards, and the main layout shell.
+* **radius/pill-button:** `100px` - Fully rounded pill shapes. Used for all primary/secondary buttons, status tags, and floating action elements.
+* **effect/glass-blur:** `backdrop-filter: blur(24px) saturate(150%)`. The slight saturation boost ensures the background colors pop softly through the frosted glass.
+* **effect/shadow-soft:** `box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08)`. This soft, highly diffused shadow anchors the floating glass panels without adding harsh, dirty lines.
 
-# Only generate docs
-npx @ai-coders/context init ./my-repo docs
+---
 
-# Only generate agent playbooks, with a custom output directory
-npx @ai-coders/context init ./my-repo agents --output ./knowledge-base
+## 4. COMPONENTS & EXECUTION GUIDELINES
 
-# Fill docs and agents with the repo context (preview the first 3 updates)
-npx @ai-coders/context fill ./my-repo --output ./.context --limit 3
+### 4.1 Buttons & Inputs
+* **Primary Buttons:** Must use the 100px border-radius, UPPERCASE text, and the specific UI/Button typography. Background is `color/accent-human` (`#C64928`), text is white.
+    * **Hover State:** Slightly dim the background and lift the shadow (`translate-y-[-2px]`).
+* **Secondary Buttons:** Pill-shaped, transparent background, text and 1px border in `color/primary` (`#1A1A1A`).
+* **Inputs & Forms:** Minimalist aesthetic. Underlined style only (no bounding boxes or heavy fills). Use `border-bottom: 1px solid rgba(255,255,255,0.4)` on the default state.
+    * **Focus State:** The border color transitions smoothly to `color/accent-human`, and the placeholder text/label floats upwards elegantly.
 
-# Draft a collaboration plan seeded with agent and doc touchpoints
-npx @ai-coders/context plan release-readiness --output ./.context
+### 4.2 Global Navigation (Consolidating the Patchwork)
+**[UNIFIED ECOSYSTEM CRITICAL RULE]:** The application must not feel like a decentralized set of pages. The main global navigation component (whether executed as a Sidebar or Top Nav) MUST contain ALL 6 primary system modules to ensure seamless transitions. The required items are: 1. MAPA Syn (Dashboard), 2. War Room, 3. The Bridge (Dual Core), 4. Team Hub, 5. Synapse, 6. The Vault.
 
-# Let the LLM enrich an existing plan with the latest context
-npx @ai-coders/context plan release-readiness --output ./.context --fill --dry-run
-```
+Create a single Master Component for Menu Items consisting of an Icon + Label.
+* **Default State:** Transparent background, `color/primary` text at 70% opacity.
+* **Hover State:** Text opacity 100%, background shifts to a very subtle `rgba(255,255,255,0.2)`.
+* **Active State:** The item must use the "Liquid Glass" background (`color/surface-glass`), 100% text opacity, and use `color/accent-human` for the active indicator/icon. Include a subtle scale-up effect (`scale: 1.02`).
 
-> ℹ️ The CLI pings npm for fresh releases at startup. Set `AI_CONTEXT_DISABLE_UPDATE_CHECK=true` to skip the check.
+### 4.3 Card Alignment & Sizing Constraints
+* **Standardization:** Cards must respect strict size limits and grid alignments. You must fix the discrepancy where some pages have centrally aligned, constrained cards while others expand infinitely to the screen edges. All informational cards and layout modules must follow the central alignment and proportional max-width sizing established in the main Dashboard layout.
 
-After running the command, inspect the generated structure:
+### 4.4 Specific Screen Elements & Widgets
+* **Deal Orbs (War Room Canvas):** 64px circular nodes representing clients/deals. Frosted glass fill, `#C64928` solid border for "High Probability" deals.
+    * **Interaction:** Hovering expands the orb slightly and reveals a Space Mono $Value tooltip. Dragging them leaves a faint motion trail.
+* **Narrative Column (Syn Dashboard):** A scrollable text area on the left using the Playfair Display Serif font. It reads like a generated newspaper article ("Neste trimestre, a eficiência da equipe subiu..."). Emphasized words should be bolded or highlighted in the Accent color.
+* **ROI Visualizer (Hero Chart):** Large area chart. Gradient fill from `color/success-growth` (`#2E4C3B`) to transparent. Absolutely NO grid lines. Minimal X/Y axes.
+    * **Interaction:** Hovering over the chart line displays a floating glass tooltip with the exact Date/Value, while simultaneously highlighting the corresponding sentence in the Narrative Column.
+* **Resource Vault Cards:** Masonry layout cards. 4:3 aspect ratio. A large editorial typography preview of the document title dominates the card. Use floating pill tags ("Preço", "Concorrência") inside the card to denote categories.
 
-```
-.context/
-├── agents/
-│   ├── README.md
-│   ├── code-reviewer.md
-│   └── ...
-└── docs/
-    ├── README.md
-    ├── architecture.md
-    └── ...
-```
+---
 
-Customize the Markdown files to reflect your project’s specifics and commit them alongside the code.
+## 5. BUILD GUIDE & STACK
 
-## 🧠 Guided Updates for AI Assistants
-
-Need help filling in the scaffold? Use [`prompts/update_scaffold_prompt.md`](./prompts/update_scaffold_prompt.md) as the canonical instruction set for any LLM or CLI agent. It walks through:
-
-- Gathering repository context and locating `agent-update`/`agent-fill` markers.
-- Updating documentation sections while satisfying the YAML front matter criteria.
-- Aligning agent playbooks with the refreshed docs and recording evidence for maintainers.
-
-Share that prompt verbatim with your assistant to keep updates consistent across teams.
-
-### Available Doc Guides & Agent Types
-
-The scaffold includes the following guides and playbooks out of the box:
-
-- Docs: `project-overview`, `architecture`, `development-workflow`, `testing-strategy`, `glossary`, `data-flow`, `security`, `tooling`
-- Agents: `code-reviewer`, `bug-fixer`, `feature-developer`, `refactoring-specialist`, `test-writer`, `documentation-writer`, `performance-optimizer`, `security-auditor`, `backend-specialist`, `frontend-specialist`, `architect-specialist`
-
-### AI Marker Reference
-
-- `<!-- agent-update:start:section-id --> … <!-- agent-update:end -->` wrap the sections that AI assistants should rewrite with up-to-date project knowledge.
-- `<!-- agent-fill:slot-id --> … <!-- /agent-fill -->` highlight inline placeholders that must be replaced with concrete details before removing the wrapper.
-- `<!-- agent-readonly:context -->` flags guidance that should remain as-is; treat the adjacent content as instructions rather than editable prose.
-
-When contributing, focus edits inside `agent-update` regions or `agent-fill` placeholders and leave `agent-readonly` guidance untouched unless you have explicit maintainer approval.
-
-## 🛠 Commands
-
-### `init`
-Scaffold documentation and/or agent playbooks.
-
-```
-Usage: ai-context init <repo-path> [type]
-
-Arguments:
-  repo-path               Path to the repository you want to scan
-  type                    "docs", "agents", or "both" (default)
-
-Options:
-  -o, --output <dir>      Output directory (default: ./.context)
-  --exclude <patterns...> Glob patterns to skip during the scan
-  --include <patterns...> Glob patterns to explicitly include
-  -v, --verbose           Print detailed progress information
-  -h, --help              Display help for command
-```
-
-### `fill`
-Use an LLM to refresh scaffolded docs and agent playbooks automatically.
-
-```
-Usage: ai-context fill <repo-path>
-
-Options:
-  -o, --output <dir>      Scaffold directory containing docs/ and agents/ (default: ./.context)
-  -k, --api-key <key>     API key for the selected LLM provider
-  -m, --model <model>     LLM model to use (default: x-ai/grok-4-fast)
-  -p, --provider <name>   Provider (openrouter only)
-      --base-url <url>    Custom base URL for OpenRouter
-      --prompt <file>     Instruction prompt to follow (optional; uses bundled instructions when omitted)
-      --limit <number>    Maximum number of files to update in one run
-  -h, --help              Display help for command
-```
-
-Under the hood, the command loads the prompt above, iterates over every Markdown file in `.context/docs` and `.context/agents`, and asks the LLM to produce the fully updated content.
-
-### `plan`
-Create a collaboration plan that links documentation guides and agent playbooks, or fill an existing plan with LLM assistance.
-
-```
-Usage: ai-context plan <plan-name>
-
-Options:
-  -o, --output <dir>      Scaffold directory containing docs/ and agents/ (default: ./.context)
-      --title <title>     Custom title for the plan document
-      --summary <text>    Seed the plan with a short summary or goal statement
-  -f, --force             Overwrite the plan if it already exists (scaffold mode)
-      --fill              Use an LLM to fill or update the plan instead of scaffolding
-  -r, --repo <path>       Repository root to summarize for additional context (fill mode)
-  -k, --api-key <key>     API key for the selected LLM provider (fill mode)
-  -m, --model <model>     LLM model to use (default: x-ai/grok-4-fast)
-  -p, --provider <name>   Provider (openrouter only)
-      --base-url <url>    Custom base URL for OpenRouter
-      --prompt <file>     Instruction prompt to follow (optional; uses bundled instructions when omitted)
-      --dry-run           Preview changes without writing files
-      --include <patterns...>  Glob patterns to include during repository analysis
-      --exclude <patterns...>  Glob patterns to exclude from repository analysis
-  -h, --help              Display help for command
-```
-
-In scaffold mode the command creates `.context/plans/<plan-name>.md`, keeps a `plans/README.md` index, and reminds contributors to consult the agent handbook before delegating work to an AI assistant. In fill mode it will scaffold the plan automatically if it does not exist, then read the plan plus its referenced docs and agent playbooks, send that context to the LLM, and either preview or write the updated Markdown.
-
-💡 Tip: run `npx @ai-coders/context` with no arguments to enter an interactive mode that guides you through scaffold and LLM-fill options.
-
-Prefer driving the update elsewhere? Just grab [`prompts/update_scaffold_prompt.md`](./prompts/update_scaffold_prompt.md) and run it in your favorite playground or agent host. When you’re ready to automate, drop your API key in `.env` (for example `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`) and let `fill` handle the edits inline.
-
-## 🧰 Local Development
-
-```bash
-git clone https://github.com/vinilana/ai-coders-context.git
-cd ai-coders-context
-npm install
-npm run build
-npm run test
-```
-
-During development you can run the CLI directly against TypeScript sources:
-
-```bash
-npm run dev -- ./path/to/repo
-```
-
-## 🤝 Contributing
-
-See [`AGENTS.md`](./AGENTS.md) for contributor guidelines, coding standards, and release tips. Pull requests are welcome!
-
-## 📄 License
-
-MIT © Vinícius Lana
+* **Stack:** HTML5, Tailwind CSS v3 (or v4), React (functional components + hooks), Framer Motion.
+* **Animation Rules (Framer Motion):** Avoid linear tweens. Use spring animations for organic, liquid movement. Standard physics: `transition={{ type: "spring", stiffness: 300, damping: 30 }}`.
+* **Tailwind Config Nuances (Extend your theme):**
+    * `backdrop-blur-xl`: Ensure this maps to exactly 24px blur.
+    * `shadow-glass`: Map this custom shadow configuration for depth (`box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08)`).
+    * `font-serif`: Set to `'Playfair Display', serif`.
+    * `font-sans`: Set to `'Satoshi', sans-serif`.
+    * `font-mono`: Set to `'Space Mono', monospace`.
+    * `colors.accent`: Map to `#C64928` (Burnt Sienna).
+    * `colors.success`: Map to `#2E4C3B` (Deep Forest Green).
+    * `colors.aluminum`: Map to `#F5F5F7`.
+* **Accessibility (A11y):** Despite the high-end aesthetic, contrast ratios must be respected. Ensure the `color/primary` text has sufficient contrast against the glass panels. All inputs must have associated `<label>` tags (even if visually floating) and buttons must have `aria-label` tags if relying heavily on iconography.
