@@ -53,16 +53,6 @@ const modules = [
     metricLabel: "Capacidade",
   },
   {
-    module: "synapse" as ModuleSlug,
-    title: "Synapse",
-    subtitle: "Analytics IA",
-    description: "Performance de outreach, scripts gerados por IA e pontuação de engajamento de leads.",
-    path: "/analytics",
-    accent: "#C64928",
-    metric: "24.8%",
-    metricLabel: "Conversão",
-  },
-  {
     module: "the-vault" as ModuleSlug,
     title: "The Vault",
     subtitle: "Biblioteca de Recursos",
@@ -78,8 +68,20 @@ export function Dashboard() {
   const navigate = useNavigate();
   const { canAccess } = useAuth();
   const [isComposerOpen, setIsComposerOpen] = useState(false);
-  const visibleModules = modules.filter(module => canAccess(module.module, "read"));
-  const addItems: ActionComposerItem[] = useMemo(() => DEFAULT_ADD_ITEMS, []);
+  const visibleModules = modules.filter((module) => {
+    if (module.module === 'mapa-syn') {
+      return canAccess('mapa-syn', 'read') || canAccess('synapse', 'read');
+    }
+    return canAccess(module.module, 'read');
+  });
+  const addItems: ActionComposerItem[] = useMemo(() => {
+    return DEFAULT_ADD_ITEMS.filter((item) => {
+      const matchesContext = !item.contexts || item.contexts.includes('dashboard');
+      const hasPermission = !item.requiredAnyModule
+        || item.requiredAnyModule.some((moduleSlug) => canAccess(moduleSlug, 'read'));
+      return matchesContext && hasPermission;
+    });
+  }, [canAccess]);
 
   const handleComposerSelect = (item: ActionComposerItem) => {
     setIsComposerOpen(false);

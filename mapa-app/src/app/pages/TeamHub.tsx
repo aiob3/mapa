@@ -15,37 +15,6 @@ import { useAuth } from '../auth/AuthContext';
 import { TEAM_SIDEBAR_ITEMS } from '../navigation/sidebarNavigation';
 import type { ActionComposerItem, SidebarStatusPanelConfig } from '../types/patterns';
 
-const teamStatusPanel: SidebarStatusPanelConfig = {
-  title: 'Status Operacional',
-  subtitle: 'Team Hub + Bridge',
-  items: [
-    {
-      id: 'team-sync',
-      severity: 'success',
-      message: 'Sincronização entre estratégia e execução em 72%.',
-      tooltip: 'Bridge absorvido em Visão Geral do Team Hub.',
-      updatedAt: 'há 2 min',
-      source: 'Team Sync',
-    },
-    {
-      id: 'team-alert',
-      severity: 'warning',
-      message: '2 desafios críticos aguardam aprovação executiva.',
-      tooltip: 'Avaliar priorização e alocação de capacidade.',
-      updatedAt: 'agora',
-      source: 'Challenge Queue',
-    },
-    {
-      id: 'team-info',
-      severity: 'info',
-      message: 'Compatibilidade /bridge ativa sem ticker inferior.',
-      tooltip: 'Deep links antigos redirecionados para /team/overview.',
-      updatedAt: 'há 5 min',
-      source: 'Routing',
-    },
-  ],
-};
-
 interface Consultant {
   name: string;
   avatar: string;
@@ -219,17 +188,74 @@ export function TeamHub() {
   }, [filter, searchQuery]);
 
   const addItems: ActionComposerItem[] = useMemo(() => {
-    return [
-      ...DEFAULT_ADD_ITEMS,
-      {
+    const context = view === 'overview' ? 'team-overview' : 'team';
+
+    const contextualItems = DEFAULT_ADD_ITEMS.filter((item) => {
+      const matchesContext = !item.contexts || item.contexts.includes(context);
+      const hasPermission = !item.requiredAnyModule
+        || item.requiredAnyModule.some((moduleSlug) => canAccess(moduleSlug, 'read'));
+      return matchesContext && hasPermission;
+    });
+
+    if (canAccess('team-hub', 'read')) {
+      contextualItems.push({
         id: 'add-team-challenge',
         label: 'Novo Desafio da Equipe',
         description: 'Criar desafio operacional e distribuir responsáveis na equipe.',
         targetPath: '/team/challenges',
         payload: { focus: 'new-challenge' },
-      },
-    ];
-  }, []);
+        requiredAnyModule: ['team-hub'],
+        contexts: ['team', 'team-overview'],
+      });
+    }
+
+    return contextualItems;
+  }, [canAccess, view]);
+
+  const teamStatusPanel: SidebarStatusPanelConfig = useMemo(() => {
+    const hasTeamHubAccess = canAccess('team-hub', 'read');
+    return {
+      title: 'Status Operacional',
+      subtitle: 'Team Hub + Bridge',
+      maxVisibleItems: 3,
+      seeMoreLabel: hasTeamHubAccess ? 'Abrir visão detalhada' : 'Manter na visão geral',
+      seeMoreTargetPath: hasTeamHubAccess ? '/team/performance' : '/team/overview',
+      items: [
+        {
+          id: 'team-sync',
+          severity: 'success',
+          message: 'Sincronização entre estratégia e execução em 72% na visão absorvida.',
+          tooltip: 'Bridge absorvido em Visão Geral do Team Hub.',
+          updatedAt: 'há 2 min',
+          source: 'Team Sync',
+          actionLabel: 'Abrir Visão Geral',
+          actionTargetPath: '/team/overview',
+        },
+        {
+          id: 'team-alert',
+          severity: 'warning',
+          message: hasTeamHubAccess
+            ? '2 desafios críticos aguardam aprovação executiva.'
+            : '2 alertas estratégicos aguardam revisão na visão geral.',
+          tooltip: 'Avaliar priorização e alocação de capacidade.',
+          updatedAt: 'agora',
+          source: 'Challenge Queue',
+          actionLabel: hasTeamHubAccess ? 'Ver desafios' : 'Ver visão geral',
+          actionTargetPath: hasTeamHubAccess ? '/team/challenges' : '/team/overview',
+        },
+        {
+          id: 'team-info',
+          severity: 'info',
+          message: 'Compatibilidade /bridge ativa com roteamento para Team Overview.',
+          tooltip: 'Deep links antigos redirecionados para /team/overview.',
+          updatedAt: 'há 5 min',
+          source: 'Routing',
+          actionLabel: 'Validar rota',
+          actionTargetPath: '/team/overview',
+        },
+      ],
+    };
+  }, [canAccess]);
 
   const visibleSidebarItems = useMemo(() => {
     const hasTeamAccess = canAccess('team-hub', 'read');
@@ -252,9 +278,14 @@ export function TeamHub() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#F5F5F7' }}>
-      <TopNav brand="MAPA" brandSub="Ecosystem" version="v2.4.0" />
+      <TopNav
+        brand="MAPA"
+        brandSub="Ecosystem"
+        version="v2.4.0"
+        navigationMode="full"
+      />
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         <SidebarNav
           brand="Team Hub"
           brandSub="GESTÃO DE EQUIPE"

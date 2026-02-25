@@ -1,7 +1,6 @@
 import {
   BarChart3,
   Eye,
-  FileText,
   LayoutDashboard,
   Phone,
   PieChart,
@@ -20,50 +19,19 @@ export const TEAM_SIDEBAR_ITEMS: SidebarNavItem[] = [
   { label: 'Configurações', subLabel: 'Governança do módulo', path: '/team/settings', icon: Settings, exact: true },
 ];
 
-export const SYNAPSE_SIDEBAR_ITEMS: SidebarNavItem[] = [
-  {
-    label: 'Dashboard',
-    subLabel: 'Ir para MAPA Syn',
-    path: '/syn',
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    label: 'Painel Synapse',
-    subLabel: 'Análise de Outreach',
-    path: '/analytics',
-    icon: BarChart3,
-    exact: true,
-  },
-  {
-    label: 'Scripts IA',
-    subLabel: 'Biblioteca de cadências',
-    path: '/analytics/scripts',
-    icon: FileText,
-    exact: true,
-  },
-  {
-    label: 'Leads',
-    subLabel: 'Engajamento e tom',
-    path: '/analytics/leads',
-    icon: Users,
-    exact: true,
-  },
-  {
-    label: 'Configurações',
-    subLabel: 'Ajustes do módulo',
-    path: '/analytics/settings',
-    icon: Settings,
-    exact: true,
-  },
-];
-
 export const MAPA_SYN_SIDEBAR_ITEMS: SidebarNavItem[] = [
   {
     label: 'Leads & Insights',
     subLabel: 'Call Intelligence Hub',
     path: '/syn',
     icon: Phone,
+    exact: true,
+  },
+  {
+    label: 'Outreach IA',
+    subLabel: 'Recursos absorvidos do Synapse',
+    path: '/syn/outreach',
+    icon: LayoutDashboard,
     exact: true,
   },
   {

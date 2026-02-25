@@ -4,17 +4,35 @@ export interface ModuleNavigationItem {
   id: string;
   label: string;
   path: string;
-  module: ModuleSlug;
+  primaryModule: ModuleSlug;
+  accessModules?: ModuleSlug[];
+}
+
+export function getAccessModules(item: ModuleNavigationItem): ModuleSlug[] {
+  if (item.accessModules && item.accessModules.length > 0) {
+    return item.accessModules;
+  }
+  return [item.primaryModule];
 }
 
 export const MODULE_NAVIGATION: ModuleNavigationItem[] = [
-  { id: 'dashboard', label: 'Dashboard', path: '/dashboard', module: 'mapa-syn' },
-  { id: 'mapa-syn', label: 'MAPA Syn', path: '/syn', module: 'mapa-syn' },
-  { id: 'war-room', label: 'War Room', path: '/war-room', module: 'war-room' },
-  { id: 'the-bridge', label: 'The Bridge', path: '/team/overview', module: 'the-bridge' },
-  { id: 'team-hub', label: 'Team Hub', path: '/team', module: 'team-hub' },
-  { id: 'synapse', label: 'Synapse', path: '/analytics', module: 'synapse' },
-  { id: 'the-vault', label: 'The Vault', path: '/vault', module: 'the-vault' },
+  { id: 'dashboard', label: 'Dashboard', path: '/dashboard', primaryModule: 'mapa-syn' },
+  {
+    id: 'mapa-syn',
+    label: 'MAPA Syn',
+    path: '/syn',
+    primaryModule: 'mapa-syn',
+    accessModules: ['mapa-syn', 'synapse'],
+  },
+  { id: 'war-room', label: 'War Room', path: '/war-room', primaryModule: 'war-room' },
+  {
+    id: 'team-hub',
+    label: 'Team Hub',
+    path: '/team',
+    primaryModule: 'team-hub',
+    accessModules: ['team-hub', 'the-bridge'],
+  },
+  { id: 'the-vault', label: 'The Vault', path: '/vault', primaryModule: 'the-vault' },
 ];
 
 function normalizePath(pathname: string): string {

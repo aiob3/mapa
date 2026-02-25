@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, Info, ShieldAlert } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { AlertTriangle, ArrowRight, CheckCircle2, Info, ShieldAlert } from 'lucide-react';
 
 import type { SidebarStatusPanelConfig, StatusInsightItem } from '../types/patterns';
 
@@ -36,6 +37,11 @@ interface SystemStatusPanelProps {
 }
 
 export function SystemStatusPanel({ config }: SystemStatusPanelProps) {
+  const navigate = useNavigate();
+  const visibleItems = config.maxVisibleItems
+    ? config.items.slice(0, config.maxVisibleItems)
+    : config.items;
+
   return (
     <div className="rounded-2xl bg-white/60 border border-white/40 p-3"
       style={{
@@ -60,8 +66,8 @@ export function SystemStatusPanel({ config }: SystemStatusPanelProps) {
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        {config.items.map((item) => (
+      <div className="flex flex-col gap-2 max-h-[180px] overflow-y-auto pr-1">
+        {visibleItems.map((item) => (
           <div
             key={item.id}
             title={item.tooltip}
@@ -82,13 +88,35 @@ export function SystemStatusPanel({ config }: SystemStatusPanelProps) {
                   className="text-[10px] text-[#717182] mt-1"
                   style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
                 >
-                  {item.source} • {item.updatedAt}
+                  Origem: {item.source} • {item.updatedAt}
                 </p>
+                {item.actionTargetPath && item.actionLabel && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(item.actionTargetPath)}
+                    className="mt-1 inline-flex items-center gap-1 text-[10px] text-[#C64928] hover:underline"
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
+                  >
+                    {item.actionLabel}
+                    <ArrowRight size={10} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {config.seeMoreTargetPath && (
+        <button
+          type="button"
+          onClick={() => navigate(config.seeMoreTargetPath)}
+          className="mt-2 text-[10px] text-[#C64928] hover:underline"
+          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700 }}
+        >
+          {config.seeMoreLabel ?? 'Ver mais status'}
+        </button>
+      )}
     </div>
   );
 }

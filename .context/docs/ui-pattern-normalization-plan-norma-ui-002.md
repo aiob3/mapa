@@ -21,6 +21,7 @@ success_criteria:
 - Consolidar padrão único para `shell`, `sidebar`, `cards`, `modais` e `status panel`.
 - Cobertura alvo: `/dashboard`, `/vault`, `/analytics`, `/team`, `/team/overview` (absorção do Bridge), `/syn`, `/war-room`.
 - Compatibilidade legada: `/bridge` e `/bridge/*` redirecionando para `/team/overview`.
+- Unificação ativa: `/analytics` e `/analytics/*` redirecionando para `/syn/outreach` (compatibilidade).
 
 ## Gate Canônico Aplicado (`CANON-PLAN-000`)
 
@@ -47,10 +48,10 @@ success_criteria:
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/dashboard` | `PAT-SHELL-001` | `PAT-SHELL-001` | `N/A` | `PAT-CARD-001` | `PAT-MODAL-001` | `N/A` | Página hub sem sidebar por decisão de produto. |
 | `/vault` | `PAT-SHELL-001` | `PAT-SHELL-001` | `N/A` | `PAT-CARD-001` | `PAT-MODAL-001` | `N/A` | Mantém preview modal do domínio Vault. |
-| `/analytics` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `N/A` | `PAT-STATUS-001` | Item Dashboard aponta para `/syn`. |
+| `/analytics` | `PAT-SHELL-001` | `PAT-SHELL-001` | `N/A` | `N/A` | `N/A` | `N/A` | Rota de compatibilidade legada; redireciona para `/syn/*` preservando query/hash. |
 | `/team` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-001` | Subviews internas por rota (`/team/*`). |
 | `/team/overview` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-002` | Absorve Bridge e recebe compatibilidade de `/bridge`. |
-| `/syn` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `N/A` | `PAT-STATUS-001` | Migração de sidebar custom para sidebar canônica. |
+| `/syn` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `N/A` | `PAT-STATUS-001` | Módulo unificado: absorve recursos de Synapse (outreach) em `/syn/outreach`. |
 | `/war-room` | `PAT-SHELL-001` | `PAT-SHELL-001` | `N/A` | `PAT-CARD-001` | `N/A` | `N/A` | Conformidade parcial; canvas preservado por exceção funcional. |
 | `/bridge` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-002` | Redireciona para `/team/overview` (compatibilidade). |
 
@@ -72,6 +73,8 @@ success_criteria:
   - `AnyModuleAccessGuard` para visão geral (`team-hub` ou `the-bridge`).
 - Navegação:
   - Schema unificado em `moduleNavigation.ts` aplicado no `TopNav`.
+  - `TopNav` mantém somente áreas principais segmentadas; itens absorvidos devem sair da barra superior.
+  - Domínios legados (`/analytics`) são compatibilidade e devem redirecionar para o domínio canônico (`/syn/*`).
 - Sidebar:
   - `SidebarNav` com suporte a `subLabel` e `statusPanel`.
 - Ações:

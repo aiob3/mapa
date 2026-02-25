@@ -8,15 +8,19 @@ import { LeadsInsights } from '../components/syn/LeadsInsights';
 import { StrategicHeatmap } from '../components/syn/StrategicHeatmap';
 import { SynProvider } from '../components/syn/SynContext';
 import { SynToolbar } from '../components/syn/SynHeader';
+import { SynapseOutreachContent } from '../components/syn/SynapseOutreachContent';
 import { SectorAnalysis } from '../components/syn/SectorAnalysis';
 import { MAPA_SYN_SIDEBAR_ITEMS } from '../navigation/sidebarNavigation';
 import type { SidebarStatusPanelConfig } from '../types/patterns';
 
-type SynView = 'leads' | 'heatmap' | 'sector';
+type SynView = 'leads' | 'heatmap' | 'sector' | 'outreach';
 
 const synStatusPanel: SidebarStatusPanelConfig = {
   title: 'Status do Sistema',
   subtitle: 'Execução do módulo MAPA Syn',
+  maxVisibleItems: 3,
+  seeMoreLabel: 'Abrir setor analítico',
+  seeMoreTargetPath: '/syn/sector',
   items: [
     {
       id: 'syn-active',
@@ -25,6 +29,8 @@ const synStatusPanel: SidebarStatusPanelConfig = {
       tooltip: 'Monitoramento em tempo real da camada narrativa.',
       updatedAt: 'há 2 min',
       source: 'MAPA Syn',
+      actionLabel: 'Abrir Leads & Insights',
+      actionTargetPath: '/syn',
     },
     {
       id: 'syn-watch',
@@ -33,19 +39,26 @@ const synStatusPanel: SidebarStatusPanelConfig = {
       tooltip: 'Recomendado revisar cadência e recorte setorial.',
       updatedAt: 'agora',
       source: 'Heatmap',
+      actionLabel: 'Ir para Heatmap',
+      actionTargetPath: '/syn/heatmap',
     },
     {
       id: 'syn-sync',
       severity: 'info',
-      message: 'Integração com Synapse e Team Hub sincronizada.',
-      tooltip: 'Estado canônico de navegação e contexto.',
-      updatedAt: 'há 5 min',
+      message: 'Outreach de Synapse absorvido e operando dentro de /syn.',
+      tooltip: 'Compatibilidade de /analytics redireciona para /syn/outreach.',
+      updatedAt: 'agora',
       source: 'Navegação',
+      actionLabel: 'Abrir Outreach',
+      actionTargetPath: '/syn/outreach',
     },
   ],
 };
 
 function resolveViewFromPath(pathname: string): SynView {
+  if (pathname.startsWith('/syn/outreach')) {
+    return 'outreach';
+  }
   if (pathname.startsWith('/syn/heatmap')) {
     return 'heatmap';
   }
@@ -115,6 +128,17 @@ export function MapaSyn() {
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
                   <SectorAnalysis />
+                </motion.div>
+              )}
+              {activeView === 'outreach' && (
+                <motion.div
+                  key="outreach"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                >
+                  <SynapseOutreachContent />
                 </motion.div>
               )}
             </AnimatePresence>

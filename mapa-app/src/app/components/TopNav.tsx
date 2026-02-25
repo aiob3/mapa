@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router';
 import { Bell, User } from 'lucide-react';
 
 import { useAuth } from '../auth/AuthContext';
-import { isPathActive, MODULE_NAVIGATION } from '../navigation/moduleNavigation';
+import { getAccessModules, isPathActive, MODULE_NAVIGATION, type ModuleNavigationItem } from '../navigation/moduleNavigation';
+import type { ModuleSlug, PermissionAction } from '../auth/types';
 
 interface TopNavProps {
   brand: string;
@@ -11,33 +12,42 @@ interface TopNavProps {
   version?: string;
   lang?: 'PT' | 'EN';
   onLangToggle?: () => void;
+  navigationMode?: 'full' | 'compact';
 }
 
 function isModuleActive(
   currentPathname: string,
   moduleId: string,
   modulePath: string,
-  bridgeVisible: boolean,
 ): boolean {
   if (moduleId === 'team-hub') {
-    if (bridgeVisible) {
-      return isPathActive(currentPathname, '/team') && !isPathActive(currentPathname, '/team/overview');
-    }
-    return isPathActive(currentPathname, '/team');
-  }
-  if (moduleId === 'the-bridge') {
-    return isPathActive(currentPathname, '/team/overview');
+    return isPathActive(currentPathname, '/team') || isPathActive(currentPathname, '/team/overview');
   }
   return isPathActive(currentPathname, modulePath);
 }
 
-export function TopNav({ brand, brandSub, version, lang = 'PT', onLangToggle }: TopNavProps) {
+function resolveModulePath(
+  item: ModuleNavigationItem,
+  canAccess: (moduleSlug: ModuleSlug, action?: PermissionAction) => boolean,
+): string {
+  if (item.id === 'team-hub' && !canAccess('team-hub', 'read') && canAccess('the-bridge', 'read')) {
+    return '/team/overview';
+  }
+  return item.path;
+}
+
+export function TopNav({ brand, brandSub, version, lang = 'PT', onLangToggle, navigationMode = 'full' }: TopNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { allowedModules, canAccess, session, signOut } = useAuth();
 
   const visibleModules = MODULE_NAVIGATION.filter(
-    (module) => allowedModules.includes(module.module) && canAccess(module.module, "read"),
+    (module) => {
+      const accessModules = getAccessModules(module);
+      return accessModules.some(
+        (moduleSlug) => allowedModules.includes(moduleSlug) && canAccess(moduleSlug, 'read'),
+      );
+    },
   );
 
   return (
@@ -68,30 +78,36 @@ export function TopNav({ brand, brandSub, version, lang = 'PT', onLangToggle }: 
         )}
       </div>
 
-      <div className="flex items-center gap-1">
-        {visibleModules.map((module) => {
-          const isActive = isModuleActive(
-            location.pathname,
-            module.id,
-            module.path,
-            visibleModules.some((visibleModule) => visibleModule.id === 'the-bridge'),
-          );
-          return (
-            <button
-              key={module.path}
-              onClick={() => navigate(module.path)}
-              className={`px-4 py-2 rounded-full text-[13px] transition-all duration-200 ${
-                isActive
-                  ? "bg-[#1A1A1A] text-white"
-                  : "text-[#717182] hover:text-[#1A1A1A] hover:bg-black/5"
-              }`}
-              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, letterSpacing: '0.02em' }}
-            >
-              {module.label}
-            </button>
-          );
-        })}
-      </div>
+      {navigationMode === 'full' ? (
+        <div className="flex items-center gap-1">
+          {visibleModules.map((module) => {
+            const targetPath = resolveModulePath(module, canAccess);
+            const isActive = isModuleActive(
+              location.pathname,
+              module.id,
+              targetPath,
+            );
+            return (
+              <button
+                key={module.path}
+                onClick={() => navigate(targetPath)}
+                className={`px-4 py-2 rounded-full text-[13px] transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#1A1A1A] text-white"
+                    : "text-[#717182] hover:text-[#1A1A1A] hover:bg-black/5"
+                }`}
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, letterSpacing: '0.02em' }}
+              >
+                {module.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-[11px] tracking-[0.08em] uppercase text-[#717182]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+          Navegação contextual no menu lateral
+        </div>
+      )}
 
       <div className="flex items-center gap-4">
         {session && (

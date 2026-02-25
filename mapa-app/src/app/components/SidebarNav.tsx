@@ -54,7 +54,7 @@ export function SidebarNav({ brand, brandSub, items, statusPanel, bottomContent 
       initial={false}
       animate={{ width: isCollapsed ? 84 : 252 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="min-h-screen flex flex-col bg-white/70 border-r border-white/40 relative"
+      className="h-full min-h-0 flex flex-col bg-white/70 border-r border-white/40 relative"
       style={{ backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)" }}
     >
       {/* Collapse/Expand Toggle Button */}
@@ -71,7 +71,7 @@ export function SidebarNav({ brand, brandSub, items, statusPanel, bottomContent 
       </button>
 
       {/* Padding wrapper */}
-      <div className="p-6 flex flex-col h-full overflow-hidden">
+      <div className="p-6 flex flex-col h-full min-h-0 overflow-hidden">
         {/* Section Title */}
         <div className="mb-7 overflow-hidden">
           <AnimatePresence mode="wait">
@@ -94,7 +94,7 @@ export function SidebarNav({ brand, brandSub, items, statusPanel, bottomContent 
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex flex-col gap-1.5 flex-1">
+        <nav className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto pr-1">
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = isItemActive(location.pathname, item);
@@ -159,7 +159,7 @@ export function SidebarNav({ brand, brandSub, items, statusPanel, bottomContent 
 
         {/* Bottom Content */}
         {(statusPanel || bottomContent) && (
-          <div className="mt-auto pt-6 border-t border-black/5 overflow-hidden">
+          <div className="mt-auto pt-6 border-t border-black/5 overflow-hidden shrink-0">
             <AnimatePresence mode="wait">
               {!isCollapsed && (
                 <motion.div

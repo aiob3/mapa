@@ -1,3 +1,5 @@
+import type { ModuleSlug } from '../auth/types';
+
 export type StatusSeverity = 'info' | 'success' | 'warning' | 'critical';
 
 export interface StatusInsightItem {
@@ -7,12 +9,17 @@ export interface StatusInsightItem {
   tooltip?: string;
   updatedAt: string;
   source: string;
+  actionLabel?: string;
+  actionTargetPath?: string;
 }
 
 export interface SidebarStatusPanelConfig {
   title: string;
   subtitle?: string;
   items: StatusInsightItem[];
+  maxVisibleItems?: number;
+  seeMoreLabel?: string;
+  seeMoreTargetPath?: string;
 }
 
 export interface ActionComposerItem {
@@ -21,6 +28,8 @@ export interface ActionComposerItem {
   description: string;
   targetPath: string;
   payload?: Record<string, string>;
+  requiredAnyModule?: ModuleSlug[];
+  contexts?: string[];
 }
 
 export type PatternId =

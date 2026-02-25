@@ -12,7 +12,6 @@ import { InternalServerError } from './pages/InternalServerError';
 import { Login } from './pages/Login';
 import { MapaSyn } from './pages/MapaSyn';
 import { NotFound } from './pages/NotFound';
-import { Synapse } from './pages/Synapse';
 import { TeamHub } from './pages/TeamHub';
 import { Unauthorized } from './pages/Unauthorized';
 import { Vault } from './pages/Vault';
@@ -54,8 +53,37 @@ function BridgeCompatibilityRedirect() {
   });
 }
 
+function AnalyticsCompatibilityRedirect() {
+  const location = useLocation();
+
+  let nextPathname = '/syn/outreach';
+  if (location.pathname.startsWith('/analytics/leads')) {
+    nextPathname = '/syn';
+  } else if (location.pathname.startsWith('/analytics/settings')) {
+    nextPathname = '/syn/sector';
+  }
+
+  return React.createElement(Navigate, {
+    to: {
+      pathname: nextPathname,
+      search: location.search,
+      hash: location.hash,
+    },
+    replace: true,
+    state: {
+      migratedFrom: location.pathname,
+      compatibilityRoute: '/analytics',
+    },
+  });
+}
+
 const TeamRoute = withModuleAccess(TeamHub, 'team-hub');
 const TeamOverviewRoute = withAnyModuleAccess(TeamHub, ['team-hub', 'the-bridge']);
+const SynUnifiedRoute = withAnyModuleAccess(MapaSyn, ['mapa-syn', 'synapse']);
+const AnalyticsCompatibilityRoute = withAnyModuleAccess(
+  AnalyticsCompatibilityRedirect,
+  ['mapa-syn', 'synapse'],
+);
 
 export const router = createBrowserRouter([
   { path: '/', Component: Login },
@@ -71,14 +99,14 @@ export const router = createBrowserRouter([
       { path: '/dashboard', Component: withModuleAccess(Dashboard, 'mapa-syn') },
       { path: '/bridge', Component: withAnyModuleAccess(BridgeCompatibilityRedirect, ['the-bridge', 'team-hub']) },
       { path: '/bridge/*', Component: withAnyModuleAccess(BridgeCompatibilityRedirect, ['the-bridge', 'team-hub']) },
-      { path: '/syn', Component: withModuleAccess(MapaSyn, 'mapa-syn') },
-      { path: '/syn/*', Component: withModuleAccess(MapaSyn, 'mapa-syn') },
+      { path: '/syn', Component: SynUnifiedRoute },
+      { path: '/syn/*', Component: SynUnifiedRoute },
       { path: '/war-room', Component: withModuleAccess(WarRoom, 'war-room') },
       { path: '/team', Component: TeamRoute },
       { path: '/team/overview', Component: TeamOverviewRoute },
       { path: '/team/*', Component: TeamRoute },
-      { path: '/analytics', Component: withModuleAccess(Synapse, 'synapse') },
-      { path: '/analytics/*', Component: withModuleAccess(Synapse, 'synapse') },
+      { path: '/analytics', Component: AnalyticsCompatibilityRoute },
+      { path: '/analytics/*', Component: AnalyticsCompatibilityRoute },
       { path: '/vault', Component: withModuleAccess(Vault, 'the-vault') },
     ],
   },

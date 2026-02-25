@@ -6,6 +6,7 @@ import { DEFAULT_ADD_ITEMS } from "../components/actions/defaultActionComposerIt
 import { GlassCard } from "../components/GlassCard";
 import { Plus, Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "../auth/AuthContext";
 import type { ActionComposerItem } from "../types/patterns";
 
 interface Asset {
@@ -55,6 +56,7 @@ const typeFilters = ["Playbook", "Template", "Ferramenta", "Script", "Report", "
 
 export function Vault() {
   const navigate = useNavigate();
+  const { canAccess } = useAuth();
   const [lang, setLang] = useState<"PT" | "EN">("PT");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFiltersByFacet, setSelectedFiltersByFacet] = useState<SelectedFiltersByFacet>({
@@ -65,7 +67,14 @@ export function Vault() {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
 
-  const addItems: ActionComposerItem[] = useMemo(() => DEFAULT_ADD_ITEMS, []);
+  const addItems: ActionComposerItem[] = useMemo(() => {
+    return DEFAULT_ADD_ITEMS.filter((item) => {
+      const matchesContext = !item.contexts || item.contexts.includes('vault');
+      const hasPermission = !item.requiredAnyModule
+        || item.requiredAnyModule.some((moduleSlug) => canAccess(moduleSlug, 'read'));
+      return matchesContext && hasPermission;
+    });
+  }, [canAccess]);
 
   const handleComposerSelect = (item: ActionComposerItem) => {
     setIsComposerOpen(false);
