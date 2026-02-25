@@ -7,7 +7,7 @@ Explain how data enters, moves through, and exits the system, including interact
 - Summarize the primary pipeline from input to output. Reference diagrams or embed Mermaid definitions when available.
 
 ## Internal Movement
-- Describe how modules within `AGENTS.md`, `CONTRIBUTING.md`, `example-documentation.ts`, `jest.config.js`, `LICENSE`, `mapa-app`, `package-lock.json`, `package.json`, `prompts`, `README.md`, `src`, `tsconfig.json` collaborate (queues, events, RPC calls, shared databases).
+- Describe how modules within `agents`, `AGENTS.md`, `CONTRIBUTING.md`, `docs`, `example-documentation.ts`, `jest.config.js`, `LICENSE`, `mapa-app`, `package-lock.json`, `package.json`, `prompts`, `README.md`, `src`, `tsconfig.json` collaborate (queues, events, RPC calls, shared databases).
 
 ## External Integrations
 - <!-- agent-fill:integration -->**Integration** — Purpose, authentication, payload shapes, retry strategy.<!-- /agent-fill -->

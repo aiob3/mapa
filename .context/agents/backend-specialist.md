@@ -25,6 +25,8 @@ Describe how the backend specialist agent supports the team and when to engage i
 - Contributor guide: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ## Repository Starting Points
+- `agents/` — TODO: Describe the purpose of this directory.
+- `docs/` — TODO: Describe the purpose of this directory.
 - `mapa-app/` — TODO: Describe the purpose of this directory.
 - `prompts/` — TODO: Describe the purpose of this directory.
 - `src/` — TODO: Describe the purpose of this directory.

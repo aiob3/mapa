@@ -8,8 +8,10 @@
 - Highlight how requests traverse the system and where control pivots between layers.
 
 ## Core System Components
+- `agents/` — approximately 1 files
 - `AGENTS.md/` — approximately 1 files
 - `CONTRIBUTING.md/` — approximately 1 files
+- `docs/` — approximately 1 files
 - `example-documentation.ts/` — approximately 1 files
 - `jest.config.js/` — approximately 1 files
 - `LICENSE/` — approximately 1 files
@@ -44,8 +46,10 @@
 - Document performance constraints, scaling considerations, or external system assumptions.
 
 ## Top Directories Snapshot
+- `agents/` — approximately 1 files
 - `AGENTS.md/` — approximately 1 files
 - `CONTRIBUTING.md/` — approximately 1 files
+- `docs/` — approximately 1 files
 - `example-documentation.ts/` — approximately 1 files
 - `jest.config.js/` — approximately 1 files
 - `LICENSE/` — approximately 1 files

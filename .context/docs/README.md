@@ -15,8 +15,10 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Tooling & Productivity Guide](./tooling.md)
 
 ## Repository Snapshot
+- `agents/` — AI agent playbooks and prompts.
 - `AGENTS.md/`
 - `CONTRIBUTING.md/`
+- `docs/` — Living documentation produced by this tool.
 - `example-documentation.ts/`
 - `jest.config.js/`
 - `LICENSE/`

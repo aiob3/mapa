@@ -14,8 +14,10 @@
 - .mts (1239 files)
 
 ## File Structure & Code Organization
+- `agents/` — AI agent playbooks and prompts.
 - <!-- agent-fill:directory-agents-md -->`AGENTS.md/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
 - <!-- agent-fill:directory-contributing-md -->`CONTRIBUTING.md/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
+- `docs/` — Living documentation produced by this tool.
 - <!-- agent-fill:directory-example-documentation-ts -->`example-documentation.ts/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
 - <!-- agent-fill:directory-jest-config-js -->`jest.config.js/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
 - <!-- agent-fill:directory-license -->`LICENSE/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
