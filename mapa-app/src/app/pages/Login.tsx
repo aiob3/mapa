@@ -3,6 +3,10 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { KeyRound, UserRound } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import { LoginRibbonVisual } from "../components/login/LoginRibbonVisual";
+
+const NOISE_SVG =
+  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")";
 
 export function Login() {
   const navigate = useNavigate();
@@ -30,36 +34,27 @@ export function Login() {
 
   return (
     <div className="min-h-screen" style={{ background: "#F5F5F7" }}>
-      <div className="grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+      <div className="relative grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-[57.5%] hidden w-32 -translate-x-1/2 lg:block"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(198,73,40,0) 0%, rgba(198,73,40,0.24) 45%, rgba(198,73,40,0.1) 58%, rgba(198,73,40,0) 100%)",
+            filter: "blur(18px)",
+            opacity: 0.8,
+          }}
+        />
+        <div
+          className="pointer-events-none absolute left-[57.5%] top-1/2 hidden h-[56vh] w-[220px] -translate-x-[48%] -translate-y-1/2 lg:block"
+          style={{
+            background:
+              "radial-gradient(55% 52% at 0% 50%, rgba(198,73,40,0.32) 0%, rgba(198,73,40,0.14) 36%, rgba(198,73,40,0) 76%)",
+            filter: "blur(20px)",
+          }}
+        />
         {/* Left: Liquid Visual */}
         <div className="relative hidden overflow-hidden lg:block">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#2a2a2a] to-[#1A1A1A]">
-            <motion.div
-              className="absolute h-[500px] w-[500px] rounded-full opacity-20"
-              style={{ background: "radial-gradient(circle, #C64928 0%, transparent 70%)", top: "20%", left: "30%" }}
-              animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute h-[400px] w-[400px] rounded-full opacity-15"
-              style={{ background: "radial-gradient(circle, #2E4C3B 0%, transparent 70%)", top: "50%", left: "50%" }}
-              animate={{ scale: [1.2, 1, 1.2], x: [0, -40, 0], y: [0, 30, 0] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute h-[300px] w-[300px] rounded-full opacity-10"
-              style={{ background: "radial-gradient(circle, #E07B5B 0%, transparent 70%)", top: "10%", left: "60%" }}
-              animate={{ scale: [1, 1.3, 1], x: [0, 20, 0], y: [0, 40, 0] }}
-              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <div
-              className="absolute inset-0 opacity-[0.03]"
-              style={{
-                backgroundImage:
-                  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
-              }}
-            />
-          </div>
+          <LoginRibbonVisual />
 
           <div className="absolute left-12 top-12 z-10">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.3 }}>
@@ -89,12 +84,65 @@ export function Login() {
         </div>
 
         {/* Right: Login Glass Pane */}
-        <div className="relative flex items-center justify-center px-4 py-8 sm:px-8 lg:px-10">
+        <div className="relative flex items-center justify-center overflow-hidden px-4 py-8 sm:px-8 lg:px-10">
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #F7F7F8 0%, #EEF0F3 100%)" }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(760px 420px at 32% 52%, rgba(198,73,40,0.12), transparent 68%), radial-gradient(760px 420px at 88% 84%, rgba(26,26,26,0.09), transparent 70%)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute -left-20 top-1/2 h-[64vh] w-[320px] -translate-y-1/2"
+            style={{
+              background:
+                "radial-gradient(58% 58% at 0% 50%, rgba(198,73,40,0.28) 0%, rgba(198,73,40,0.12) 42%, rgba(198,73,40,0.02) 60%, transparent 78%)",
+              filter: "blur(16px)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute left-[8%] top-[20%] h-52 w-52 rounded-full border-[16px]"
+            style={{
+              borderColor: "rgba(198,73,40,0.22) rgba(198,73,40,0.04) rgba(198,73,40,0.08) rgba(198,73,40,0.18)",
+              transform: "rotate(22deg)",
+              filter: "blur(0.3px)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute right-[8%] top-[34%] h-40 w-64 rounded-full border-[14px]"
+            style={{
+              borderColor: "rgba(26,26,26,0.16) rgba(26,26,26,0.03) rgba(26,26,26,0.09) rgba(26,26,26,0.14)",
+              transform: "rotate(-18deg)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute left-[18%] bottom-[14%] h-24 w-72 rounded-full"
+            style={{
+              background: "linear-gradient(100deg, rgba(255,255,255,0.2), rgba(255,255,255,0.04), rgba(198,73,40,0.18))",
+              transform: "rotate(-15deg)",
+              filter: "blur(1px)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute right-[12%] bottom-[18%] h-32 w-52 rounded-full border-[12px]"
+            style={{
+              borderColor: "rgba(198,73,40,0.16) rgba(198,73,40,0.04) rgba(198,73,40,0.08) rgba(198,73,40,0.14)",
+              transform: "rotate(14deg)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[94%] -translate-x-1/2 -translate-y-1/2 rounded-[50%]"
+            style={{
+              background:
+                "radial-gradient(55% 45% at 48% 50%, rgba(198,73,40,0.16) 0%, rgba(198,73,40,0.06) 48%, rgba(198,73,40,0) 76%)",
+              filter: "blur(18px)",
+            }}
+          />
           <div
             className="absolute inset-0 opacity-[0.02]"
             style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+              backgroundImage: NOISE_SVG,
             }}
           />
 
@@ -105,12 +153,28 @@ export function Login() {
             className="relative w-full max-w-[520px]"
           >
             <div
+              className="pointer-events-none absolute -inset-6 rounded-[40px]"
+              style={{
+                background:
+                  "radial-gradient(420px 180px at 50% 50%, rgba(198,73,40,0.16), rgba(198,73,40,0.02) 60%, transparent 72%)",
+                filter: "blur(18px)",
+              }}
+            />
+            <div
+              className="pointer-events-none absolute -inset-12 rounded-[58px]"
+              style={{
+                background:
+                  "radial-gradient(460px 220px at 42% 52%, rgba(198,73,40,0.18), rgba(198,73,40,0.05) 58%, transparent 78%)",
+                filter: "blur(22px)",
+              }}
+            />
+            <div
               className="rounded-[32px] border border-white/40 px-6 py-7 sm:px-9 sm:py-10"
               style={{
-                background: "rgba(255, 255, 255, 0.72)",
+                background: "rgba(255, 255, 255, 0.76)",
                 backdropFilter: "blur(24px) saturate(150%)",
                 WebkitBackdropFilter: "blur(24px) saturate(150%)",
-                boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.1)",
+                boxShadow: "0 28px 56px -18px rgba(0, 0, 0, 0.18), 0 10px 28px -18px rgba(198, 73, 40, 0.32)",
               }}
             >
               <div className="mb-8 text-center sm:mb-10">

@@ -11,7 +11,8 @@ This directory is the run queue for AI agents and maintainers coordinating work 
 6. **Return here** and pick the next plan in the queue. Always leave the README and plan files consistent with the work performed.
 
 ## Plan Queue (process in order)
-1. [Canon Plan 000 Validar Init](./canon-plan-000-validar-init.md)
+1. [Janela 001 Pos-Validacao](./janela-planejar-001.md)
+2. [Canon Plan 000 Validar Init](./canon-plan-000-validar-init.md)
 
 ## How To Create Or Update Plans
 - Run "ai-context plan <name>" to scaffold a new plan template.
