@@ -2,18 +2,20 @@
 # Bug Fixer Agent Playbook
 
 ## Mission
-Describe how the bug fixer agent supports the team and when to engage it.
+The Bug Fixer Agent is dedicated to identifying, diagnosing, and resolving software defects across the repository. Engage this agent when a bug report is filed, a test suite fails unexpectedly, or an error is detected in production. It supports the team by reducing issue triage time, providing targeted code patches, and ensuring regressions are prevented via rigorous testing.
 
 ## Responsibilities
-- Analyze bug reports and error messages
-- Identify root causes of issues
+- Analyze bug reports, stack traces, and error messages
+- Identify root causes of issues by tracing data flow and application state
 - Implement targeted fixes with minimal side effects
-- Test fixes thoroughly before deployment
+- Write and execute tests to thoroughly validate fixes before deployment
+- Update relevant documentation if the bug fix alters expected behavior
 
 ## Best Practices
-- Reproduce the bug before fixing
-- Write tests to prevent regression
-- Document the fix for future reference
+- Reproduce the bug in an isolated environment before attempting a fix
+- Write regression tests *before* fixing the code (Test-Driven Development approach)
+- Document the fix, including the root cause and why the specific solution was chosen, for future reference
+- Keep PRs scoped strictly to the bug fix to avoid introducing unrelated changes
 
 ## Key Project Resources
 - Documentation index: [docs/README.md](../docs/README.md)
@@ -22,11 +24,14 @@ Describe how the bug fixer agent supports the team and when to engage it.
 - Contributor guide: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ## Repository Starting Points
-- `agents/` — TODO: Describe the purpose of this directory.
-- `docs/` — TODO: Describe the purpose of this directory.
-- `mapa-app/` — TODO: Describe the purpose of this directory.
-- `prompts/` — TODO: Describe the purpose of this directory.
-- `src/` — TODO: Describe the purpose of this directory.
+- `agents/` — Contains AI agent playbooks, roles, and instructions (like this file).
+- `docs/` — Contains project documentation, architecture notes, and workflow guides.
+- `mapa-app/` — Contains the primary application codebase (frontend/client application).
+- `prompts/` — Contains system prompts and templates used to guide AI interactions.
+- `scripts/` — Contains automation, build, and utility scripts for repo maintenance.
+- `snippets/` — Contains reusable code snippets and configuration fragments.
+- `src/` — Contains shared source code, libraries, or backend logic complementing the main app.
+- `supabase/` — Contains database migrations, edge functions, and configuration for the Supabase backend.
 
 ## Documentation Touchpoints
 - [Documentation Index](../docs/README.md) — agent-update:docs-index
@@ -42,7 +47,7 @@ Describe how the bug fixer agent supports the team and when to engage it.
 <!-- agent-readonly:guidance -->
 ## Collaboration Checklist
 1. Confirm assumptions with issue reporters or maintainers.
-2. Review open pull requests affecting this area.
+2. Review open pull requests affecting this area to avoid merge conflicts.
 3. Update the relevant doc section listed above and remove any resolved `agent-fill` placeholders.
 4. Capture learnings back in [docs/README.md](../docs/README.md) or the appropriate task marker.
 
@@ -54,19 +59,23 @@ Track effectiveness of this agent's contributions:
 - **Collaboration:** PR review turnaround time, feedback quality, knowledge sharing
 
 **Target Metrics:**
-- TODO: Define measurable goals specific to this agent (e.g., "Reduce bug resolution time by 30%")
-- TODO: Track trends over time to identify improvement areas
+- Achieve a >90% first-pass success rate on test executions for submitted patches.
+- Ensure 100% of bug fixes include at least one corresponding regression test.
+- Reduce average bug resolution time (time from assignment to PR creation) by 30%.
+- Maintain a 0% regression rate for resolved issues over a 30-day period.
 
 ## Troubleshooting Common Issues
 Document frequent problems this agent encounters and their solutions:
 
-### Issue: [Common Problem]
-**Symptoms:** Describe what indicates this problem
-**Root Cause:** Why this happens
-**Resolution:** Step-by-step fix
-**Prevention:** How to avoid in the future
+### Issue: Missing or Unclear Reproduction Steps
+**Symptoms:** The agent cannot trigger the reported error in the local or test environment.
+**Root Cause:** Bug reports lack specific environment details, state conditions, or exact user steps.
+**Resolution:** 
+1. Halt code changes to prevent blind fixes.
+2. Ask the reporter for specific logs, environment details, or a reproducible example.
+3. Search the codebase for the reported error string to hypothesize the failure point statically.
+**Prevention:** Enforce a strict Bug Report Template requiring reproduction steps, expected vs. actual behavior, and environment details.
 
-**Example:**
 ### Issue: Build Failures Due to Outdated Dependencies
 **Symptoms:** Tests fail with module resolution errors
 **Root Cause:** Package versions incompatible with codebase
@@ -77,7 +86,7 @@ Document frequent problems this agent encounters and their solutions:
 **Prevention:** Keep dependencies updated regularly, use lockfiles
 
 ## Hand-off Notes
-Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work.
+Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work. Ensure the PR description clearly maps the root cause to the implemented fix and lists the new tests added to prevent regressions.
 
 ## Evidence to Capture
 - Reference commits, issues, or ADRs used to justify updates.

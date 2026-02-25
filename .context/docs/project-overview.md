@@ -1,57 +1,69 @@
-
 <!-- agent-update:start:project-overview -->
 # Project Overview
 
-> TODO: Summarize the problem this project solves and who benefits from it.
+Mapa is an AI-integrated, full-stack application designed to provide intelligent, context-aware features powered by custom AI agents and a robust Supabase backend. The project streamlines user workflows by combining a modern frontend (`mapa-app`) with AI-driven tooling, prompts, and automated agents, ultimately benefiting end-users who need smart, scalable, and data-backed application experiences.
 
 ## Quick Facts
 - Root path: `/home/papa/mapa`
 - Primary languages detected:
-- .js (31291 files)
-- .ts (25927 files)
-- .map (3356 files)
-- .mjs (1708 files)
-- .mts (1239 files)
+  - .js (31291 files)
+  - .ts (25927 files)
+  - .map (3356 files)
+  - .mjs (1708 files)
+  - .mts (1239 files)
 
 ## File Structure & Code Organization
-- `agents/` — AI agent playbooks and prompts.
-- <!-- agent-fill:directory-agents-md -->`AGENTS.md/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-contributing-md -->`CONTRIBUTING.md/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- `docs/` — Living documentation produced by this tool.
-- <!-- agent-fill:directory-example-documentation-ts -->`example-documentation.ts/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-jest-config-js -->`jest.config.js/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-license -->`LICENSE/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-mapa-app -->`mapa-app/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-package-lock-json -->`package-lock.json/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-package-json -->`package.json/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-prompts -->`prompts/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- <!-- agent-fill:directory-readme-md -->`README.md/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
-- `src/` — TypeScript source files and CLI entrypoints.
-- <!-- agent-fill:directory-tsconfig-json -->`tsconfig.json/` — TODO: Describe the purpose of this directory.<!-- /agent-fill -->
+- `agents/` — AI agent playbooks, guidelines, and behavioral instructions.
+- `AGENTS.md` — High-level documentation and rules for interacting with and updating the AI agents in this repository.
+- `CONTRIBUTING.md` — Guidelines, code of conduct, and instructions for developers contributing to the project.
+- `docs/` — Living documentation produced and maintained by AI scaffolding tools.
+- `example-documentation.ts` — Example file demonstrating documentation standards and code commenting patterns.
+- `jest.config.js` — Configuration settings for the Jest testing framework.
+- `LICENSE` — The open-source or proprietary license terms governing the use of this project.
+- `mapa-app/` — The primary frontend application code and UI components.
+- `package-lock.json` — Automatically generated dependency tree ensuring reproducible npm installs.
+- `package.json` — Project metadata, npm scripts, and dependency declarations.
+- `prompts/` — System prompts, templates, and context files used to instruct the AI agents.
+- `README.md` — The main entry point for repository documentation and onboarding.
+- `scripts/` — Utility scripts for build processes, deployments, or local development scaffolding.
+- `snippets/` — Reusable code fragments, templates, or AI scaffolding snippets.
+- `src/` — TypeScript source files and CLI entrypoints for backend or tooling logic.
+- `supabase/` — Supabase configuration, database migrations, and edge functions.
+- `tsconfig.json` — TypeScript compiler configuration and project references.
 
 ## Technology Stack Summary
-- Outline primary runtimes, languages, and platforms in use.
-- Note build tooling, linting, and formatting infrastructure the team relies on.
+- **Languages**: TypeScript (Primary), JavaScript, Node.js.
+- **Backend & Database**: Supabase (PostgreSQL, Auth, Edge Functions).
+- **Frontend**: Modern JS/TS web framework housed within `mapa-app`.
+- **Testing**: Jest for unit and integration testing.
+- **Package Management**: npm.
+- **AI Integration**: Custom prompt engineering and agent playbooks.
 
 ## Core Framework Stack
-- Document core frameworks per layer (backend, frontend, data, messaging).
-- Mention architectural patterns enforced by these frameworks.
+- **Data & Auth Layer**: Supabase handles user authentication, row-level security (RLS), and database persistence.
+- **Application Layer**: `mapa-app` serves as the client-facing application, consuming Supabase APIs and agent endpoints.
+- **AI/Messaging Layer**: Agent playbooks (`agents/`) and prompts (`prompts/`) dictate the logic, formatting, and interaction models for AI-driven features.
 
 ## UI & Interaction Libraries
-- List UI kits, CLI interaction helpers, or design system dependencies.
-- Note theming, accessibility, or localization considerations contributors must follow.
+- **Frontend UI**: Components and design system implementations are localized within `mapa-app/`.
+- **Accessibility & Theming**: Contributors must ensure new UI components in `mapa-app` adhere to standard web accessibility guidelines and support the project's theming system.
+- **CLI Interaction**: Terminal-based tooling in `src/` and `scripts/` utilize standard Node.js CLI helpers for scaffolding and maintenance.
 
 ## Development Tools Overview
-- Highlight essential CLIs, scripts, or developer environments.
-- Link to [Tooling & Productivity Guide](./tooling.md) for deeper setup instructions.
+- **Local Environment**: npm for dependency management, TypeScript compiler (`tsc`) for type-checking, and Jest for test execution.
+- **Database Tooling**: Supabase CLI is recommended for local database development, running migrations, and testing edge functions.
+- For deeper setup instructions, environment variables, and editor configurations, see the [Tooling & Productivity Guide](./tooling.md).
 
 ## Getting Started Checklist
 1. Install dependencies with `npm install`.
-2. Explore the CLI by running `npm run dev`.
-3. Review [Development Workflow](./development-workflow.md) for day-to-day tasks.
+2. Ensure you have the Supabase CLI installed if you need to run the local database.
+3. Explore the main application by navigating to `mapa-app/` and running the local dev server (e.g., `npm run dev`).
+4. Review [Development Workflow](./development-workflow.md) for day-to-day tasks, testing guidelines, and commit standards.
 
 ## Next Steps
-Capture product positioning, key stakeholders, and links to external documentation or product specs here.
+- **Stakeholders**: *Maintainers to confirm and document primary product owners and key stakeholders here.*
+- **Product Specs**: Ensure any external Figma files, Jira boards, or product requirement documents (PRDs) are linked in the `README.md`.
+- **Agent Workflows**: Review the `agents/` directory to understand how AI assistants interact with this codebase.
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

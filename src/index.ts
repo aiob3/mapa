@@ -15,6 +15,7 @@ import { LLMConfig } from './types';
 import { InitService } from './services/init/initService';
 import { FillService } from './services/fill/fillService';
 import { PlanService } from './services/plan/planService';
+import { LLMClientFactory } from './services/llmClientFactory';
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ const program = new Command();
 const ui = new CLIInterface(t);
 const VERSION = '0.4.0';
 const PACKAGE_NAME = '@ai-coders/context';
-const DEFAULT_MODEL = 'x-ai/grok-4-fast';
+const DEFAULT_MODEL = LLMClientFactory.getDefaultModel();
 
 const initService = new InitService({
   ui,
@@ -105,7 +106,7 @@ program
   .argument('<repo-path>', t('commands.fill.arguments.repoPath'))
   .option('-o, --output <dir>', t('commands.fill.options.output'), './.context')
   .option('-k, --api-key <key>', t('commands.fill.options.apiKey'))
-  .option('-m, --model <model>', t('commands.fill.options.model'), DEFAULT_MODEL)
+  .option('-m, --model <model>', t('commands.fill.options.model'))
   .option('-p, --provider <provider>', t('commands.fill.options.provider'))
   .option('--base-url <url>', t('commands.fill.options.baseUrl'))
   .option('--prompt <file>', t('commands.fill.options.prompt'))
@@ -133,7 +134,7 @@ program
   .option('--fill', t('commands.plan.options.fill'))
   .option('-r, --repo <path>', t('commands.plan.options.repo'))
   .option('-k, --api-key <key>', t('commands.plan.options.apiKey'))
-  .option('-m, --model <model>', t('commands.plan.options.model'), DEFAULT_MODEL)
+  .option('-m, --model <model>', t('commands.plan.options.model'))
   .option('-p, --provider <provider>', t('commands.plan.options.provider'))
   .option('--base-url <url>', t('commands.plan.options.baseUrl'))
   .option('--prompt <file>', t('commands.plan.options.prompt'))
@@ -399,16 +400,29 @@ async function runInteractiveLlmFill(): Promise<void> {
   let provider: LLMConfig['provider'] | undefined;
   let model: string | undefined;
   if (specifyModel) {
+    const providerAnswer = await inquirer.prompt<{ provider: LLMConfig['provider'] }>([
+      {
+        type: 'list',
+        name: 'provider',
+        message: t('prompts.fill.provider'),
+        default: 'openrouter',
+        choices: [
+          { name: 'OpenRouter', value: 'openrouter' },
+          { name: 'Google Gemini', value: 'google' }
+        ]
+      }
+    ]);
+    provider = providerAnswer.provider;
+
     const modelAnswer = await inquirer.prompt<{ model: string }>([
       {
         type: 'input',
         name: 'model',
         message: t('prompts.fill.model'),
-        default: DEFAULT_MODEL
+        default: LLMClientFactory.getDefaultModel(provider)
       }
     ]);
     model = modelAnswer.model.trim();
-    provider = 'openrouter';
   }
 
   const { provideApiKey } = await inquirer.prompt<{ provideApiKey: boolean }>([

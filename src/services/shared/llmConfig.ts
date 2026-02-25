@@ -27,26 +27,35 @@ export async function resolveLlmConfig({
   t,
   factory = LLMClientFactory
 }: ResolveLlmConfigOptions): Promise<ResolvedLlmConfig> {
-  const envVars = factory.getEnvironmentVariables();
-  const provider: LLMConfig['provider'] = 'openrouter';
+  const providerFromOption = normalizeProvider(rawOptions.provider);
+  if (rawOptions.provider && !providerFromOption) {
+    throw new Error(
+      t('errors.fill.invalidProvider', {
+        value: rawOptions.provider,
+        allowed: 'openrouter, google'
+      })
+    );
+  }
+
+  const providerFromEnv = normalizeProvider(process.env.LLM_PROVIDER);
+  const provider: LLMConfig['provider'] = providerFromOption || providerFromEnv || 'openrouter';
+  const envVars = factory.getEnvironmentVariables(provider);
 
   // Get API key from options or environment
   let apiKey = rawOptions.apiKey;
   if (!apiKey) {
-    for (const envVar of envVars) {
-      const value = process.env[envVar];
-      if (value) {
-        apiKey = value;
-        break;
-      }
-    }
+    apiKey = readFirstEnvValue(envVars);
   }
 
   // Get model from options, environment, or defaults
   let model = rawOptions.model;
   if (!model) {
-    model = process.env.OPENROUTER_MODEL || factory.getDefaultModel() || fallbackModel;
+    model = readFirstEnvValue(factory.getModelEnvironmentVariables(provider))
+      || factory.getDefaultModel(provider)
+      || fallbackModel;
   }
+
+  const baseUrl = rawOptions.baseUrl || readFirstEnvValue(factory.getBaseUrlEnvironmentVariables(provider));
 
   // Validate API key exists
   if (!apiKey) {
@@ -62,6 +71,29 @@ export async function resolveLlmConfig({
     provider,
     model,
     apiKey,
-    baseUrl: rawOptions.baseUrl
+    baseUrl
   };
+}
+
+function normalizeProvider(provider: string | undefined): LLMConfig['provider'] | undefined {
+  if (!provider) {
+    return undefined;
+  }
+
+  const normalized = provider.trim().toLowerCase();
+  if (normalized === 'openrouter' || normalized === 'google') {
+    return normalized;
+  }
+
+  return undefined;
+}
+
+function readFirstEnvValue(envVars: string[]): string | undefined {
+  for (const envVar of envVars) {
+    const value = process.env[envVar];
+    if (value) {
+      return value;
+    }
+  }
+  return undefined;
 }

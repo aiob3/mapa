@@ -1,4 +1,3 @@
-
 <!-- agent-update:start:docs-index -->
 # Documentation Index
 
@@ -17,19 +16,19 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
-- `AGENTS.md/`
-- `CONTRIBUTING.md/`
 - `docs/` — Living documentation produced by this tool.
-- `example-documentation.ts/`
-- `jest.config.js/`
-- `LICENSE/`
-- `mapa-app/`
-- `package-lock.json/`
-- `package.json/`
-- `prompts/`
-- `README.md/`
+- `mapa-app/` — Main application directory.
+- `prompts/` — AI prompt templates and system instructions.
+- `scripts/` — Utility and automation scripts.
+- `snippets/` — Reusable code snippets.
 - `src/` — TypeScript source files and CLI entrypoints.
-- `tsconfig.json/`
+- `supabase/` — Backend configurations and database migrations.
+- `AGENTS.md` — AI Agent directory and overview.
+- `CONTRIBUTING.md` — Guidelines for contributing to the repository.
+- `package.json` / `package-lock.json` — Node.js dependencies and project scripts.
+- `tsconfig.json` / `jest.config.js` — TypeScript and testing configurations.
+- `README.md` — Main repository entrypoint.
+- `LICENSE` — Project license information.
 
 ## Document Map
 | Guide | File | AI Marker | Primary Inputs |

@@ -51,6 +51,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/claude-code": "^2.1.58",
+    "@google/gemini-cli": "^0.31.0-preview.0",
     "audit": "^0.0.6",
     "axios": "^1.12.2",
     "boxen": "^5.1.2",
@@ -59,7 +61,7 @@
     "commander": "^14.0.1",
     "dotenv": "^17.2.2",
     "figures": "^3.2.0",
-    "fix": "^0.0.6",
+    "fix": "^0.0.3",
     "fs-extra": "^11.3.2",
     "glob": "^10.4.5",
     "inquirer": "^12.6.3",

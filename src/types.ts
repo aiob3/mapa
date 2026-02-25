@@ -28,11 +28,19 @@ export interface OpenRouterConfig {
   model: string;
 }
 
+export interface GoogleGeminiConfig {
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+}
+
+export type LLMProvider = 'openrouter' | 'google';
+
 export interface LLMConfig {
   apiKey: string;
   model: string;
   baseUrl?: string;
-  provider: 'openrouter';
+  provider: LLMProvider;
 }
 
 export interface CLIOptions {

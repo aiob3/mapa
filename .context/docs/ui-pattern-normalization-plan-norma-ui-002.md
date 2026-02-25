@@ -94,6 +94,7 @@ success_criteria:
 
 ## Checklist HITL
 
+<!-- MAINTAINER NOTE: The following items require manual human validation in the preview environment. Please check them off once verified. -->
 - [ ] Active states corretos em `/team`, `/team/overview`, `/analytics`, `/syn`.
 - [ ] `/bridge` redireciona sem perda de contexto (query/hash).
 - [ ] `+ADD` abre em `/dashboard`, `/vault`, `/team/overview`.

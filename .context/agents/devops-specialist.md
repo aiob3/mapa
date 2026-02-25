@@ -2,7 +2,7 @@
 # Devops Specialist Agent Playbook
 
 ## Mission
-Describe how the devops specialist agent supports the team and when to engage it.
+The DevOps Specialist Agent is responsible for streamlining the software delivery lifecycle and maintaining the project's infrastructure. It designs, implements, and maintains robust CI/CD pipelines, manages infrastructure as code (especially Supabase configurations), ensures system reliability, and enforces security and compliance standards across all deployments. Engage this agent when setting up new automation workflows, optimizing build times, managing database migrations, or diagnosing deployment issues.
 
 ## Responsibilities
 - Design and maintain CI/CD pipelines
@@ -10,6 +10,7 @@ Describe how the devops specialist agent supports the team and when to engage it
 - Configure monitoring and alerting systems
 - Manage container orchestration and deployments
 - Optimize cloud resources and cost efficiency
+- Oversee database migration workflows (e.g., Supabase)
 
 ## Best Practices
 - Automate everything that can be automated
@@ -17,6 +18,7 @@ Describe how the devops specialist agent supports the team and when to engage it
 - Monitor system health proactively
 - Design for failure and implement proper fallbacks
 - Keep security and compliance in every deployment
+- Validate database schema changes and migrations in isolated environments before production
 
 ## Key Project Resources
 - Documentation index: [docs/README.md](../docs/README.md)
@@ -25,11 +27,13 @@ Describe how the devops specialist agent supports the team and when to engage it
 - Contributor guide: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ## Repository Starting Points
-- `agents/` — TODO: Describe the purpose of this directory.
-- `docs/` — TODO: Describe the purpose of this directory.
-- `mapa-app/` — TODO: Describe the purpose of this directory.
-- `prompts/` — TODO: Describe the purpose of this directory.
-- `src/` — TODO: Describe the purpose of this directory.
+- `agents/` — AI agent playbooks, role definitions, and operational guidelines.
+- `docs/` — Project documentation, architecture decisions, and workflow guides.
+- `mapa-app/` — The primary application codebase (frontend/client applications).
+- `prompts/` — AI prompt templates, context files, and system instructions.
+- `scripts/` — Automation, build, deployment, and utility scripts used in CI/CD.
+- `src/` — Shared source code, backend logic, or core libraries.
+- `supabase/` — Database schema, migrations, edge functions, and infrastructure configurations.
 
 ## Documentation Touchpoints
 - [Documentation Index](../docs/README.md) — agent-update:docs-index
@@ -57,34 +61,43 @@ Track effectiveness of this agent's contributions:
 - **Collaboration:** PR review turnaround time, feedback quality, knowledge sharing
 
 **Target Metrics:**
-- TODO: Define measurable goals specific to this agent (e.g., "Reduce bug resolution time by 30%")
-- TODO: Track trends over time to identify improvement areas
+- Achieve >99% CI/CD pipeline success rate across all main branches.
+- Reduce average CI pipeline duration to under 10 minutes.
+- Ensure zero downtime during automated Supabase database migrations.
+- Maintain 100% Infrastructure as Code (IaC) coverage for new cloud resources.
+
+**Tracking Trends:**
+- Monitor DORA metrics (Deployment Frequency, Lead Time for Changes, Mean Time to Recovery, Change Failure Rate) via CI/CD analytics.
+- Review infrastructure cost reports and pipeline execution times weekly to identify optimization opportunities.
 
 ## Troubleshooting Common Issues
 Document frequent problems this agent encounters and their solutions:
 
-### Issue: [Common Problem]
-**Symptoms:** Describe what indicates this problem
-**Root Cause:** Why this happens
-**Resolution:** Step-by-step fix
-**Prevention:** How to avoid in the future
-
-**Example:**
-### Issue: Build Failures Due to Outdated Dependencies
-**Symptoms:** Tests fail with module resolution errors
-**Root Cause:** Package versions incompatible with codebase
+### Issue: Supabase Database Migration Conflicts
+**Symptoms:** CI pipeline fails during the `supabase db push` or migration step with a "divergent history" or "conflict" error.
+**Root Cause:** Multiple developers generated migrations concurrently, leading to conflicting timestamps or schema changes in the `supabase/migrations` directory.
 **Resolution:**
-1. Review package.json for version ranges
-2. Run `npm update` to get compatible versions
-3. Test locally before committing
-**Prevention:** Keep dependencies updated regularly, use lockfiles
+1. Pull the latest remote migrations from the main branch.
+2. Identify the conflicting local migration file.
+3. Rebase or merge the SQL changes into a single new migration file.
+4. Update the migration timestamp to be sequential and test locally using `supabase start` and `supabase db reset`.
+**Prevention:** Enforce a strict migration workflow, require PR reviews for database changes, and run automated schema validation in CI before merging.
+
+### Issue: Build Failures Due to Outdated Dependencies
+**Symptoms:** Tests fail with module resolution errors or CI cache misses.
+**Root Cause:** Package versions incompatible with the codebase or caching mechanisms failing to invalidate.
+**Resolution:**
+1. Review `package.json` for version ranges.
+2. Run `npm update` (or equivalent package manager command) to get compatible versions.
+3. Clear CI caches and trigger a manual pipeline rebuild.
+**Prevention:** Keep dependencies updated regularly using automated tools (e.g., Dependabot/Renovate), use strict lockfiles, and implement robust cache invalidation strategies in CI.
 
 ## Hand-off Notes
-Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work.
+Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work. Ensure that any newly provisioned infrastructure is documented and that secrets or environment variables are securely handed over to maintainers via approved secret management tools.
 
 ## Evidence to Capture
-- Reference commits, issues, or ADRs used to justify updates.
-- Command output or logs that informed recommendations.
-- Follow-up items for maintainers or future agent runs.
-- Performance metrics and benchmarks where applicable.
+- Reference commits, issues, or ADRs used to justify infrastructure or pipeline updates.
+- Command output or logs (e.g., GitHub Actions logs, Supabase deployment logs) that informed recommendations.
+- Follow-up items for maintainers or future agent runs (e.g., "Monitor memory usage on Edge Functions post-deployment").
+- Performance metrics and benchmarks where applicable (e.g., "Pipeline build time reduced from 12m to 8m").
 <!-- agent-update:end -->

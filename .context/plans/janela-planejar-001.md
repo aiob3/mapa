@@ -55,22 +55,22 @@ related_agents:
 | Agent | Role in this plan | Playbook | First responsibility focus |
 | --- | --- | --- | --- |
 | Architect Specialist | Guardar consistencia entre contratos `CTX-*` e `WEB-*` | [Architect Specialist](../agents/architect-specialist.md) | Aprovar recorte tecnico da janela e limites de camada |
-| Frontend Specialist | Implementar testes e ajustes de rota no `mapa-app` | [Frontend Specialist](../agents/frontend-specialist.md) | Cobrir guardas e fluxos 401/403/login/logout |
 | Backend Specialist | Garantir alinhamento com contratos de auth/RBAC | [Backend Specialist](../agents/backend-specialist.md) | Revisar acoplamento frontend x Supabase |
-| Test Writer | Estruturar suites e cenarios de regressao | [Test Writer](../agents/test-writer.md) | Definir matriz de testes automatizados |
-| Security Auditor | Verificar exposicao indevida de rotas/modulos | [Security Auditor](../agents/security-auditor.md) | Revisao de bypass de autorizacao |
-| Documentation Writer | Sincronizar contexto/plano com estado real | [Documentation Writer](../agents/documentation-writer.md) | Reduzir lacunas criticas em `.context/docs` e `.context/plans` |
 | Code Reviewer | Revisar risco de regressao e qualidade final | [Code Reviewer](../agents/code-reviewer.md) | Gate final de qualidade antes de persistir |
 | Devops Specialist | Assegurar repetibilidade do bundle de validacao | [Devops Specialist](../agents/devops-specialist.md) | Estabilizar comandos e evidencias de CI/local |
+| Documentation Writer | Sincronizar contexto/plano com estado real | [Documentation Writer](../agents/documentation-writer.md) | Reduzir lacunas criticas em `.context/docs` e `.context/plans` |
+| Frontend Specialist | Implementar testes e ajustes de rota no `mapa-app` | [Frontend Specialist](../agents/frontend-specialist.md) | Cobrir guardas e fluxos 401/403/login/logout |
+| Security Auditor | Verificar exposicao indevida de rotas/modulos | [Security Auditor](../agents/security-auditor.md) | Revisao de bypass de autorizacao |
+| Test Writer | Estruturar suites e cenarios de regressao | [Test Writer](../agents/test-writer.md) | Definir matriz de testes automatizados |
 
 ## Documentation Touchpoints
 | Guide | File | Task Marker | Primary Inputs |
 | --- | --- | --- | --- |
+| Data Flow | [data-flow.md](../docs/data-flow.md) | agent-update:data-flow | Fluxo login/sessao/rota privada |
 | Plans Index | [README.md](./README.md) | plan-queue | Ordem de execucao e prioridade |
 | Project Overview | [project-overview.md](../docs/project-overview.md) | agent-update:project-overview | Escopo atual e topologia canônica |
-| Testing Strategy | [testing-strategy.md](../docs/testing-strategy.md) | agent-update:testing-strategy | Matriz de cobertura e comandos de validacao |
 | Security Notes | [security.md](../docs/security.md) | agent-update:security | Regras de auth, sessao e permissao |
-| Data Flow | [data-flow.md](../docs/data-flow.md) | agent-update:data-flow | Fluxo login/sessao/rota privada |
+| Testing Strategy | [testing-strategy.md](../docs/testing-strategy.md) | agent-update:testing-strategy | Matriz de cobertura e comandos de validacao |
 
 ## Risk Assessment
 ### Identified Risks
@@ -111,79 +111,46 @@ related_agents:
 - **Escalation:** maintainer responsavel pelo contrato `WEB-HITL-005` em caso de divergencia.
 
 ## Working Phases
-### Phase 0 - Gate Canônico
-**Steps**
-1. Revalidar `READ-CORE-001`, `READ-TRIGGER-005`, `READ-CONTRACTS-003` e `READ-HITL-004`.
-2. Congelar escopo da janela: testes auth/rotas + sincronizacao documental critica.
 
-**Commit Checkpoint**
-- `chore(plan): freeze janela-001 scope and gate`
+### Phase 0 - Gate Canônico & Scope Freeze
+- **Owner:** Architect Specialist
+- **Deliverables:** Escopo da janela congelado e contratos revalidados.
+- **Evidence Expectations:** Log de revalidação dos contratos e documentação inicial confirmando o escopo da branch atual.
+- **Steps:**
+  1. Revalidar contratos `READ-CORE-001`, `READ-TRIGGER-005`, `READ-CONTRACTS-003` e `READ-HITL-004`.
+  2. Congelar escopo da janela focando exclusivamente em testes de auth, hardening de rotas e sincronização documental no `mapa-app`.
+  3. Criar a branch base para esta janela de consolidação (ex: `janela-001-pos-validacao`).
+- **Git Checkpoint:** Commit `chore: freeze scope and validate contracts for janela 001`
 
-### Phase 1 - Discovery & Alignment
-**Steps**
-1. Definir matriz de cenarios: login valido, sem sessao, sessao expirada, sem permissao, rota invalida.
-2. Mapear arquivos-alvo e lacunas de teste no `mapa-app`.
-3. Priorizar placeholders/TODOs criticos para handoff na documentacao `.context`.
+### Phase 1 - Discovery & Test Matrix
+- **Owner:** Test Writer
+- **Deliverables:** Matriz de testes de autenticação/rotas e cenários de regressão mapeados.
+- **Evidence Expectations:** Arquivo `docs/testing-strategy.md` atualizado com novos cenários de cobertura.
+- **Steps:**
+  1. **Security Auditor:** Levantar cenários de bypass de autorização (ex: acesso direto a rotas protegidas sem token).
+  2. **Test Writer:** Estruturar cenários de teste automatizados cobrindo fluxos de login, logout, 401, 403 e guardas de rota.
+  3. **Documentation Writer:** Atualizar o arquivo `docs/testing-strategy.md` (via marcador `agent-update:testing-strategy`) refletindo a nova matriz.
+- **Git Checkpoint:** Commit `docs: define test matrix for auth and routing scenarios`
 
-**Commit Checkpoint**
-- `chore(plan): complete janela-001 discovery`
-
-### Phase 2 - Implementation & Iteration
-**Steps**
-1. Implementar suites automatizadas para fluxos de auth/route defense.
-2. Corrigir falhas detectadas e manter contratos `WEB-*` intactos.
-3. Atualizar docs/plans com o estado real removendo lacunas bloqueantes.
-
-**Commit Checkpoint**
-- `feat(testing): add auth-route regression coverage`
+### Phase 2 - Implementation
+- **Owner:** Frontend Specialist
+- **Deliverables:** Testes implementados, ajustes de rota realizados e pipeline verde.
+- **Evidence Expectations:** Código coberto por testes passando localmente e sem warnings de segurança ou performance crítica.
+- **Steps:**
+  1. **Frontend Specialist:** Implementar a suíte de testes automatizados para os fluxos de autenticação definidos na Phase 1.
+  2. **Backend Specialist:** Revisar o acoplamento das chamadas Supabase no frontend, assegurando conformidade com as políticas RBAC/RLS.
+  3. **Devops Specialist:** Otimizar o bundle web (split de chunk) mitigando warnings de tamanho gerados na validação canônica.
+  4. **Frontend Specialist:** Rodar a suíte localmente (`build`, `test`, `build:app`), garantindo status `HTTP 200` e zero falhas nas rotas privadas.
+- **Git Checkpoint:** Commit `test: implement auth tests and route hardening in mapa-app`
 
 ### Phase 3 - Validation & Handoff
-**Steps**
-1. Executar bundle de validacao canônica: `npm run build`, `npm run test`, `npm run build:app`, `npm run preview:app` e `HTTP 200`.
-2. Registrar evidencias (hash, branch, ts_sp, logs e resultado HITL quando aplicavel).
-3. Fechar checkpoint runtime com `next_intent` decidido (`persistir` ou novo `planejar`).
-
-**Commit Checkpoint**
-- `chore(validation): close janela-001 with canonical evidence`
-
-## Rollback Plan
-### Rollback Triggers
-- Falha de regressao em autenticao/roteamento apos merge da janela.
-- Quebra de build/test no root ou no `mapa-app`.
-- Divergencia de contrato que afete gate de acesso.
-
-### Rollback Procedures
-#### Phase 0/1 Rollback
-- **Action:** Reverter commits de escopo/descoberta e restaurar plano anterior.
-- **Data Impact:** Nenhum.
-- **Estimated Time:** < 1 hora.
-
-#### Phase 2 Rollback
-- **Action:** Reverter commits de implementacao de testes/hardening que causarem regressao.
-- **Data Impact:** Baixo (codigo apenas).
-- **Estimated Time:** 1-2 horas.
-
-#### Phase 3 Rollback
-- **Action:** Restaurar estado anterior a validacao e rerodar bundle para confirmar estabilizacao.
-- **Data Impact:** Nenhum em dados de producao nesta janela.
-- **Estimated Time:** 1 hora.
-
-### Post-Rollback Actions
-1. Registrar causa raiz no plano e no checkpoint runtime.
-2. Atualizar matriz de risco com nova mitigacao.
-3. Replanejar fase afetada antes de nova tentativa.
-
-<!-- agent-readonly:guidance -->
-## Agent Playbook Checklist
-1. Pick the agent that matches your task.
-2. Enrich the template with project-specific context or links.
-3. Share the final prompt with your AI assistant.
-4. Capture learnings in the relevant documentation file so future runs improve.
-
-## Evidence & Follow-up
-- Logs dos comandos canônicos de validação.
-- Lista de arquivos de teste adicionados/atualizados.
-- Evidência de revisão de segurança para rotas privadas.
-- Link para checkpoint runtime da janela.
-
+- **Owner:** Code Reviewer
+- **Deliverables:** Código revisado, documentação sincronizada e checkpoint canônico criado.
+- **Evidence Expectations:** Aprovação final do PR, arquivos em `docs/` atualizados (sem TODOs) e novo checkpoint registrado em `runtime/checkpoints/`.
+- **Steps:**
+  1. **Code Reviewer:** Executar gate final de qualidade no PR, garantindo que não há regressões e que o Baseline `DS-BASELINE-v1` foi mantido intacto.
+  2. **Documentation Writer:** Sincronizar contexto atualizando `docs/data-flow.md`, `docs/project-overview.md` e `docs/security.md`, resolvendo placeholders pendentes.
+  3. **Documentation Writer:** Registrar o checkpoint canônico final com as evidências desta janela e resultados dos testes.
+  4. **Operator (HITL):** Confirmar validação técnica e aprovar o merge da janela.
+- **Git Checkpoint:** Commit `docs: sync context and finalize janela 001 handoff`
 <!-- agent-update:end -->

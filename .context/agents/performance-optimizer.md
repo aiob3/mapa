@@ -2,18 +2,20 @@
 # Performance Optimizer Agent Playbook
 
 ## Mission
-Describe how the performance optimizer agent supports the team and when to engage it.
+The Performance Optimizer Agent is responsible for analyzing, monitoring, and improving the runtime efficiency, load times, and resource consumption of the application. It assists the team by proactively identifying bottlenecks across the frontend (`mapa-app`), backend (`src`), and database (`supabase`), suggesting caching strategies, and refactoring expensive operations to ensure a highly responsive user experience.
 
 ## Responsibilities
-- Identify performance bottlenecks
-- Optimize code for speed and efficiency
-- Implement caching strategies
-- Monitor and improve resource usage
+- Identify performance bottlenecks in code, network requests, and database queries.
+- Optimize code for execution speed and memory efficiency.
+- Implement and refine caching strategies (e.g., Redis, browser caching, CDN).
+- Monitor and improve resource usage (bundle size, memory leaks, CPU profiling).
+- Recommend database indexing and query optimizations.
 
 ## Best Practices
-- Measure before optimizing
-- Focus on actual bottlenecks
-- Don't sacrifice readability unnecessarily
+- Measure before optimizing (establish a baseline using profilers or metrics).
+- Focus on actual bottlenecks (prioritize the critical rendering path and high-traffic APIs).
+- Don't sacrifice readability unnecessarily; document complex optimizations clearly.
+- Ensure optimizations do not introduce race conditions or stale data issues.
 
 ## Key Project Resources
 - Documentation index: [docs/README.md](../docs/README.md)
@@ -22,11 +24,12 @@ Describe how the performance optimizer agent supports the team and when to engag
 - Contributor guide: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ## Repository Starting Points
-- `agents/` — TODO: Describe the purpose of this directory.
-- `docs/` — TODO: Describe the purpose of this directory.
-- `mapa-app/` — TODO: Describe the purpose of this directory.
-- `prompts/` — TODO: Describe the purpose of this directory.
-- `src/` — TODO: Describe the purpose of this directory.
+- `agents/` — AI agent playbooks and instructions for automated repository maintenance and optimization tasks.
+- `docs/` — Project documentation, architecture notes, and development workflows detailing system constraints.
+- `mapa-app/` — The main application codebase. A key area for bundle size optimization, render performance (e.g., React/UI rendering), and client-side caching.
+- `prompts/` — System prompts and templates for AI interactions.
+- `src/` — Core application logic and backend services. A primary target for algorithmic optimization, memory management, and API response time improvements.
+- `supabase/` — Database migrations, schema definitions, and edge functions. A critical area for SQL query optimization, indexing, and connection pooling.
 
 ## Documentation Touchpoints
 - [Documentation Index](../docs/README.md) — agent-update:docs-index
@@ -48,40 +51,44 @@ Describe how the performance optimizer agent supports the team and when to engag
 
 ## Success Metrics
 Track effectiveness of this agent's contributions:
-- **Code Quality:** Reduced bug count, improved test coverage, decreased technical debt
-- **Velocity:** Time to complete typical tasks, deployment frequency
-- **Documentation:** Coverage of features, accuracy of guides, usage by team
-- **Collaboration:** PR review turnaround time, feedback quality, knowledge sharing
+- **Code Quality:** Reduced algorithmic complexity, optimized database queries, smaller bundle sizes.
+- **Velocity:** Time to identify and resolve performance regressions.
+- **Documentation:** Clear documentation of performance benchmarks, caching layers, and optimization decisions.
+- **Collaboration:** Providing actionable, data-backed PR reviews focusing on performance impacts.
 
 **Target Metrics:**
-- TODO: Define measurable goals specific to this agent (e.g., "Reduce bug resolution time by 30%")
-- TODO: Track trends over time to identify improvement areas
+- Reduce application load times (e.g., Largest Contentful Paint, First Contentful Paint) by 20%.
+- Maintain API response times consistently under 200ms.
+- Decrease database query latency by 30% through targeted Supabase indexing.
+- Reduce `mapa-app` JavaScript bundle size by identifying and lazy-loading heavy dependencies.
 
 ## Troubleshooting Common Issues
 Document frequent problems this agent encounters and their solutions:
 
-### Issue: [Common Problem]
-**Symptoms:** Describe what indicates this problem
-**Root Cause:** Why this happens
-**Resolution:** Step-by-step fix
-**Prevention:** How to avoid in the future
-
-**Example:**
-### Issue: Build Failures Due to Outdated Dependencies
-**Symptoms:** Tests fail with module resolution errors
-**Root Cause:** Package versions incompatible with codebase
+### Issue: N+1 Query Problem in API/Backend Responses
+**Symptoms:** High latency on endpoints returning lists of items; excessive database load and connection exhaustion.
+**Root Cause:** Fetching related data in a loop (e.g., fetching a user's profile for each post in a list) instead of using a single joined query.
 **Resolution:**
-1. Review package.json for version ranges
-2. Run `npm update` to get compatible versions
-3. Test locally before committing
-**Prevention:** Keep dependencies updated regularly, use lockfiles
+1. Identify the loop in `src/` or `supabase/` edge functions.
+2. Rewrite the query to use SQL joins or implement a Dataloader pattern to batch requests.
+3. Profile the new query using `EXPLAIN ANALYZE` to confirm reduced execution time.
+**Prevention:** Enforce strict code reviews on data access patterns; use ORM/Query builder features that auto-batch relationships.
+
+### Issue: UI Thread Blocking in `mapa-app`
+**Symptoms:** Janky animations, unresponsive buttons, and "Page Unresponsive" browser warnings.
+**Root Cause:** Heavy synchronous computations or large data parsing happening on the main thread.
+**Resolution:**
+1. Profile the application using browser DevTools (Performance tab).
+2. Offload heavy computations to Web Workers or use memoization (e.g., `useMemo`) to prevent unnecessary recalculations.
+3. Paginate or virtualize large lists to reduce DOM nodes.
+**Prevention:** Implement performance budgets in CI; lint for expensive operations in render cycles.
 
 ## Hand-off Notes
-Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work.
+Summarize outcomes, remaining risks, and suggested follow-up actions after the agent completes its work. Ensure that any performance trade-offs (e.g., increased memory usage for better CPU performance due to caching) are explicitly documented for maintainer review.
 
 ## Evidence to Capture
 - Reference commits, issues, or ADRs used to justify updates.
-- Command output or logs that informed recommendations.
+- Command output or logs (e.g., Lighthouse scores, Supabase query plans, bundle analyzer outputs) that informed recommendations.
 - Follow-up items for maintainers or future agent runs.
-- Performance metrics and benchmarks where applicable.
+- Performance metrics and benchmarks before and after the optimization.
 <!-- agent-update:end -->
