@@ -214,3 +214,77 @@ Padrão oficial aprovado pelo operador:
 Regra:
 - Toda resposta operacional deve incluir `ts_sp`.
 - É proibido usar somente referência temporal relativa (`hoje`, `agora`, `ontem`) sem `ts_sp`.
+
+## 11) Algoritmo de Loopback Persistente (Eficácia)
+
+Objetivo:
+- Reavaliar continuamente a eficácia do ciclo semântico com memória curta entre sessões e critério determinístico de ajuste.
+
+### Entradas obrigatórias
+
+1. `ts_sp` (formato canônico)
+2. `intent_token`
+3. `scope_key`
+4. `idem_key = <intent_token>:<scope_key>:<head_hash>`
+5. métricas da iteração:
+   - `reset_duplication_rate`
+   - `ambiguity_escalation_rate`
+   - `context_reload_token_cost`
+   - `session_carryover_success`
+
+### Função de eficácia normalizada
+
+Definir:
+
+- `d = 1 - clamp(reset_duplication_rate, 0, 1)`
+- `a = 1 - clamp(ambiguity_escalation_rate, 0, 1)`
+- `c = 1 - clamp(context_reload_token_cost, 0, 1)` (normalizado por baseline)
+- `s = clamp(session_carryover_success, 0, 1)`
+
+Score:
+
+`E = 0.35*d + 0.25*a + 0.20*c + 0.20*s`
+
+Critérios:
+
+- `E >= 0.90`: `estavel`
+- `0.75 <= E < 0.90`: `monitorar`
+- `E < 0.75`: `corrigir`
+
+### Loopback determinístico (pseudo-código)
+
+```text
+input event
+normalize -> intent_token
+build scope_key
+build idem_key
+
+if idem_key == last_idem_key and delta_ts <= janela_idempotencia:
+  emit "ja_aplicado" with ts_sp_last
+  stop
+
+execute action_bundle(intent_token)
+collect metrics -> m
+compute E
+write checkpoint(ts_sp, idem_key, intent_token, m, E, status)
+
+if status == "corrigir":
+  enqueue next_intent = "planejar"
+else:
+  enqueue next_intent = predicted(intent_token, m)
+```
+
+### Persistência mínima obrigatória
+
+Registrar em artefato versionável por iteração:
+
+- `ts_sp`
+- `branch`
+- `head_hash`
+- `intent_token`
+- `scope_key`
+- `idem_key`
+- métricas
+- `E`
+- `status` (`estavel|monitorar|corrigir`)
+- `next_intent`

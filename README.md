@@ -106,6 +106,7 @@ Uso:
 - Interpretar intenção do operador por gatilho (`{{reiniciar}}`, `{{#atualizar}}`, `{{#salve}}`, `{{#sincronize}}`, etc.).
 - Acionar contratos de leitura obrigatória e skills recomendadas.
 - Padronizar matriz decisória, validação HITL e loop semântico persistente.
+- Aplicar o algoritmo de loopback persistente para medir eficácia (`E`) e decidir `estavel|monitorar|corrigir`.
 
 Matriz de convergência semântica (determinística):
 - Intenções canônicas fechadas: `retomar`, `estruturar`, `enriquecer`, `planejar`, `validar`, `persistir`.
