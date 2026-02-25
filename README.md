@@ -14,6 +14,9 @@ mapa/
 ├── src/                  # Código-fonte do CLI/context engine
 ├── prompts/              # Prompts base usados por fill/plan
 ├── dist/                 # Build do CLI (gerado por tsc)
+├── docs/                 # Hub estável de navegação para documentação
+├── agents/               # Hub estável de navegação para playbooks de agentes
+├── .context/             # Scaffold canônico (docs/, agents/, plans/)
 ├── mapa-app/             # Aplicação web (React + Vite)
 │   ├── src/
 │   ├── guidelines/
@@ -90,6 +93,8 @@ http://localhost:4173/
 - Preservar marcadores `agent-update`, `agent-fill`, `agent-readonly` quando existirem.
 - Atualizar `AGENTS.md` e este `README.md` ao alterar topologia, comandos ou nomenclatura.
 - Evitar instruções ambíguas: sempre referenciar paths completos (`mapa` vs `mapa-app`).
+- `docs/README.md` e `agents/README.md` são hubs de entrada estáveis para navegação humana.
+- A fonte canônica do scaffold gerado por CLI é `.context/docs/README.md` e `.context/agents/README.md`.
 
 ## Protocolo de Gatilhos de Prompt
 
@@ -101,6 +106,11 @@ Uso:
 - Interpretar intenção do operador por gatilho (`{{reiniciar}}`, `{{#atualizar}}`, `{{#salve}}`, `{{#sincronize}}`, etc.).
 - Acionar contratos de leitura obrigatória e skills recomendadas.
 - Padronizar matriz decisória, validação HITL e loop semântico persistente.
+
+Matriz de convergência semântica (determinística):
+- Intenções canônicas fechadas: `retomar`, `estruturar`, `enriquecer`, `planejar`, `validar`, `persistir`.
+- Toda execução deve mapear primeiro para uma intenção canônica e só depois para comandos.
+- Toda saída operacional deve incluir `ts_sp` no padrão `yyMMdd-HHmmss` com timezone `America/Sao_Paulo`.
 
 ## Contratos de Integração (`mapa` x `mapa-app`)
 

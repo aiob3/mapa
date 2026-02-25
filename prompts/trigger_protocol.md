@@ -9,6 +9,7 @@ success_criteria:
   - "Toda mensagem relevante é classificada em um gatilho canônico"
   - "Ação resultante referencia contratos, skills e critérios HITL"
   - "Saída do agente permanece rastreável e auditável"
+  - "Toda saída operacional inclui time-stamp canônico (`ts_sp`) no padrão acordado"
 ---
 
 # Prompt Trigger Protocol (Canônico)
@@ -23,6 +24,37 @@ Este protocolo define como interpretar comandos do operador e converter intenç�
 3. Classificar a mensagem em um gatilho canônico (seções 2-6).
 4. Selecionar skills e plano de execução conforme roteamento definido.
 5. Exigir critérios de aprovação quando o gatilho pedir calibração.
+6. Anexar `ts_sp` obrigatório em toda saída operacional.
+
+## 1.1) Matriz de Convergência Semântica (Aprovada)
+
+Objetivo:
+- Reduzir volatilidade interpretativa do agente e evitar abertura de múltiplas frentes desconexas.
+
+### Camadas determinísticas
+
+1. `IntentNormalizer` (camada 1): normaliza a mensagem em uma única intenção canônica.
+2. `SemanticRouter` (camada 2): converte a intenção em um bundle fixo de ações.
+3. `ExecutionKernel` (camada 3): executa apenas o bundle aprovado com evidências.
+4. `MemoryCheckpoint` (camada 4): registra checkpoint e próxima inferência provável.
+
+### Vocabulário canônico fechado
+
+| Intenção canônica | Gatilhos equivalentes | Bundle operacional padrão |
+|---|---|---|
+| `retomar` | `{{reiniciar}}` | estado git + pendências + matriz decisória |
+| `estruturar` | `{{#crie-contexto}}`, `{{#inicialize}}` | `ai-context init <repo> [docs\|agents\|both] --output ./.context` |
+| `enriquecer` | `{{#preencha-contexto}}`, `{{#atualize-contexto}}` | `ai-context fill <repo> --output ./.context ...` |
+| `planejar` | `{{#planejar}}` | `ai-context plan <nome> --output ./.context` ou plano textual com gate |
+| `validar` | `{{#validar}}`, `{{#homologar}}` | `npm run build` + `npm run test` + `npm run build:app` + `npm run preview:app` + HTTP 200 |
+| `persistir` | `{{#salve}}`, `{{#sincronize}}` | checkpoint local + sincronização remota (quando aprovado) |
+
+### Regras anti-confusão (obrigatórias)
+
+1. Uma mensagem do operador aciona uma intenção canônica principal.
+2. Se houver múltiplas intenções, aplicar prioridade fixa: `retomar > planejar > estruturar > enriquecer > validar > persistir`.
+3. Se confiança de mapeamento `< 0.85`, fazer exatamente uma pergunta de desambiguação.
+4. Proibido assumir semântica implícita sem declarar hipótese explícita.
 
 ## 2) Gatilho de Retomada
 
@@ -147,7 +179,10 @@ Política de adoção:
 Use o seguinte formato para respostas orientadas por gatilho:
 
 ```md
+ts_sp: <yyMMdd-HHmmss>
 Trigger: <gatilho identificado>
+Intenção canônica: <token fechado>
+Hipóteses explícitas: <lista curta>
 Objetivo: <resultado esperado>
 Contratos lidos: <READ-* aplicáveis>
 Skills usadas: <lista>
@@ -165,3 +200,17 @@ Toda iteração deve fechar o ciclo:
 3. Validação técnica + HITL (quando aplicável).
 4. Registro de evidências e métricas do ciclo.
 5. Sincronização documental (`README`, `AGENTS`, contratos em `prompts/`).
+
+## 10) Time-Stamp Canônico Obrigatório
+
+Padrão oficial aprovado pelo operador:
+
+- Campo: `ts_sp`
+- Formato: `yyMMdd-HHmmss`
+- Timezone: `America/Sao_Paulo`
+- Exemplo válido: `260224-223705`
+- Regex de validação: `^[0-9]{6}-[0-9]{6}$`
+
+Regra:
+- Toda resposta operacional deve incluir `ts_sp`.
+- É proibido usar somente referência temporal relativa (`hoje`, `agora`, `ontem`) sem `ts_sp`.

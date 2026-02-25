@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`src/index.ts` owns the Commander CLI and now scaffolds documentation and agent playbooks without hitting any LLM endpoints. Generators live under `src/generators`, utilities (CLI helpers, file mapping, git support) stay in `src/utils`, and type contracts in `src/types.ts`. Built artefacts land in `dist/` after `npm run build`, while generated assets are saved to `./.context`. Treat `docs/README.md` as the navigation hub for documentation deliverables and `agents/README.md` as the index for agent playbooks.
+`src/index.ts` owns the Commander CLI and now scaffolds documentation and agent playbooks without hitting any LLM endpoints. Generators live under `src/generators`, utilities (CLI helpers, file mapping, git support) stay in `src/utils`, and type contracts in `src/types.ts`. Built artefacts land in `dist/` after `npm run build`, while generated assets are saved to `./.context`. Treat `docs/README.md` as the navigation hub for documentation deliverables and `agents/README.md` as the index for agent playbooks. The canonical scaffold source of truth remains `.context/docs/README.md` and `.context/agents/README.md`.
 
 ### Workspace Topology (Canonical Names)
 - `mapa/` (root) is the CLI/context-engineering project.
@@ -58,6 +58,8 @@ Stick to Conventional Commits (`feat(scaffolding): ...`, `fix(cli): ...`, `chore
 ## Environment & Release Tips
 No API keys are required for scaffolding; remove stale tokens from local `.env` files. Ensure `dist/` reflects the latest build before publishing and double-check that `package.json`'s version matches the intended release tag. If you modify the scaffold templates, refresh `docs/README.md` and `agents/README.md` in your commit so downstream teams receive the latest references.
 ## AI Context References
+- Documentation hub: `docs/README.md`
+- Agent hub: `agents/README.md`
 - Documentation index: `.context/docs/README.md`
 - Agent playbooks: `.context/agents/README.md`
 
