@@ -103,7 +103,7 @@ Documento canônico:
 - [`prompts/trigger_protocol.md`](/home/papa/mapa/prompts/trigger_protocol.md)
 
 Uso:
-- Interpretar intenção do operador por gatilho (`{{reiniciar}}`, `{{#atualizar}}`, `{{#salve}}`, `{{#sincronize}}`, etc.).
+- Interpretar intenção do operador por gatilho (`{{#reiniciar}}`, `{{#atualizar}}`, `{{#salve}}`, `{{#sincronize}}`, etc.).
 - Acionar contratos de leitura obrigatória e skills recomendadas.
 - Padronizar matriz decisória, validação HITL e loop semântico persistente.
 - Aplicar o algoritmo de loopback persistente para medir eficácia (`E`) e decidir `estavel|monitorar|corrigir`.
