@@ -288,3 +288,14 @@ Registrar em artefato versionável por iteração:
 - `E`
 - `status` (`estavel|monitorar|corrigir`)
 - `next_intent`
+
+## 12) Artefatos de Runtime Canônico (Chunking + Ações Atômicas)
+
+Referências oficiais para execução determinística:
+
+1. `.context/runtime/chunk-manifest.md`
+2. `.context/runtime/atomic-actions.md`
+3. `.context/runtime/checkpoint-template.md`
+
+Regra de uso:
+- Para `{{reiniciar}}` e demais intents canônicas, carregar primeiro o manifesto de chunks e executar a cadeia atômica na ordem declarada.

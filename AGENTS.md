@@ -62,6 +62,7 @@ No API keys are required for scaffolding; remove stale tokens from local `.env` 
 - Agent hub: `agents/README.md`
 - Documentation index: `.context/docs/README.md`
 - Agent playbooks: `.context/agents/README.md`
+- Runtime semantic index: `.context/runtime/README.md`
 
 ## AI Agent Environment & Skill Management
 The Copilot/agent runtime relies on per‑user data stored under the home directory. On this machine you'll find:

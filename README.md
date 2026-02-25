@@ -16,7 +16,7 @@ mapa/
 ├── dist/                 # Build do CLI (gerado por tsc)
 ├── docs/                 # Hub estável de navegação para documentação
 ├── agents/               # Hub estável de navegação para playbooks de agentes
-├── .context/             # Scaffold canônico (docs/, agents/, plans/)
+├── .context/             # Scaffold canônico (docs/, agents/, plans/, runtime/)
 ├── mapa-app/             # Aplicação web (React + Vite)
 │   ├── src/
 │   ├── guidelines/
@@ -112,6 +112,19 @@ Matriz de convergência semântica (determinística):
 - Intenções canônicas fechadas: `retomar`, `estruturar`, `enriquecer`, `planejar`, `validar`, `persistir`.
 - Toda execução deve mapear primeiro para uma intenção canônica e só depois para comandos.
 - Toda saída operacional deve incluir `ts_sp` no padrão `yyMMdd-HHmmss` com timezone `America/Sao_Paulo`.
+- Inicialização canônica centralizada: [`.context/runtime/chunk-manifest.md`](/home/papa/mapa/.context/runtime/chunk-manifest.md).
+
+## Inicialização Canônica Centralizada (Ações Atômicas)
+
+Menu de referência para reduzir deriva e garantir idempotência de retomada:
+
+1. Manifesto de chunks: [`.context/runtime/chunk-manifest.md`](/home/papa/mapa/.context/runtime/chunk-manifest.md)
+2. Catálogo de ações atômicas: [`.context/runtime/atomic-actions.md`](/home/papa/mapa/.context/runtime/atomic-actions.md)
+3. Template de checkpoint persistente: [`.context/runtime/checkpoint-template.md`](/home/papa/mapa/.context/runtime/checkpoint-template.md)
+
+Regra:
+- Reinicialização deve carregar somente os chunks declarados no manifesto conforme `intent_token` e `scope_key`.
+- A execução deve seguir a sequência atômica e registrar checkpoint ao final.
 
 ## Contratos de Integração (`mapa` x `mapa-app`)
 
