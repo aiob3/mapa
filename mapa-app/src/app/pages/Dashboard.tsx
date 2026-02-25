@@ -4,6 +4,8 @@ import { GlassCard } from "../components/GlassCard";
 import { TopNav } from "../components/TopNav";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useAuth } from "../auth/AuthContext";
+import type { ModuleSlug } from "../auth/types";
 
 const syncTabs = [
   { label: "Dashboard", path: "/dashboard" },
@@ -13,6 +15,7 @@ const syncTabs = [
 
 const modules = [
   {
+    module: "mapa-syn" as ModuleSlug,
     title: "MAPA Syn",
     subtitle: "Narrativa Executiva",
     description: "Visão estratégica C-Level. Narrativas de crescimento, projeções de ROI e aprovações de governança.",
@@ -22,6 +25,7 @@ const modules = [
     metricLabel: "Crescimento Q3",
   },
   {
+    module: "war-room" as ModuleSlug,
     title: "War Room",
     subtitle: "Comando Tático",
     description: "Canvas de pipeline, rastreador de desafios e recursos para reuniões da equipe de vendas.",
@@ -31,6 +35,7 @@ const modules = [
     metricLabel: "Pipeline",
   },
   {
+    module: "the-bridge" as ModuleSlug,
     title: "The Bridge",
     subtitle: "Sincronização Dual Core",
     description: "Onde a estratégia encontra a execução. Alinhamento de OKRs, status de sincronização e ponte tática.",
@@ -40,6 +45,7 @@ const modules = [
     metricLabel: "Taxa de Sync",
   },
   {
+    module: "team-hub" as ModuleSlug,
     title: "Team Hub",
     subtitle: "Pessoas & Desafios",
     description: "Capacidade da equipe, carga dos consultores e atribuições de desafios ativos.",
@@ -49,6 +55,7 @@ const modules = [
     metricLabel: "Capacidade",
   },
   {
+    module: "synapse" as ModuleSlug,
     title: "Synapse",
     subtitle: "Analytics IA",
     description: "Performance de outreach, scripts gerados por IA e pontuação de engajamento de leads.",
@@ -58,6 +65,7 @@ const modules = [
     metricLabel: "Conversão",
   },
   {
+    module: "the-vault" as ModuleSlug,
     title: "The Vault",
     subtitle: "Biblioteca de Recursos",
     description: "Playbooks, battlecards, templates e frameworks estratégicos para capacitação.",
@@ -70,6 +78,8 @@ const modules = [
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const { canAccess } = useAuth();
+  const visibleModules = modules.filter(module => canAccess(module.module, "read"));
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#F5F5F7" }}>
@@ -100,7 +110,7 @@ export function Dashboard() {
           </motion.div>
 
           <div className="grid grid-cols-3 gap-6">
-            {modules.map((module, i) => (
+            {visibleModules.map((module, i) => (
               <motion.div
                 key={module.title}
                 initial={{ opacity: 0, y: 20 }}

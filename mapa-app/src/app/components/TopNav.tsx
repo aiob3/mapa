@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router";
 import { Bell, User } from "lucide-react";
+import { useAuth } from "../auth/AuthContext";
+import type { ModuleSlug } from "../auth/types";
 
 interface TopNavProps {
   brand: string;
@@ -12,18 +14,22 @@ interface TopNavProps {
 
 // UNIFIED NAVIGATION: All 6 primary modules (Guidelines §4.2)
 const allModules = [
-  { label: "Dashboard", path: "/dashboard" },
-  { label: "MAPA Syn", path: "/syn" },
-  { label: "War Room", path: "/war-room" },
-  { label: "The Bridge", path: "/bridge" },
-  { label: "Team Hub", path: "/team" },
-  { label: "Synapse", path: "/analytics" },
-  { label: "The Vault", path: "/vault" },
+  { label: "Dashboard", path: "/dashboard", module: "mapa-syn" as ModuleSlug },
+  { label: "MAPA Syn", path: "/syn", module: "mapa-syn" as ModuleSlug },
+  { label: "War Room", path: "/war-room", module: "war-room" as ModuleSlug },
+  { label: "The Bridge", path: "/bridge", module: "the-bridge" as ModuleSlug },
+  { label: "Team Hub", path: "/team", module: "team-hub" as ModuleSlug },
+  { label: "Synapse", path: "/analytics", module: "synapse" as ModuleSlug },
+  { label: "The Vault", path: "/vault", module: "the-vault" as ModuleSlug },
 ];
 
 export function TopNav({ brand, brandSub, version, lang = "PT", onLangToggle }: TopNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { allowedModules, canAccess, session, signOut } = useAuth();
+  const visibleModules = allModules.filter(
+    (module) => allowedModules.includes(module.module) && canAccess(module.module, "read"),
+  );
 
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-white/60 border-b border-white/40"
@@ -54,7 +60,7 @@ export function TopNav({ brand, brandSub, version, lang = "PT", onLangToggle }: 
       </div>
 
       <div className="flex items-center gap-1">
-        {allModules.map((module) => {
+        {visibleModules.map((module) => {
           const isActive = location.pathname === module.path || 
                           (module.path !== "/dashboard" && location.pathname.startsWith(module.path));
           return (
@@ -75,6 +81,11 @@ export function TopNav({ brand, brandSub, version, lang = "PT", onLangToggle }: 
       </div>
 
       <div className="flex items-center gap-4">
+        {session && (
+          <span className="px-2 py-0.5 text-[10px] rounded-full bg-[#2E4C3B]/10 text-[#2E4C3B]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            {session.role === "administrator" ? "ADMINISTRADOR" : "CONVIDADO"}
+          </span>
+        )}
         <div className="flex items-center gap-1 bg-black/5 rounded-full px-1 py-0.5">
           <button
             onClick={onLangToggle}
@@ -99,7 +110,15 @@ export function TopNav({ brand, brandSub, version, lang = "PT", onLangToggle }: 
           <Bell size={18} className="text-[#1A1A1A]" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-[#C64928] rounded-full" />
         </button>
-        <button className="w-9 h-9 rounded-full bg-gradient-to-br from-[#C64928] to-[#E07B5B] flex items-center justify-center">
+        <button
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-[#C64928] to-[#E07B5B] flex items-center justify-center"
+          onClick={() => {
+            signOut();
+            navigate("/", { replace: true });
+          }}
+          title="Encerrar sessão"
+          aria-label="Encerrar sessão"
+        >
           <User size={16} className="text-white" />
         </button>
       </div>

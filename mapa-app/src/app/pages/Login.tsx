@@ -1,21 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
+import { useAuth } from "../auth/AuthContext";
 
 export function Login() {
   const navigate = useNavigate();
+  const { signIn, loading, error, isAuthenticated, session } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"consultant" | "executive">("consultant");
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 800);
+    try {
+      await signIn(email.trim(), password);
+      navigate("/dashboard", { replace: true });
+    } catch {
+      // handled in context error state
+    }
   };
 
   return (
@@ -83,7 +91,7 @@ export function Login() {
         
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: isLoading ? 0 : 1, scale: isLoading ? 1.05 : 1 }}
+          animate={{ opacity: loading ? 0.98 : 1, scale: loading ? 0.99 : 1 }}
           transition={{ duration: 0.6 }}
           className="w-full max-w-[360px] px-8"
         >
@@ -101,34 +109,8 @@ export function Login() {
                 Bem-vindo de Volta
               </h2>
               <p className="text-[#717182] text-[13px] mt-2" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
-                Insira suas credenciais para continuar
+                Faça login para acessar os módulos permitidos no seu perfil
               </p>
-            </div>
-
-            {/* Role Toggle */}
-            <div className="flex gap-1 bg-black/5 rounded-full p-1 mb-8">
-              <button
-                onClick={() => setRole("consultant")}
-                className={`flex-1 py-2 rounded-full text-[12px] transition-all duration-300 ${
-                  role === "consultant"
-                    ? "bg-white text-[#1A1A1A] shadow-sm"
-                    : "text-[#717182]"
-                }`}
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}
-              >
-                Consultor
-              </button>
-              <button
-                onClick={() => setRole("executive")}
-                className={`flex-1 py-2 rounded-full text-[12px] transition-all duration-300 ${
-                  role === "executive"
-                    ? "bg-white text-[#1A1A1A] shadow-sm"
-                    : "text-[#717182]"
-                }`}
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}
-              >
-                Executivo
-              </button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -186,6 +168,7 @@ export function Login() {
 
               <button
                 type="submit"
+                disabled={loading}
                 className="mt-4 w-full py-3 rounded-full text-white text-[13px] tracking-[0.06em] uppercase transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px]"
                 style={{
                   fontFamily: "'Inter', sans-serif",
@@ -195,9 +178,21 @@ export function Login() {
                 }}
                 aria-label="Acessar o MAPA"
               >
-                {isLoading ? "Entrando..." : "ACESSAR MAPA"}
+                {loading ? "Entrando..." : "ACESSAR MAPA"}
               </button>
             </form>
+
+            {error && (
+              <p className="text-center text-[11px] text-[#C64928] mt-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+                {error}
+              </p>
+            )}
+
+            {session && (
+              <p className="text-center text-[11px] text-[#2E4C3B] mt-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Perfil ativo: {session.role === "administrator" ? "Administrador" : "Convidado"}
+              </p>
+            )}
 
             <p className="text-center text-[11px] text-[#717182] mt-6" style={{ fontFamily: "'Inter', sans-serif" }}>
               Esqueceu as credenciais?{" "}

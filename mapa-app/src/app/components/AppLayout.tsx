@@ -1,8 +1,19 @@
 import React from "react";
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { FloatingHomeButton } from "./FloatingHomeButton";
+import { useAuth } from "../auth/AuthContext";
 
 export function AppLayout() {
+  const { loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <>
       {/* Global Noise Texture Overlay - Guidelines §3.1 */}

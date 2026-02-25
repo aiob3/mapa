@@ -97,8 +97,11 @@ Identify potential blockers, dependencies, and mitigation strategies before begi
 
 ### Camada de autorização (RBAC)
 1. Criar modelo mínimo com `roles`, `permissions`, `role_permissions` e `user_roles`.
-2. Permissões devem usar escopo explícito por módulo e ação (`read`, `write`, `admin`).
+2. Permissões devem usar escopo explícito por módulo e ação (`read`, `write`, `full`).
 3. Atribuição de papel deve ser auditável (quem concedeu, quando concedeu, status ativo/inativo).
+4. Política inicial obrigatória:
+   - `administrator` = `full` em todos os módulos.
+   - `guest` = `read` por módulo visível na interface principal.
 
 ### Camada de acesso por módulo
 1. Registrar módulos em tabela canônica (`mapa-syn`, `war-room`, `the-bridge`, `team-hub`, `synapse`, `the-vault`).
@@ -109,6 +112,15 @@ Identify potential blockers, dependencies, and mitigation strategies before begi
 1. Implementar integração de login frontend com Supabase como etapa mandatória.
 2. Sem login validado e sessão ativa, dashboard e módulos permanecem indisponíveis.
 3. Somente após validação de login + RBAC por módulo a etapa segue para handoff.
+
+## Roadmap de Retomada (acordo com operador)
+1. **Marco P0 - Homologação prévia de payload**: se o documento originário vier inválido como JSON, executar normalização sintática e gerar envelope de depuração homologado antes de qualquer ingestão.
+2. **Marco A - Baseline de segurança**: aprovar e congelar `STATE-DB-001` (DDL + RBAC + policies RLS).
+3. **Marco B - Login e bloqueio de rota**: validar integração frontend de login e bloqueio de dashboard/módulos sem sessão.
+4. **Marco C - Visibilidade por módulo**: aplicar leitura de módulos visíveis para `guest` e acesso total para `administrator`.
+5. **Marco D - Extensibilidade incremental**: habilitar evolução sem quebra para novas funcionalidades por `resource_kind` e `resource_key` (`module`, `feature`, `modal`, `field`).
+6. **Marco E - Expansão controlada**: toda nova funcionalidade/modal/campo entra por migração versionada com validação `allow/deny` e evidência no checklist.
+7. **Marco F - Canonical V2 dual-write (deferido)**: ativar `canonical_events`, `canonical_atoms`, `canonical_id_aliases` e `canonical_ingestion_runs` com idempotência por `idempotency_key` e alias reversível de IDs legados.
 
 ## Resource Estimation
 
@@ -130,6 +142,16 @@ Identify potential blockers, dependencies, and mitigation strategies before begi
 - **Escalation:** TODO: Name of person to contact if resources are insufficient
 
 ## Working Phases
+### Phase 0 — Homologação Prévia do Documento Originário (obrigatória)
+**Steps**
+1. Validar se o payload originário é JSON parseável.
+2. Se inválido, aplicar normalização automática mínima (remoção de comentários, correção de envelope e tentativa de parse).
+3. Persistir envelope homologado de depuração com `raw_document`, `normalized_candidate`, `parse_error` e `warnings`.
+4. Bloquear ingestão operacional quando status de homologação for `requires_operator_review`.
+
+**Commit Checkpoint**
+- After completing this phase, create a checkpoint commit documenting payload homologation logic and tests (for example, `git commit -m "feat(canonical): add pre-ingestion payload homologation"`).
+
 ### Phase 1 — Discovery & Alignment
 **Steps**
 1. `STATE-DB-001` (primeiro item do `#planejar`): desenhar o esquema com foco em autenticação, autorização RBAC e segmentação de acesso por módulo.
@@ -137,6 +159,7 @@ Identify potential blockers, dependencies, and mitigation strategies before begi
 3. Consolidar matriz de decisão de banco com recomendação formal (`PostgreSQL + Supabase`) e critérios: consistência transacional, RLS, realtime, custo operacional e facilidade de evolução.
 4. Classificar atividades órfãs em cinco grupos: gatilho, contrato, evidência, ownership e contexto; priorizar as bloqueantes para a fase de implementação.
 5. Capturar perguntas abertas de execução (política de RLS por papel, estratégia de auditoria, naming conventions SQL, limites de realtime e retenção de logs).
+6. Publicar proposta técnica de DDL para aprovação pré-aplicação em [state-db-001-initial-ddl.sql](../../supabase/proposals/state-db-001-initial-ddl.sql).
 
 **Commit Checkpoint**
 - After completing this phase, capture the agreed context and create a commit (for example, `git commit -m "chore(plan): complete phase 1 discovery"`).
@@ -148,6 +171,7 @@ Identify potential blockers, dependencies, and mitigation strategies before begi
 3. Implementar bloqueio obrigatório de dashboard/módulos quando não autenticado ou sem permissão RBAC adequada.
 4. Definir camada de acesso a dados para a `mapa-app` com contratos tipados, separação de responsabilidades e guarda de erro para chamadas ao Supabase.
 5. Atualizar documentação operacional com as decisões tomadas e vínculos de contrato (`CTX-*`/`WEB-*`) impactados.
+6. Aplicar DDL no Supabase somente apos aprovação explícita do operador.
 
 **Commit Checkpoint**
 - Summarize progress, update cross-links, and create a commit documenting the outcomes of this phase (for example, `git commit -m "chore(plan): complete phase 2 implementation"`).

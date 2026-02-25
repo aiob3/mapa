@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TopNav } from "../components/TopNav";
 import { GlassCard } from "../components/GlassCard";
 import { Search, X } from "lucide-react";
@@ -32,20 +32,77 @@ const stageColors: Record<string, string> = {
   Execute: "#C64928",
 };
 
-const allFilters = ["Todos", "Objection Handling", "Pricing", "Competidores", "Estratégia", "Prospecção"];
+type FilterFacet = "category" | "stage" | "type";
+type SelectedFiltersByFacet = Record<FilterFacet, string[]>;
+
+const categoryFilters = [
+  "Objection Handling",
+  "Pricing",
+  "Competidores",
+  "Estratégia",
+  "Prospecção",
+  "Valor",
+  "Negociação",
+  "Relacionamento",
+  "Mercado",
+];
+const stageFilters = ["Analyze", "Plan", "Execute"];
+const typeFilters = ["Playbook", "Template", "Ferramenta", "Script", "Report", "Guia"];
 
 export function Vault() {
   const [lang, setLang] = useState<"PT" | "EN">("PT");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("Todos");
+  const [selectedFiltersByFacet, setSelectedFiltersByFacet] = useState<SelectedFiltersByFacet>({
+    category: [],
+    stage: [],
+    type: [],
+  });
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
-  const filteredAssets = assets.filter((asset) => {
-    const matchesSearch = asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = activeFilter === "Todos" || asset.category.includes(activeFilter);
-    return matchesSearch && matchesFilter;
-  });
+  const toggleFacetOption = (facet: FilterFacet, option: string) => {
+    if (option === "Todos") {
+      setSelectedFiltersByFacet((prev) => ({ ...prev, [facet]: [] }));
+      return;
+    }
+
+    setSelectedFiltersByFacet((prev) => {
+      const current = prev[facet];
+      const next = current.includes(option)
+        ? current.filter((value) => value !== option)
+        : [...current, option];
+      return { ...prev, [facet]: next };
+    });
+  };
+
+  const filteredAssets = useMemo(() => {
+    return assets.filter((asset) => {
+      const matchesSearch =
+        asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.stage.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesCategory =
+        selectedFiltersByFacet.category.length === 0 ||
+        selectedFiltersByFacet.category.includes(asset.category);
+      const matchesStage =
+        selectedFiltersByFacet.stage.length === 0 ||
+        selectedFiltersByFacet.stage.includes(asset.stage);
+      const matchesType =
+        selectedFiltersByFacet.type.length === 0 ||
+        selectedFiltersByFacet.type.includes(asset.type);
+
+      return matchesSearch && matchesCategory && matchesStage && matchesType;
+    });
+  }, [searchQuery, selectedFiltersByFacet]);
+
+  useEffect(() => {
+    console.info("[vault.filter.telemetry]", {
+      query: searchQuery,
+      selectedFiltersByFacet,
+      resultCount: filteredAssets.length,
+    });
+  }, [searchQuery, selectedFiltersByFacet, filteredAssets.length]);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#F5F5F7" }}>
@@ -75,21 +132,48 @@ export function Vault() {
             </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-            {allFilters.map((f) => (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`px-5 py-2 rounded-full text-[12px] transition-all duration-200 ${
-                  activeFilter === f
-                    ? "bg-[#1A1A1A] text-white shadow-sm"
-                    : "bg-white/50 text-[#717182] border border-white/40 hover:text-[#1A1A1A] hover:bg-white/70"
-                }`}
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
-              >
-                {f}
-              </button>
+          {/* Composable Faceted Filters (OR inside facet / AND across facets) */}
+          <div className="mb-10 space-y-4">
+            {([
+              { facet: "category" as const, title: "Categoria", options: categoryFilters },
+              { facet: "stage" as const, title: "Etapa", options: stageFilters },
+              { facet: "type" as const, title: "Tipo", options: typeFilters },
+            ]).map((group) => (
+              <div key={group.facet}>
+                <p className="text-[11px] tracking-[0.08em] uppercase text-[#717182] mb-2 text-center" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700 }}>
+                  {group.title}
+                </p>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => toggleFacetOption(group.facet, "Todos")}
+                    className={`px-4 py-2 rounded-full text-[12px] transition-all duration-200 ${
+                      selectedFiltersByFacet[group.facet].length === 0
+                        ? "bg-[#1A1A1A] text-white shadow-sm"
+                        : "bg-white/50 text-[#717182] border border-white/40 hover:text-[#1A1A1A] hover:bg-white/70"
+                    }`}
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+                  >
+                    Todos
+                  </button>
+                  {group.options.map((option) => {
+                    const isActive = selectedFiltersByFacet[group.facet].includes(option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleFacetOption(group.facet, option)}
+                        className={`px-4 py-2 rounded-full text-[12px] transition-all duration-200 ${
+                          isActive
+                            ? "bg-[#1A1A1A] text-white shadow-sm"
+                            : "bg-white/50 text-[#717182] border border-white/40 hover:text-[#1A1A1A] hover:bg-white/70"
+                        }`}
+                        style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             ))}
           </div>
 
