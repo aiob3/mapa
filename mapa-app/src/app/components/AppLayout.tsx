@@ -4,14 +4,15 @@ import { FloatingHomeButton } from "./FloatingHomeButton";
 import { useAuth } from "../auth/AuthContext";
 
 export function AppLayout() {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated, session } = useAuth();
 
   if (loading) {
     return null;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const isExpired = Boolean(session?.expiresAt && session.expiresAt <= Date.now());
+    return <Navigate to={isExpired ? "/401?reason=expired" : "/401?reason=auth-required"} replace />;
   }
 
   return (

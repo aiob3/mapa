@@ -1,13 +1,20 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { clearStoredSession, loadStoredSession, persistSession } from './sessionStorage';
+import {
+  clearStoredSession,
+  loadRememberMePreference,
+  loadStoredSession,
+  persistRememberMePreference,
+  persistSession,
+} from './sessionStorage';
 import { signInWithPassword } from './supabaseAuthApi';
 import type { AuthSession, AuthState, ModuleSlug, PermissionAction } from './types';
 
 interface AuthContextValue extends AuthState {
-  signIn: (identifier: string, password: string) => Promise<void>;
+  signIn: (identifier: string, password: string, rememberMe?: boolean) => Promise<void>;
   signOut: () => void;
   isAuthenticated: boolean;
+  rememberMeDefault: boolean;
   allowedModules: ModuleSlug[];
   canAccess: (moduleSlug: ModuleSlug, action?: PermissionAction) => boolean;
 }
@@ -61,14 +68,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rememberMeDefault] = useState<boolean>(() => loadRememberMePreference(true));
+  const sessionExpired = Boolean(session?.expiresAt && session.expiresAt <= Date.now());
 
-  const signIn = useCallback(async (identifier: string, password: string) => {
+  useEffect(() => {
+    if (!sessionExpired) {
+      return;
+    }
+    clearStoredSession();
+    setSession(null);
+  }, [sessionExpired]);
+
+  const signIn = useCallback(async (identifier: string, password: string, rememberMe = rememberMeDefault) => {
     setLoading(true);
     setError(null);
     try {
       const nextSession = await signInWithPassword(identifier, password);
       setSession(nextSession);
-      persistSession(nextSession);
+      persistSession(nextSession, rememberMe);
+      persistRememberMePreference(rememberMe);
     } catch (err) {
       setSession(null);
       clearStoredSession();
@@ -77,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [rememberMeDefault]);
 
   const signOut = useCallback(() => {
     setSession(null);
@@ -104,11 +122,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       error,
       signIn,
       signOut,
-      isAuthenticated: Boolean(session?.accessToken),
+      isAuthenticated: Boolean(session?.accessToken) && !sessionExpired,
+      rememberMeDefault,
       allowedModules,
       canAccess,
     }),
-    [session, loading, error, signIn, signOut, allowedModules, canAccess],
+    [session, loading, error, signIn, signOut, sessionExpired, rememberMeDefault, allowedModules, canAccess],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -10,19 +10,19 @@ interface ModuleAccessGuardProps {
 }
 
 export function ModuleAccessGuard({ moduleSlug, children }: ModuleAccessGuardProps) {
-  const { loading, isAuthenticated, canAccess } = useAuth();
+  const { loading, isAuthenticated, canAccess, session } = useAuth();
 
   if (loading) {
     return null;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const isExpired = Boolean(session?.expiresAt && session.expiresAt <= Date.now());
+    return <Navigate to={isExpired ? "/401?reason=expired" : "/401?reason=auth-required"} replace />;
   }
 
   if (!canAccess(moduleSlug, 'read')) {
-    const fallback = canAccess('mapa-syn', 'read') ? '/dashboard' : '/';
-    return <Navigate to={fallback} replace />;
+    return <Navigate to="/403" state={{ moduleSlug }} replace />;
   }
 
   return <>{children}</>;
