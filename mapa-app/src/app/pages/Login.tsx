@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 export function Login() {
   const navigate = useNavigate();
   const { signIn, loading, error, isAuthenticated, session } = useAuth();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -19,7 +19,7 @@ export function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signIn(email.trim(), password);
+      await signIn(identifier.trim(), password);
       navigate("/dashboard", { replace: true });
     } catch {
       // handled in context error state
@@ -117,18 +117,18 @@ export function Login() {
               <div className="relative">
                 <label
                   className={`absolute left-0 transition-all duration-200 ${
-                    focusedField === "email" || email
+                    focusedField === "email" || identifier
                       ? "text-[11px] -top-4 text-[#C64928]"
                       : "text-[14px] top-2 text-[#717182]"
                   }`}
-                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: focusedField === "email" || email ? 500 : 400 }}
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: focusedField === "email" || identifier ? 500 : 400 }}
                 >
-                  E-mail
+                  Usuário ou E-mail
                 </label>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                   className="w-full bg-transparent border-b outline-none py-2 text-[14px] text-[#1A1A1A] transition-colors"

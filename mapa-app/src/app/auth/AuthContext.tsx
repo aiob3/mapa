@@ -5,7 +5,7 @@ import { signInWithPassword } from './supabaseAuthApi';
 import type { AuthSession, AuthState, ModuleSlug, PermissionAction } from './types';
 
 interface AuthContextValue extends AuthState {
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (identifier: string, password: string) => Promise<void>;
   signOut: () => void;
   isAuthenticated: boolean;
   allowedModules: ModuleSlug[];
@@ -62,11 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (identifier: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
-      const nextSession = await signInWithPassword(email, password);
+      const nextSession = await signInWithPassword(identifier, password);
       setSession(nextSession);
       persistSession(nextSession);
     } catch (err) {

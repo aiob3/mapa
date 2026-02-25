@@ -18,6 +18,14 @@ interface SupabaseUserResponse {
 interface SupabaseConfig {
   url: string;
   anonKey: string;
+  defaultEmailDomain: string;
+}
+
+interface SupabaseErrorPayload {
+  error?: string;
+  error_description?: string;
+  msg?: string;
+  message?: string;
 }
 
 const MODULE_SLUGS: ModuleSlug[] = [
@@ -32,14 +40,15 @@ const MODULE_SLUGS: ModuleSlug[] = [
 function resolveConfig(): SupabaseConfig {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const defaultEmailDomain = import.meta.env.VITE_AUTH_DEFAULT_EMAIL_DOMAIN || 'mapa.local';
 
   if (!url || !anonKey) {
     throw new Error(
-      'Configuração Supabase ausente. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no mapa-app/.env.',
+      'Configuração Supabase ausente. Execute "npm run sync:env:app" na raiz ou defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no mapa-app/.env.',
     );
   }
 
-  return { url, anonKey };
+  return { url, anonKey, defaultEmailDomain };
 }
 
 async function requestSupabase<T>(path: string, init: RequestInit): Promise<T> {
@@ -55,7 +64,34 @@ async function requestSupabase<T>(path: string, init: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(errorText || `Erro Supabase (${response.status})`);
+    let parsedError: SupabaseErrorPayload | null = null;
+
+    if (errorText) {
+      try {
+        parsedError = JSON.parse(errorText) as SupabaseErrorPayload;
+      } catch {
+        parsedError = null;
+      }
+    }
+
+    const rawMessage =
+      parsedError?.error_description ||
+      parsedError?.msg ||
+      parsedError?.message ||
+      parsedError?.error ||
+      errorText;
+
+    const normalizedMessage = rawMessage ? rawMessage.toLowerCase() : '';
+    if (
+      response.status === 400 &&
+      (normalizedMessage.includes('invalid login credentials') ||
+        normalizedMessage.includes('invalid credentials') ||
+        normalizedMessage.includes('email not confirmed'))
+    ) {
+      throw new Error('Usuário ou senha inválidos.');
+    }
+
+    throw new Error(rawMessage || `Erro Supabase (${response.status})`);
   }
 
   return response.json() as Promise<T>;
@@ -110,7 +146,20 @@ async function resolveAllowedModules(accessToken: string, role: AppRole): Promis
   }
 }
 
-export async function signInWithPassword(email: string, password: string): Promise<AuthSession> {
+function resolveEmailIdentifier(identifier: string): string {
+  const normalized = identifier.trim().toLowerCase();
+  const { defaultEmailDomain } = resolveConfig();
+  if (!normalized) {
+    return normalized;
+  }
+  if (normalized.includes('@')) {
+    return normalized;
+  }
+  return `${normalized}@${defaultEmailDomain}`;
+}
+
+export async function signInWithPassword(identifier: string, password: string): Promise<AuthSession> {
+  const email = resolveEmailIdentifier(identifier);
   const auth = await requestSupabase<SupabaseAuthResponse>('/auth/v1/token?grant_type=password', {
     method: 'POST',
     body: JSON.stringify({
