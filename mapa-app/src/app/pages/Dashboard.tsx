@@ -1,17 +1,15 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { Plus, ArrowRight } from "lucide-react";
+
+import { ActionComposerModal } from "../components/actions/ActionComposerModal";
+import { DEFAULT_ADD_ITEMS } from "../components/actions/defaultActionComposerItems";
+import type { ActionComposerItem } from "../types/patterns";
 import { GlassCard } from "../components/GlassCard";
 import { TopNav } from "../components/TopNav";
-import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useAuth } from "../auth/AuthContext";
 import type { ModuleSlug } from "../auth/types";
-
-const syncTabs = [
-  { label: "Dashboard", path: "/dashboard" },
-  { label: "The Bridge", path: "/bridge" },
-  { label: "Analytics", path: "/analytics" },
-];
 
 const modules = [
   {
@@ -39,7 +37,7 @@ const modules = [
     title: "The Bridge",
     subtitle: "Sincronização Dual Core",
     description: "Onde a estratégia encontra a execução. Alinhamento de OKRs, status de sincronização e ponte tática.",
-    path: "/bridge",
+    path: "/team/overview",
     accent: "#4A6FA5",
     metric: "72%",
     metricLabel: "Taxa de Sync",
@@ -79,7 +77,20 @@ const modules = [
 export function Dashboard() {
   const navigate = useNavigate();
   const { canAccess } = useAuth();
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
   const visibleModules = modules.filter(module => canAccess(module.module, "read"));
+  const addItems: ActionComposerItem[] = useMemo(() => DEFAULT_ADD_ITEMS, []);
+
+  const handleComposerSelect = (item: ActionComposerItem) => {
+    setIsComposerOpen(false);
+    navigate(item.targetPath, {
+      state: {
+        actionComposer: item.payload,
+        actionId: item.id,
+        origin: "/dashboard",
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#F5F5F7" }}>
@@ -107,6 +118,15 @@ export function Dashboard() {
             <p className="text-[16px] text-[#717182] mt-3 max-w-lg" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400, fontStyle: "italic", lineHeight: 1.6 }}>
               Seu ecossistema narrativo está ativo. 3 itens requerem atenção nas camadas de estratégia e execução.
             </p>
+            <button
+              onClick={() => setIsComposerOpen(true)}
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#C64928] text-white text-[12px] tracking-[0.06em] uppercase shadow-sm hover:translate-y-[-2px] transition-all duration-300"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
+              aria-label="Abrir ações rápidas"
+            >
+              <Plus size={14} />
+              +ADD
+            </button>
           </motion.div>
 
           <div className="grid grid-cols-3 gap-6">
@@ -155,6 +175,15 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      <ActionComposerModal
+        open={isComposerOpen}
+        title="Ações rápidas do Ecossistema"
+        description="Fluxo unificado para iniciar sessões, elementos estratégicos e novos insights."
+        items={addItems}
+        onClose={() => setIsComposerOpen(false)}
+        onSelect={handleComposerSelect}
+      />
     </div>
   );
 }

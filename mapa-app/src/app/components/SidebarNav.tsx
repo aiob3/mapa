@@ -1,16 +1,46 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router";
-import { LucideIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+
+import { isPathActive } from '../navigation/moduleNavigation';
+import type { SidebarStatusPanelConfig } from '../types/patterns';
+import { SystemStatusPanel } from './SystemStatusPanel';
 
 interface SidebarNavProps {
   brand: string;
   brandSub: string;
-  items: { label: string; path: string; icon: LucideIcon }[];
+  items: SidebarNavItem[];
+  statusPanel?: SidebarStatusPanelConfig;
   bottomContent?: React.ReactNode;
 }
 
-export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNavProps) {
+export interface SidebarNavItem {
+  label: string;
+  path: string;
+  icon: LucideIcon;
+  subLabel?: string;
+  exact?: boolean;
+}
+
+function normalizePath(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
+function isItemActive(pathname: string, item: SidebarNavItem): boolean {
+  const normalizedPathname = normalizePath(pathname);
+  const normalizedItemPath = normalizePath(item.path);
+
+  if (item.exact) {
+    return normalizedPathname === normalizedItemPath;
+  }
+  return isPathActive(normalizedPathname, normalizedItemPath);
+}
+
+export function SidebarNav({ brand, brandSub, items, statusPanel, bottomContent }: SidebarNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -22,7 +52,7 @@ export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNav
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? 80 : 220 }}
+      animate={{ width: isCollapsed ? 84 : 252 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="min-h-screen flex flex-col bg-white/70 border-r border-white/40 relative"
       style={{ backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)" }}
@@ -43,7 +73,7 @@ export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNav
       {/* Padding wrapper */}
       <div className="p-6 flex flex-col h-full overflow-hidden">
         {/* Section Title */}
-        <div className="mb-8 overflow-hidden">
+        <div className="mb-7 overflow-hidden">
           <AnimatePresence mode="wait">
             {!isCollapsed && (
               <motion.div
@@ -64,10 +94,10 @@ export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNav
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex flex-col gap-1 flex-1">
+        <nav className="flex flex-col gap-1.5 flex-1">
           {items.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = isItemActive(location.pathname, item);
             return (
               <button
                 key={item.path}
@@ -97,12 +127,22 @@ export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNav
                     transition={{ duration: 0.15 }}
                     className="flex items-center justify-between flex-1 overflow-hidden"
                   >
-                    <span
-                      className="text-[14px] whitespace-nowrap"
-                      style={{ fontFamily: "'Inter', sans-serif", fontWeight: isActive ? 600 : 400 }}
-                    >
-                      {item.label}
-                    </span>
+                    <div className="min-w-0">
+                      <span
+                        className="text-[13px] whitespace-nowrap"
+                        style={{ fontFamily: "'Inter', sans-serif", fontWeight: isActive ? 600 : 500 }}
+                      >
+                        {item.label}
+                      </span>
+                      {item.subLabel && (
+                        <p
+                          className="text-[10px] whitespace-nowrap text-[#717182]"
+                          style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}
+                        >
+                          {item.subLabel}
+                        </p>
+                      )}
+                    </div>
                     {isActive && (
                       <motion.span
                         initial={{ scale: 0 }}
@@ -118,39 +158,24 @@ export function SidebarNav({ brand, brandSub, items, bottomContent }: SidebarNav
         </nav>
 
         {/* Bottom Content */}
-        {bottomContent && (
+        {(statusPanel || bottomContent) && (
           <div className="mt-auto pt-6 border-t border-black/5 overflow-hidden">
             <AnimatePresence mode="wait">
               {!isCollapsed && (
                 <motion.div
+                  key={statusPanel ? 'status-panel' : 'bottom-content'}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {bottomContent}
+                  {statusPanel ? <SystemStatusPanel config={statusPanel} /> : bottomContent}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         )}
       </div>
-
-      {/* Click area when collapsed to expand */}
-      {isCollapsed && (
-        <div
-          onClick={toggleSidebar}
-          className="absolute inset-0 cursor-pointer z-10"
-          aria-label="Expandir menu lateral"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              toggleSidebar();
-            }
-          }}
-        />
-      )}
     </motion.aside>
   );
 }

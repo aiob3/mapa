@@ -13,6 +13,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Data Flow & Integrations](./data-flow.md)
 - [Security & Compliance Notes](./security.md)
 - [Tooling & Productivity Guide](./tooling.md)
+- [UI Pattern Normalization (PLAN-NORMA-UI-002)](./ui-pattern-normalization-plan-norma-ui-002.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
@@ -41,6 +42,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Data Flow & Integrations | `data-flow.md` | agent-update:data-flow | System diagrams, integration specs, queue topics |
 | Security & Compliance Notes | `security.md` | agent-update:security | Auth model, secrets management, compliance requirements |
 | Tooling & Productivity Guide | `tooling.md` | agent-update:tooling | CLI scripts, IDE configs, automation workflows |
+| UI Pattern Normalization (PLAN-NORMA-UI-002) | `ui-pattern-normalization-plan-norma-ui-002.md` | agent-update:ui-pattern-normalization | Routes inventory, pattern IDs, adoption matrix, HITL checklist |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

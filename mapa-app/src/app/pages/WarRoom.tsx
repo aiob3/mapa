@@ -68,6 +68,12 @@ export function WarRoom() {
           <div className={`flex-1 p-8 transition-all duration-500 ${hacksOpen ? "mr-[340px]" : ""}`}>
             <div className="flex items-center justify-between mb-6">
               <div>
+                <span
+                  className="inline-flex items-center px-3 py-1 rounded-full bg-[#C64928]/10 text-[#C64928] text-[10px] tracking-[0.08em] uppercase mb-2"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700 }}
+                >
+                  shell normatizado • canvas com exceção funcional
+                </span>
                 <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "28px", fontWeight: 600, lineHeight: 1.2 }}>
                   Pipeline Canvas
                 </h1>
@@ -177,7 +183,10 @@ export function WarRoom() {
           </div>
 
           {/* Right: Challenge Tracker */}
-          <div className="w-[280px] shrink-0 p-6 border-l border-white/30 bg-white/30 backdrop-blur-[16px]">
+          <div
+            className="w-[280px] shrink-0 p-6 border-l border-white/40 bg-white/60"
+            style={{ backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)" }}
+          >
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "18px", fontWeight: 600 }} className="mb-1">
               Rastreador de Desafios
             </h3>

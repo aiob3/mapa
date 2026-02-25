@@ -2,15 +2,41 @@ import React from "react";
 import { TopNav } from "../components/TopNav";
 import { SidebarNav } from "../components/SidebarNav";
 import { GlassCard } from "../components/GlassCard";
-import { LayoutDashboard, FileText, Users, Settings, Search, Calendar, SlidersHorizontal, TrendingUp, Sparkles, ArrowUpRight } from "lucide-react";
+import { Search, Calendar, SlidersHorizontal, TrendingUp, Sparkles, ArrowUpRight } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
+import { SYNAPSE_SIDEBAR_ITEMS } from "../navigation/sidebarNavigation";
+import type { SidebarStatusPanelConfig } from "../types/patterns";
 
-const sidebarItems = [
-  { label: "Dashboard", path: "/analytics", icon: LayoutDashboard },
-  { label: "Scripts IA", path: "/analytics/scripts", icon: FileText },
-  { label: "Leads", path: "/analytics/leads", icon: Users },
-  { label: "Configurações", path: "/analytics/settings", icon: Settings },
-];
+const synapseStatusPanel: SidebarStatusPanelConfig = {
+  title: "Painel de Status",
+  subtitle: "Execução analítica do Synapse",
+  items: [
+    {
+      id: "synapse-model",
+      severity: "success",
+      message: "Modelo IA ativo com calibragem de tom setorial.",
+      tooltip: "Modelo de pontuação narrativa e conversão validado.",
+      updatedAt: "há 2 min",
+      source: "Synapse IA",
+    },
+    {
+      id: "synapse-alert",
+      severity: "warning",
+      message: "2 leads com queda de abertura acima de 15%.",
+      tooltip: "Revisar cadência e assunto inicial.",
+      updatedAt: "agora",
+      source: "Outreach Monitor",
+    },
+    {
+      id: "synapse-sync",
+      severity: "info",
+      message: "Dashboard integrado ao MAPA Syn para visão cruzada.",
+      tooltip: "Atalho disponível no item Dashboard.",
+      updatedAt: "há 5 min",
+      source: "Navegação",
+    },
+  ],
+};
 
 const chartData = [
   { week: "Semana 1", value: 18 },
@@ -94,31 +120,8 @@ export function Synapse() {
         <SidebarNav
           brand="Synapse"
           brandSub="AI ANALYTICS"
-          items={sidebarItems}
-          bottomContent={
-            <div>
-              <div className="p-3 rounded-2xl bg-white/50 border border-white/40 mb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-[#2E4C3B]" />
-                  <span className="text-[10px] tracking-[0.1em] uppercase" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700 }}>
-                    STATUS DO MODELO
-                  </span>
-                </div>
-                <p className="text-[11px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.5 }}>
-                  GPT-4 Turbo ativo e otimizado para vendas B2B.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                  <span className="text-white text-[11px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>MV</span>
-                </div>
-                <div>
-                  <p className="text-[13px] text-[#1A1A1A]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>Marina V.</p>
-                  <p className="text-[11px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>Consultora Sênior</p>
-                </div>
-              </div>
-            </div>
-          }
+          items={SYNAPSE_SIDEBAR_ITEMS}
+          statusPanel={synapseStatusPanel}
         />
 
         {/* UNIFIED LAYOUT CONTAINER - Guidelines §4.3 */}

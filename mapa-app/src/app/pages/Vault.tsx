@@ -1,8 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { TopNav } from "../components/TopNav";
+import { ActionComposerModal } from "../components/actions/ActionComposerModal";
+import { DEFAULT_ADD_ITEMS } from "../components/actions/defaultActionComposerItems";
 import { GlassCard } from "../components/GlassCard";
-import { Search, X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import type { ActionComposerItem } from "../types/patterns";
 
 interface Asset {
   id: string;
@@ -50,6 +54,7 @@ const stageFilters = ["Analyze", "Plan", "Execute"];
 const typeFilters = ["Playbook", "Template", "Ferramenta", "Script", "Report", "Guia"];
 
 export function Vault() {
+  const navigate = useNavigate();
   const [lang, setLang] = useState<"PT" | "EN">("PT");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFiltersByFacet, setSelectedFiltersByFacet] = useState<SelectedFiltersByFacet>({
@@ -58,6 +63,20 @@ export function Vault() {
     type: [],
   });
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+
+  const addItems: ActionComposerItem[] = useMemo(() => DEFAULT_ADD_ITEMS, []);
+
+  const handleComposerSelect = (item: ActionComposerItem) => {
+    setIsComposerOpen(false);
+    navigate(item.targetPath, {
+      state: {
+        actionComposer: item.payload,
+        actionId: item.id,
+        origin: "/vault",
+      },
+    });
+  };
 
   const toggleFacetOption = (facet: FilterFacet, option: string) => {
     if (option === "Todos") {
@@ -117,8 +136,20 @@ export function Vault() {
       {/* UNIFIED LAYOUT CONTAINER - Guidelines §4.3 */}
       <div className="flex-1 p-8 overflow-auto">
         <div className="max-w-7xl mx-auto">
+          <div className="flex justify-end mb-6 mt-2">
+            <button
+              onClick={() => setIsComposerOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#C64928] text-white text-[12px] tracking-[0.06em] uppercase shadow-sm hover:translate-y-[-2px] transition-all duration-300"
+              style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
+              aria-label="Abrir ações rápidas"
+            >
+              <Plus size={14} />
+              +ADD
+            </button>
+          </div>
+
           {/* Search */}
-          <div className="max-w-2xl mx-auto mb-10 mt-4">
+          <div className="max-w-2xl mx-auto mb-10">
             <div className="flex items-center gap-3 px-8 py-5 rounded-full bg-white/65 backdrop-blur-[24px] border border-white/40 shadow-[0_12px_32px_rgba(0,0,0,0.04)]">
               <Search size={20} className="text-[#717182]" />
               <input
@@ -297,6 +328,15 @@ export function Vault() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ActionComposerModal
+        open={isComposerOpen}
+        title="Adicionar no Vault"
+        description="Acesse fluxos unificados de criação para sessão, bridge e insights."
+        items={addItems}
+        onClose={() => setIsComposerOpen(false)}
+        onSelect={handleComposerSelect}
+      />
     </div>
   );
 }
