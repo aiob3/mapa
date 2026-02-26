@@ -1,0 +1,38 @@
+{
+  "version": "PAT-SYN-v1",
+  "rpcContracts": [
+    "api_syn_leads_v1",
+    "api_syn_heatmap_v1",
+    "api_syn_outreach_v1",
+    "api_syn_sector_v1",
+    "api_syn_kpis_v1"
+  ],
+  "scoreBands": [
+    { "id": "PAT-SYN-SCORE-001", "minScore": 80, "maxScore": 100, "status": "Quente", "color": "#C64928" },
+    { "id": "PAT-SYN-SCORE-002", "minScore": 60, "maxScore": 79.9999, "status": "Morno", "color": "#F59E0B" },
+    { "id": "PAT-SYN-SCORE-003", "minScore": 0, "maxScore": 59.9999, "status": "Frio", "color": "#6B7280" }
+  ],
+  "signals": [
+    { "id": "PAT-SYN-SIGNAL-001", "dtoKey": "causalHypotheses", "storageKey": "causal_hypotheses", "summaryKey": "causalitySignals", "summaryColumn": "causality_signals" },
+    { "id": "PAT-SYN-SIGNAL-002", "dtoKey": "counterintuitiveSignals", "storageKey": "counterintuitive_signals", "summaryKey": "counterintuitiveSignals", "summaryColumn": "counterintuitive_signals" },
+    { "id": "PAT-SYN-SIGNAL-003", "dtoKey": "relationalConflicts", "storageKey": "relational_conflicts", "summaryKey": "relationalConflicts", "summaryColumn": "relational_conflicts" },
+    { "id": "PAT-SYN-SIGNAL-004", "dtoKey": "inflectionPoints", "storageKey": "inflection_points", "summaryKey": "inflectionPoints", "summaryColumn": "inflection_points" },
+    { "id": "PAT-SYN-SIGNAL-005", "dtoKey": "tacitBasis", "storageKey": "tacit_basis", "summaryKey": "tacitBasisSignals", "summaryColumn": "tacit_basis_signals" }
+  ],
+  "patternOriginMatrix": [
+    { "id": "PAT-SYN-DTO-001", "pattern": "SynLeadDto", "origin": "Supabase RPC api_syn_leads_v1", "stage": "DTO" },
+    { "id": "PAT-SYN-DTO-002", "pattern": "SynSemanticLayerDto", "origin": "Supabase semantic_layer + middleware normalize", "stage": "DTO" },
+    { "id": "PAT-SYN-DTO-003", "pattern": "SynSemanticSignalsSummaryDto", "origin": "ClickHouse semantic_signals_summary_v1 via middleware", "stage": "DTO" },
+    { "id": "PAT-SYN-STATUS-001", "pattern": "statusColor", "origin": "Score semantics PAT-SYN-SCORE-*", "stage": "Mapper/Transform" },
+    { "id": "PAT-SYN-SCORE-001", "pattern": "score>=80 => Quente", "origin": "Supabase view fallback + shared normalizer", "stage": "Cross-layer rule" },
+    { "id": "PAT-SYN-SCORE-002", "pattern": "60<=score<80 => Morno", "origin": "Supabase view fallback + shared normalizer", "stage": "Cross-layer rule" },
+    { "id": "PAT-SYN-SCORE-003", "pattern": "score<60 => Frio", "origin": "Supabase view fallback + shared normalizer", "stage": "Cross-layer rule" },
+    { "id": "PAT-SYN-SIGNAL-001", "pattern": "causalHypotheses", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
+    { "id": "PAT-SYN-SIGNAL-002", "pattern": "counterintuitiveSignals", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
+    { "id": "PAT-SYN-SIGNAL-003", "pattern": "relationalConflicts", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
+    { "id": "PAT-SYN-SIGNAL-004", "pattern": "inflectionPoints", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
+    { "id": "PAT-SYN-SIGNAL-005", "pattern": "tacitBasis", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
+    { "id": "PAT-SYN-RPC-001", "pattern": "RPC contract list", "origin": "validate-syn-post-migration + analyticsApi", "stage": "Contract gate" },
+    { "id": "PAT-SYN-TRANSFORM-001", "pattern": "summary row snake_case -> camelCase", "origin": "syn-middleware response map", "stage": "Middleware transform" }
+  ]
+}

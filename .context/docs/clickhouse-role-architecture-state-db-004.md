@@ -140,6 +140,20 @@ npm run syn:ingest
 npm run syn:middleware
 ```
 
+## 8) Contratos canônicos PAT-SYN
+
+Os contratos transversais de DTO, score/status, taxonomia e RPC do Syn foram consolidados em:
+
+1. `.context/docs/syn-canonical-pattern-catalog-state-db-005.md`
+2. `shared/syn/pat-syn-v1.mjs`
+
+Essas referências devem ser tratadas como SSOT para evitar deriva entre Supabase, middleware e mapa-app.
+
+Registro de prioridade:
+
+1. A consolidação `PAT-SYN-v1` está classificada como **VITAL** no pipeline desta etapa.
+2. A trilha de consulta para exibição no frontend Syn deve considerar esse baseline como pré-condição.
+
 <!-- agent-update:end -->
 
 <!-- agent-readonly:guidance -->

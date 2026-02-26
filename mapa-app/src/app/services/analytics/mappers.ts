@@ -9,6 +9,13 @@ import type {
   SynLeadViewModel,
 } from '../../types/analytics';
 import { createEmptySynAnalyticsBundleDto } from './analyticsApi';
+import {
+  deriveSynScoreIA,
+  deriveSynStatusByScore,
+  normalizeSynSemanticLayer,
+  normalizeSynSemanticSignals,
+  normalizeSynTone,
+} from '@syn-patterns';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -35,70 +42,12 @@ function initialsOf(name: string): string {
   return parts.map((part) => part[0]?.toUpperCase() || '').join('');
 }
 
-function statusByScore(score: number): { status: string; color: string } {
-  if (score >= 80) {
-    return { status: 'Quente', color: '#C64928' };
-  }
-  if (score >= 60) {
-    return { status: 'Morno', color: '#F59E0B' };
-  }
-  return { status: 'Frio', color: '#6B7280' };
-}
-
-function createEmptySemanticLayer(): SynSemanticLayerDto {
-  return {
-    causalHypotheses: [],
-    counterintuitiveSignals: [],
-    relationalConflicts: [],
-    inflectionPoints: [],
-    tacitBasis: [],
-    tacticalFormula: {
-      action: '',
-      owner: '',
-      timing: '',
-      expectedOutcome: '',
-    },
-    executiveSummary: '',
-  };
-}
-
-function normalizeSemanticLayer(layer?: SynSemanticLayerDto): SynSemanticLayerDto {
-  const base = createEmptySemanticLayer();
-  if (!layer) {
-    return base;
-  }
-
-  return {
-    causalHypotheses: Array.isArray(layer.causalHypotheses) ? layer.causalHypotheses : [],
-    counterintuitiveSignals: Array.isArray(layer.counterintuitiveSignals) ? layer.counterintuitiveSignals : [],
-    relationalConflicts: Array.isArray(layer.relationalConflicts) ? layer.relationalConflicts : [],
-    inflectionPoints: Array.isArray(layer.inflectionPoints) ? layer.inflectionPoints : [],
-    tacitBasis: Array.isArray(layer.tacitBasis) ? layer.tacitBasis : [],
-    tacticalFormula: {
-      action: layer.tacticalFormula?.action || '',
-      owner: layer.tacticalFormula?.owner || '',
-      timing: layer.tacticalFormula?.timing || '',
-      expectedOutcome: layer.tacticalFormula?.expectedOutcome || '',
-    },
-    executiveSummary: layer.executiveSummary || '',
-  };
-}
-
-function normalizeSemanticSignals(signals: SynSemanticSignalsDto | undefined, semanticLayer: SynSemanticLayerDto): SynSemanticSignalsDto {
-  return {
-    causalityCount: signals?.causalityCount ?? semanticLayer.causalHypotheses.length,
-    counterintuitiveCount: signals?.counterintuitiveCount ?? semanticLayer.counterintuitiveSignals.length,
-    relationalConflictCount: signals?.relationalConflictCount ?? semanticLayer.relationalConflicts.length,
-    inflectionPointsCount: signals?.inflectionPointsCount ?? semanticLayer.inflectionPoints.length,
-    tacitBasisCount: signals?.tacitBasisCount ?? semanticLayer.tacitBasis.length,
-    executiveSummary: signals?.executiveSummary || semanticLayer.executiveSummary || '',
-  };
-}
-
 function toLeadViewModel(dto: SynLeadDto): SynLeadViewModel {
-  const status = statusByScore(dto.score);
-  const semanticLayer = normalizeSemanticLayer(dto.semanticLayer);
-  const semanticSignals = normalizeSemanticSignals(dto.semanticSignals, semanticLayer);
+  const status = deriveSynStatusByScore(dto.score);
+  const semanticLayer = normalizeSynSemanticLayer(dto.semanticLayer) as SynSemanticLayerDto;
+  const semanticSignals = normalizeSynSemanticSignals(dto.semanticSignals, semanticLayer) as SynSemanticSignalsDto;
+  const scoreIA = deriveSynScoreIA(dto.score, dto.scoreIA);
+  const tone = normalizeSynTone(dto.tone, dto.toneColor);
 
   return {
     id: dto.id,
@@ -114,10 +63,10 @@ function toLeadViewModel(dto: SynLeadDto): SynLeadViewModel {
     statusColor: dto.statusColor || status.color,
     openRate: formatPercent(dto.openRate ?? 0),
     clickRate: formatPercent(dto.clickRate ?? 0),
-    tone: (dto.tone || 'ANALÍTICO').toUpperCase(),
-    toneColor: dto.toneColor || '#4A6FA5',
-    scoreIA: (dto.scoreIA ?? Math.max(0, Math.min(10, dto.score / 10))).toFixed(1),
-    scoreColor: (dto.scoreIA ?? dto.score / 10) >= 8 ? '#2E4C3B' : '#C64928',
+    tone: tone.tone,
+    toneColor: tone.toneColor,
+    scoreIA: scoreIA.text,
+    scoreColor: scoreIA.color,
     semanticLayer,
     semanticSignals,
   };

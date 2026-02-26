@@ -1,0 +1,424 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`syn pattern contracts keeps stable snapshot for PAT-SYN catalog and RPC fixtures 1`] = `
+{
+  "catalog": {
+    "patternOriginMatrix": [
+      {
+        "id": "PAT-SYN-DTO-001",
+        "origin": "Supabase RPC api_syn_leads_v1",
+        "pattern": "SynLeadDto",
+        "stage": "DTO",
+      },
+      {
+        "id": "PAT-SYN-DTO-002",
+        "origin": "Supabase semantic_layer + middleware normalize",
+        "pattern": "SynSemanticLayerDto",
+        "stage": "DTO",
+      },
+      {
+        "id": "PAT-SYN-DTO-003",
+        "origin": "ClickHouse semantic_signals_summary_v1 via middleware",
+        "pattern": "SynSemanticSignalsSummaryDto",
+        "stage": "DTO",
+      },
+      {
+        "id": "PAT-SYN-STATUS-001",
+        "origin": "Score semantics PAT-SYN-SCORE-*",
+        "pattern": "statusColor",
+        "stage": "Mapper/Transform",
+      },
+      {
+        "id": "PAT-SYN-SCORE-001",
+        "origin": "Supabase view fallback + shared normalizer",
+        "pattern": "score>=80 => Quente",
+        "stage": "Cross-layer rule",
+      },
+      {
+        "id": "PAT-SYN-SCORE-002",
+        "origin": "Supabase view fallback + shared normalizer",
+        "pattern": "60<=score<80 => Morno",
+        "stage": "Cross-layer rule",
+      },
+      {
+        "id": "PAT-SYN-SCORE-003",
+        "origin": "Supabase view fallback + shared normalizer",
+        "pattern": "score<60 => Frio",
+        "stage": "Cross-layer rule",
+      },
+      {
+        "id": "PAT-SYN-SIGNAL-001",
+        "origin": "semantic_layer -> ClickHouse + app",
+        "pattern": "causalHypotheses",
+        "stage": "Taxonomia de sinais",
+      },
+      {
+        "id": "PAT-SYN-SIGNAL-002",
+        "origin": "semantic_layer -> ClickHouse + app",
+        "pattern": "counterintuitiveSignals",
+        "stage": "Taxonomia de sinais",
+      },
+      {
+        "id": "PAT-SYN-SIGNAL-003",
+        "origin": "semantic_layer -> ClickHouse + app",
+        "pattern": "relationalConflicts",
+        "stage": "Taxonomia de sinais",
+      },
+      {
+        "id": "PAT-SYN-SIGNAL-004",
+        "origin": "semantic_layer -> ClickHouse + app",
+        "pattern": "inflectionPoints",
+        "stage": "Taxonomia de sinais",
+      },
+      {
+        "id": "PAT-SYN-SIGNAL-005",
+        "origin": "semantic_layer -> ClickHouse + app",
+        "pattern": "tacitBasis",
+        "stage": "Taxonomia de sinais",
+      },
+      {
+        "id": "PAT-SYN-RPC-001",
+        "origin": "validate-syn-post-migration + analyticsApi",
+        "pattern": "RPC contract list",
+        "stage": "Contract gate",
+      },
+      {
+        "id": "PAT-SYN-TRANSFORM-001",
+        "origin": "syn-middleware response map",
+        "pattern": "summary row snake_case -> camelCase",
+        "stage": "Middleware transform",
+      },
+    ],
+    "rpcContracts": [
+      "api_syn_leads_v1",
+      "api_syn_heatmap_v1",
+      "api_syn_outreach_v1",
+      "api_syn_sector_v1",
+      "api_syn_kpis_v1",
+    ],
+    "scoreBands": [
+      {
+        "color": "#C64928",
+        "id": "PAT-SYN-SCORE-001",
+        "maxScore": 100,
+        "minScore": 80,
+        "status": "Quente",
+      },
+      {
+        "color": "#F59E0B",
+        "id": "PAT-SYN-SCORE-002",
+        "maxScore": 79.9999,
+        "minScore": 60,
+        "status": "Morno",
+      },
+      {
+        "color": "#6B7280",
+        "id": "PAT-SYN-SCORE-003",
+        "maxScore": 59.9999,
+        "minScore": 0,
+        "status": "Frio",
+      },
+    ],
+    "signals": [
+      {
+        "dtoKey": "causalHypotheses",
+        "id": "PAT-SYN-SIGNAL-001",
+        "storageKey": "causal_hypotheses",
+        "summaryColumn": "causality_signals",
+        "summaryKey": "causalitySignals",
+      },
+      {
+        "dtoKey": "counterintuitiveSignals",
+        "id": "PAT-SYN-SIGNAL-002",
+        "storageKey": "counterintuitive_signals",
+        "summaryColumn": "counterintuitive_signals",
+        "summaryKey": "counterintuitiveSignals",
+      },
+      {
+        "dtoKey": "relationalConflicts",
+        "id": "PAT-SYN-SIGNAL-003",
+        "storageKey": "relational_conflicts",
+        "summaryColumn": "relational_conflicts",
+        "summaryKey": "relationalConflicts",
+      },
+      {
+        "dtoKey": "inflectionPoints",
+        "id": "PAT-SYN-SIGNAL-004",
+        "storageKey": "inflection_points",
+        "summaryColumn": "inflection_points",
+        "summaryKey": "inflectionPoints",
+      },
+      {
+        "dtoKey": "tacitBasis",
+        "id": "PAT-SYN-SIGNAL-005",
+        "storageKey": "tacit_basis",
+        "summaryColumn": "tacit_basis_signals",
+        "summaryKey": "tacitBasisSignals",
+      },
+    ],
+    "version": "PAT-SYN-v1",
+  },
+  "fixtures": {
+    "middlewareSummary": {
+      "rows": [
+        {
+          "causality_signals": 20,
+          "counterintuitive_signals": 6,
+          "entity_kind": "deal",
+          "events": 12,
+          "inflection_points": 5,
+          "relational_conflicts": 3,
+          "tacit_basis_signals": 7,
+        },
+      ],
+      "totals": {
+        "causalitySignals": 20,
+        "counterintuitiveSignals": 6,
+        "events": 12,
+        "inflectionPoints": 5,
+        "relationalConflicts": 3,
+        "tacitBasisSignals": 7,
+      },
+    },
+    "rpc": {
+      "api_syn_heatmap_v1": {
+        "heatmapData": [
+          {
+            "metrics": [
+              {
+                "intensity": "forte",
+                "value": 88,
+              },
+              {
+                "intensity": "estavel",
+                "value": 77,
+              },
+            ],
+            "name": "Sudeste",
+          },
+        ],
+        "heatmapMetrics": [
+          "Revenue",
+          "Growth",
+          "Market Share",
+          "Innovation",
+          "Customer Sat.",
+          "Pipeline",
+        ],
+        "kpiCards": [
+          {
+            "amount": "4200000",
+            "color": "#8B5CF6",
+            "iconKey": "star",
+            "label": "New Logo",
+            "sub": "Leads ativos",
+            "value": "12",
+          },
+        ],
+        "narrativeItems": [
+          {
+            "desc": "Ana Oliveira — Atlas Logística — 780000",
+            "priority": "ALTA",
+            "tag": "NOVO",
+            "tagColor": "#8B5CF6",
+            "time": "agora",
+            "title": "Movimento em Logística",
+          },
+        ],
+        "pipelineData": [
+          {
+            "atual": 2.8,
+            "meta": 3,
+            "month": "Jan",
+            "projetado": 3.1,
+          },
+        ],
+        "strategicActions": [
+          {
+            "action": "Acionar frente comercial para Atlas Logística",
+            "color": "#C64928",
+            "date": "27/02",
+            "owner": "Revenue Ops",
+            "priority": "ALTA",
+          },
+        ],
+      },
+      "api_syn_kpis_v1": {
+        "arrGrowth": 21.3,
+        "atRiskValue": 980000,
+        "contratosVigentes": 7,
+        "conversionDelta": 6.4,
+        "conversionRate": 41.8,
+        "eventosMonitorados": 84,
+        "leadsAtivos": 12,
+        "leadsEmAberto": 5,
+        "pipelineTotal": 4200000,
+        "scriptsGenerated": 252,
+        "winRate": 72.5,
+      },
+      "api_syn_leads_v1": [
+        {
+          "clickRate": 31.2,
+          "company": "Atlas Logística",
+          "dealValue": 780000,
+          "id": "lead-001",
+          "location": "São Paulo",
+          "name": "Ana Oliveira",
+          "openRate": 58.4,
+          "region": "Sudeste",
+          "score": 83,
+          "scoreIA": 8.3,
+          "sector": "Logística",
+          "semanticLayer": {
+            "causal_hypotheses": [
+              "Lead com orçamento aprovado e sponsor executivo",
+            ],
+            "counterintuitive_signals": [
+              "Aumento de abertura mesmo com queda de reuniões",
+            ],
+            "executive_summary": "Conta em estágio avançado com risco controlável.",
+            "inflection_points": [
+              "Comitê de aprovação na próxima semana",
+            ],
+            "relational_conflicts": [
+              "Risco de conflito com área de compras",
+            ],
+            "tacit_basis": [
+              "Histórico de renovação acima da média do segmento",
+            ],
+            "tactical_formula": {
+              "action": "Executar plano de fechamento orientado por risco",
+              "expected_outcome": "Fechamento com margem preservada",
+              "owner": "RevOps",
+              "timing": "72h",
+            },
+          },
+          "semanticSignals": {
+            "causalityCount": 1,
+            "counterintuitiveCount": 1,
+            "executiveSummary": "Conta em estágio avançado com risco controlável.",
+            "inflectionPointsCount": 1,
+            "relationalConflictCount": 1,
+            "tacitBasisCount": 1,
+          },
+          "status": "Quente",
+          "statusColor": "#C64928",
+          "tone": "ANALÍTICO",
+          "toneColor": "#4A6FA5",
+        },
+      ],
+      "api_syn_outreach_v1": {
+        "chartData": [
+          {
+            "value": 54,
+            "week": "Semana 1",
+          },
+        ],
+        "globalConversionDelta": "6.4%",
+        "globalConversionRate": "41.8%",
+        "leads": [
+          {
+            "clickRate": "31.2%",
+            "name": "Ana Oliveira",
+            "openRate": "58.4%",
+            "scoreColor": "#2E4C3B",
+            "scoreIA": "8.3",
+            "sector": "Logística",
+            "tone": "ANALÍTICO",
+            "toneColor": "#4A6FA5",
+          },
+        ],
+        "radarData": [
+          {
+            "A": 90,
+            "fullMark": 100,
+            "subject": "Analítico",
+          },
+        ],
+        "scriptsGenerated": "252",
+        "toneInsights": [
+          {
+            "color": "#4A6FA5",
+            "label": "Logística",
+            "score": "(8.3)",
+            "tone": "Analítico",
+          },
+        ],
+      },
+      "api_syn_sector_v1": {
+        "aiRecommendations": [
+          {
+            "desc": "Conduzir frente executiva com sponsor técnico.",
+            "level": "ALTO",
+            "levelColor": "#C64928",
+            "sector": "Logística",
+            "title": "Acelerar fechamento",
+          },
+        ],
+        "boardSynthesis": [
+          {
+            "content": "Dependência de aprovação de compras.",
+            "type": "Risco",
+            "typeColor": "#C64928",
+          },
+        ],
+        "conversionInsights": [
+          {
+            "barColor": "#C64928",
+            "change": "+2.4",
+            "changeColor": "#2E4C3B",
+            "metric": "Conversão",
+            "sector": "Logística",
+            "tags": [
+              "prioritário",
+            ],
+            "target": 45,
+            "value": 41.8,
+          },
+        ],
+        "kpiCards": [
+          {
+            "change": "+0.2",
+            "isHighlight": true,
+            "label": "ROI",
+            "value": "2.4x",
+          },
+        ],
+        "radarComparative": [
+          {
+            "Financeiro": 65,
+            "Tecnologia": 75,
+            "Varejo": 70,
+            "fullMark": 100,
+            "subject": "Engajamento",
+          },
+        ],
+        "radarLegend": [
+          {
+            "color": "#C64928",
+            "label": "Logística",
+          },
+        ],
+        "scatterData": [
+          {
+            "color": "#C64928",
+            "engagement": 58.4,
+            "name": "Logística",
+            "roi": 2.4,
+            "size": 780000,
+          },
+        ],
+        "sectorReportByName": {
+          "Logística": {
+            "dealsAtivos": "12",
+            "growth": "18%",
+            "revenue": "R$ 4.2M",
+            "roi": "2.4x",
+            "sentimento": "Positivo",
+          },
+        },
+      },
+    },
+  },
+}
+`;

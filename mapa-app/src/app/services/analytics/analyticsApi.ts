@@ -7,6 +7,12 @@ import type {
   SynSemanticSignalsSummaryDto,
   SynSectorDto,
 } from '../../types/analytics';
+import {
+  createEmptySynSemanticSignalsSummary,
+  mapSynSemanticSummaryRow,
+  normalizeSynSemanticSummaryTotals,
+  SYN_ANALYTICS_RPC,
+} from '@syn-patterns';
 
 const REQUEST_TIMEOUT_MS = 12000;
 
@@ -205,18 +211,7 @@ function emptyOutreach(): SynOutreachDto {
 }
 
 function emptySemanticSignalsSummary(): SynSemanticSignalsSummaryDto {
-  return {
-    rows: [],
-    totals: {
-      events: 0,
-      causalitySignals: 0,
-      counterintuitiveSignals: 0,
-      relationalConflicts: 0,
-      inflectionPoints: 0,
-      tacitBasisSignals: 0,
-    },
-    generatedAt: '',
-  };
+  return createEmptySynSemanticSignalsSummary() as SynSemanticSignalsSummaryDto;
 }
 
 function emptySector(): SynSectorDto {
@@ -244,27 +239,27 @@ export function createEmptySynAnalyticsBundleDto(): SynAnalyticsBundleDto {
 }
 
 export async function fetchSynKpisV1(accessToken: string): Promise<SynKpisDto> {
-  const data = await callRpc<SynKpisDto>('api_syn_kpis_v1', accessToken);
+  const data = await callRpc<SynKpisDto>(SYN_ANALYTICS_RPC.kpis, accessToken);
   return { ...emptyKpis(), ...(data || {}) };
 }
 
 export async function fetchSynLeadsV1(accessToken: string): Promise<SynLeadDto[]> {
-  const data = await callRpc<SynLeadDto[]>('api_syn_leads_v1', accessToken);
+  const data = await callRpc<SynLeadDto[]>(SYN_ANALYTICS_RPC.leads, accessToken);
   return Array.isArray(data) ? data : [];
 }
 
 export async function fetchSynHeatmapV1(accessToken: string): Promise<SynHeatmapDto> {
-  const data = await callRpc<SynHeatmapDto>('api_syn_heatmap_v1', accessToken);
+  const data = await callRpc<SynHeatmapDto>(SYN_ANALYTICS_RPC.heatmap, accessToken);
   return { ...emptyHeatmap(), ...(data || {}) };
 }
 
 export async function fetchSynOutreachV1(accessToken: string): Promise<SynOutreachDto> {
-  const data = await callRpc<SynOutreachDto>('api_syn_outreach_v1', accessToken);
+  const data = await callRpc<SynOutreachDto>(SYN_ANALYTICS_RPC.outreach, accessToken);
   return { ...emptyOutreach(), ...(data || {}) };
 }
 
 export async function fetchSynSectorV1(accessToken: string): Promise<SynSectorDto> {
-  const data = await callRpc<SynSectorDto>('api_syn_sector_v1', accessToken);
+  const data = await callRpc<SynSectorDto>(SYN_ANALYTICS_RPC.sector, accessToken);
   return { ...emptySector(), ...(data || {}) };
 }
 
@@ -282,24 +277,9 @@ export async function fetchSynSemanticSignalsSummaryV1(accessToken: string): Pro
 
   return {
     rows: Array.isArray(data?.rows)
-      ? data.rows.map((row) => ({
-          entityKind: row.entity_kind || 'unknown',
-          events: Number(row.events || 0),
-          causalitySignals: Number(row.causality_signals || 0),
-          counterintuitiveSignals: Number(row.counterintuitive_signals || 0),
-          relationalConflicts: Number(row.relational_conflicts || 0),
-          inflectionPoints: Number(row.inflection_points || 0),
-          tacitBasisSignals: Number(row.tacit_basis_signals || 0),
-        }))
+      ? data.rows.map((row) => mapSynSemanticSummaryRow(row))
       : [],
-    totals: {
-      events: Number(data?.totals?.events || 0),
-      causalitySignals: Number(data?.totals?.causalitySignals || 0),
-      counterintuitiveSignals: Number(data?.totals?.counterintuitiveSignals || 0),
-      relationalConflicts: Number(data?.totals?.relationalConflicts || 0),
-      inflectionPoints: Number(data?.totals?.inflectionPoints || 0),
-      tacitBasisSignals: Number(data?.totals?.tacitBasisSignals || 0),
-    },
+    totals: normalizeSynSemanticSummaryTotals(data?.totals),
     generatedAt: typeof data?.generatedAt === 'string' ? data.generatedAt : '',
   };
 }

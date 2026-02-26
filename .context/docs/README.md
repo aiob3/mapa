@@ -18,6 +18,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [ClickHouse Activation Runbook (STATE-DB-004)](./clickhouse-activation-state-db-004.md)
 - [ClickHouse Role in Architecture (STATE-DB-004)](./clickhouse-role-architecture-state-db-004.md)
 - [Syn Post-Migration Validation Checklist (STATE-DB-004)](./syn-post-migration-validation-checklist-state-db-004.md)
+- [Syn Canonical Pattern Catalog (STATE-DB-005)](./syn-canonical-pattern-catalog-state-db-005.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
@@ -52,6 +53,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | ClickHouse Activation Runbook (STATE-DB-004) | `clickhouse-activation-state-db-004.md` | agent-update:clickhouse-activation-state-db-004 | Bootstrap de instância ClickHouse, schema vetorial/sinais e fluxo de integração com `semantic_layer` |
 | ClickHouse Role in Architecture (STATE-DB-004) | `clickhouse-role-architecture-state-db-004.md` | agent-update:clickhouse-role-architecture-state-db-004 | Papel arquitetural incorporado, limites de responsabilidade e contrato operacional Supabase -> Middleware -> ClickHouse -> Syn |
 | Syn Post-Migration Validation Checklist (STATE-DB-004) | `syn-post-migration-validation-checklist-state-db-004.md` | agent-update:syn-post-migration-validation-checklist-state-db-004 | Checklist/script único para validar migrations e RPCs `api_syn_*_v1` com token `authenticated` e mitigação automática de inconsistências |
+| Syn Canonical Pattern Catalog (STATE-DB-005) | `syn-canonical-pattern-catalog-state-db-005.md` | agent-update:syn-canonical-pattern-catalog-state-db-005 | Catálogo PAT-SYN-* versionado, matriz pattern->origem, SSOT de score/status, taxonomia semântica e contratos de RPC |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

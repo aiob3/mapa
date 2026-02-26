@@ -1,0 +1,190 @@
+{
+  "rpc": {
+    "api_syn_kpis_v1": {
+      "leadsAtivos": 12,
+      "contratosVigentes": 7,
+      "leadsEmAberto": 5,
+      "eventosMonitorados": 84,
+      "pipelineTotal": 4200000,
+      "winRate": 72.5,
+      "atRiskValue": 980000,
+      "conversionRate": 41.8,
+      "conversionDelta": 6.4,
+      "scriptsGenerated": 252,
+      "arrGrowth": 21.3
+    },
+    "api_syn_leads_v1": [
+      {
+        "id": "lead-001",
+        "name": "Ana Oliveira",
+        "company": "Atlas Logística",
+        "sector": "Logística",
+        "region": "Sudeste",
+        "location": "São Paulo",
+        "dealValue": 780000,
+        "score": 83,
+        "status": "Quente",
+        "statusColor": "#C64928",
+        "openRate": 58.4,
+        "clickRate": 31.2,
+        "tone": "ANALÍTICO",
+        "toneColor": "#4A6FA5",
+        "scoreIA": 8.3,
+        "semanticLayer": {
+          "causal_hypotheses": ["Lead com orçamento aprovado e sponsor executivo"],
+          "counterintuitive_signals": ["Aumento de abertura mesmo com queda de reuniões"],
+          "relational_conflicts": ["Risco de conflito com área de compras"],
+          "inflection_points": ["Comitê de aprovação na próxima semana"],
+          "tacit_basis": ["Histórico de renovação acima da média do segmento"],
+          "tactical_formula": {
+            "action": "Executar plano de fechamento orientado por risco",
+            "owner": "RevOps",
+            "timing": "72h",
+            "expected_outcome": "Fechamento com margem preservada"
+          },
+          "executive_summary": "Conta em estágio avançado com risco controlável."
+        },
+        "semanticSignals": {
+          "causalityCount": 1,
+          "counterintuitiveCount": 1,
+          "relationalConflictCount": 1,
+          "inflectionPointsCount": 1,
+          "tacitBasisCount": 1,
+          "executiveSummary": "Conta em estágio avançado com risco controlável."
+        }
+      }
+    ],
+    "api_syn_heatmap_v1": {
+      "heatmapMetrics": ["Revenue", "Growth", "Market Share", "Innovation", "Customer Sat.", "Pipeline"],
+      "heatmapData": [
+        {
+          "name": "Sudeste",
+          "metrics": [
+            { "value": 88, "intensity": "forte" },
+            { "value": 77, "intensity": "estavel" }
+          ]
+        }
+      ],
+      "pipelineData": [
+        { "month": "Jan", "projetado": 3.1, "atual": 2.8, "meta": 3.0 }
+      ],
+      "narrativeItems": [
+        {
+          "priority": "ALTA",
+          "tag": "NOVO",
+          "tagColor": "#8B5CF6",
+          "title": "Movimento em Logística",
+          "desc": "Ana Oliveira — Atlas Logística — 780000",
+          "time": "agora"
+        }
+      ],
+      "strategicActions": [
+        {
+          "priority": "ALTA",
+          "color": "#C64928",
+          "action": "Acionar frente comercial para Atlas Logística",
+          "owner": "Revenue Ops",
+          "date": "27/02"
+        }
+      ],
+      "kpiCards": [
+        {
+          "label": "New Logo",
+          "value": "12",
+          "amount": "4200000",
+          "color": "#8B5CF6",
+          "iconKey": "star",
+          "sub": "Leads ativos"
+        }
+      ]
+    },
+    "api_syn_outreach_v1": {
+      "chartData": [{ "week": "Semana 1", "value": 54 }],
+      "radarData": [{ "subject": "Analítico", "A": 90, "fullMark": 100 }],
+      "leads": [
+        {
+          "name": "Ana Oliveira",
+          "sector": "Logística",
+          "tone": "ANALÍTICO",
+          "toneColor": "#4A6FA5",
+          "openRate": "58.4%",
+          "clickRate": "31.2%",
+          "scoreIA": "8.3",
+          "scoreColor": "#2E4C3B"
+        }
+      ],
+      "globalConversionRate": "41.8%",
+      "globalConversionDelta": "6.4%",
+      "scriptsGenerated": "252",
+      "toneInsights": [
+        { "label": "Logística", "tone": "Analítico", "score": "(8.3)", "color": "#4A6FA5" }
+      ]
+    },
+    "api_syn_sector_v1": {
+      "scatterData": [
+        { "name": "Logística", "roi": 2.4, "engagement": 58.4, "size": 780000, "color": "#C64928" }
+      ],
+      "conversionInsights": [
+        {
+          "sector": "Logística",
+          "metric": "Conversão",
+          "value": 41.8,
+          "target": 45,
+          "change": "+2.4",
+          "changeColor": "#2E4C3B",
+          "barColor": "#C64928",
+          "tags": ["prioritário"]
+        }
+      ],
+      "aiRecommendations": [
+        {
+          "level": "ALTO",
+          "levelColor": "#C64928",
+          "sector": "Logística",
+          "title": "Acelerar fechamento",
+          "desc": "Conduzir frente executiva com sponsor técnico."
+        }
+      ],
+      "radarComparative": [
+        { "subject": "Engajamento", "Varejo": 70, "Financeiro": 65, "Tecnologia": 75, "fullMark": 100 }
+      ],
+      "boardSynthesis": [
+        { "type": "Risco", "typeColor": "#C64928", "content": "Dependência de aprovação de compras." }
+      ],
+      "kpiCards": [
+        { "label": "ROI", "value": "2.4x", "change": "+0.2", "isHighlight": true }
+      ],
+      "sectorReportByName": {
+        "Logística": {
+          "revenue": "R$ 4.2M",
+          "growth": "18%",
+          "roi": "2.4x",
+          "dealsAtivos": "12",
+          "sentimento": "Positivo"
+        }
+      },
+      "radarLegend": [{ "label": "Logística", "color": "#C64928" }]
+    }
+  },
+  "middlewareSummary": {
+    "rows": [
+      {
+        "entity_kind": "deal",
+        "events": 12,
+        "causality_signals": 20,
+        "counterintuitive_signals": 6,
+        "relational_conflicts": 3,
+        "inflection_points": 5,
+        "tacit_basis_signals": 7
+      }
+    ],
+    "totals": {
+      "events": 12,
+      "causalitySignals": 20,
+      "counterintuitiveSignals": 6,
+      "relationalConflicts": 3,
+      "inflectionPoints": 5,
+      "tacitBasisSignals": 7
+    }
+  }
+}

@@ -14,6 +14,12 @@ export default defineConfig({
     alias: {
       // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
+      '@syn-patterns': path.resolve(__dirname, '../shared/syn/pat-syn-v1.mjs'),
+    },
+  },
+  server: {
+    fs: {
+      allow: [path.resolve(__dirname, '..')],
     },
   },
 

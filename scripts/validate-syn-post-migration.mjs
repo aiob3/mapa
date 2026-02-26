@@ -3,6 +3,7 @@ import process from 'node:process';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import dotenv from 'dotenv';
+import { SYN_ANALYTICS_RPCS } from '../shared/syn/pat-syn-v1.mjs';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 
@@ -203,13 +204,7 @@ async function tryReloadSchema({ projectUrl, serviceRoleKey }) {
 }
 
 async function validateRpcs({ projectUrl, anonKey, userToken, retries, retryDelayMs, serviceRoleKey }) {
-  const rpcNames = [
-    'api_syn_leads_v1',
-    'api_syn_heatmap_v1',
-    'api_syn_outreach_v1',
-    'api_syn_sector_v1',
-    'api_syn_kpis_v1',
-  ];
+  const rpcNames = [...SYN_ANALYTICS_RPCS];
 
   const cycles = [];
 

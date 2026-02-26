@@ -1,6 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import dotenv from 'dotenv';
+import {
+  normalizeSynSemanticLayer,
+  toSnakeSynSemanticLayer,
+} from '../../shared/syn/pat-syn-v1.mjs';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 dotenv.config({ path: path.resolve(process.cwd(), '.env.clickhouse'), quiet: true });
@@ -122,37 +126,6 @@ async function insertJsonEachRow(config, tableName, rows) {
   );
 }
 
-function toStringArray(value) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value
-    .map((item) => (typeof item === 'string' ? item.trim() : String(item ?? '').trim()))
-    .filter((item) => item.length > 0);
-}
-
-function normalizeSemanticLayer(layer) {
-  const source = layer && typeof layer === 'object' ? layer : {};
-  const tacticalFormula = source.tactical_formula && typeof source.tactical_formula === 'object'
-    ? source.tactical_formula
-    : {};
-
-  return {
-    causal_hypotheses: toStringArray(source.causal_hypotheses),
-    counterintuitive_signals: toStringArray(source.counterintuitive_signals),
-    relational_conflicts: toStringArray(source.relational_conflicts),
-    inflection_points: toStringArray(source.inflection_points),
-    tacit_basis: toStringArray(source.tacit_basis),
-    tactical_formula: {
-      action: typeof tacticalFormula.action === 'string' ? tacticalFormula.action.trim() : '',
-      owner: typeof tacticalFormula.owner === 'string' ? tacticalFormula.owner.trim() : '',
-      timing: typeof tacticalFormula.timing === 'string' ? tacticalFormula.timing.trim() : '',
-      expected_outcome: typeof tacticalFormula.expected_outcome === 'string' ? tacticalFormula.expected_outcome.trim() : '',
-    },
-    executive_summary: typeof source.executive_summary === 'string' ? source.executive_summary.trim() : '',
-  };
-}
-
 function resolveSemanticLayerFromEvent(event) {
   const semanticLayer = event.semantic_layer;
   const eventLayerSemantic = event.event_layer && typeof event.event_layer === 'object'
@@ -162,7 +135,7 @@ function resolveSemanticLayerFromEvent(event) {
     ? event.raw_payload.semantic_layer
     : null;
 
-  return normalizeSemanticLayer(semanticLayer || eventLayerSemantic || rawPayloadSemantic || {});
+  return normalizeSynSemanticLayer(semanticLayer || eventLayerSemantic || rawPayloadSemantic || {});
 }
 
 function resolveEntityKind(event) {
@@ -243,35 +216,35 @@ function buildSemanticChunks(event, semantic) {
     `Setor: ${eventValue(event, 'sector', 'Geral')}`,
     `Região: ${eventValue(event, 'region', 'Sem região')}`,
     `Local: ${eventValue(event, 'location', 'N/A')}`,
-    `Resumo Executivo: ${semantic.executive_summary || 'Sem resumo executivo informado.'}`,
+    `Resumo Executivo: ${semantic.executiveSummary || 'Sem resumo executivo informado.'}`,
   ].join('\n');
 
   chunks.push(contextChunk);
 
-  if (semantic.causal_hypotheses.length > 0) {
-    chunks.push(`Hipóteses causais:\n- ${semantic.causal_hypotheses.join('\n- ')}`);
+  if (semantic.causalHypotheses.length > 0) {
+    chunks.push(`Hipóteses causais:\n- ${semantic.causalHypotheses.join('\n- ')}`);
   }
-  if (semantic.counterintuitive_signals.length > 0) {
-    chunks.push(`Sinais contraintuitivos:\n- ${semantic.counterintuitive_signals.join('\n- ')}`);
+  if (semantic.counterintuitiveSignals.length > 0) {
+    chunks.push(`Sinais contraintuitivos:\n- ${semantic.counterintuitiveSignals.join('\n- ')}`);
   }
-  if (semantic.relational_conflicts.length > 0) {
-    chunks.push(`Conflitos relacionais:\n- ${semantic.relational_conflicts.join('\n- ')}`);
+  if (semantic.relationalConflicts.length > 0) {
+    chunks.push(`Conflitos relacionais:\n- ${semantic.relationalConflicts.join('\n- ')}`);
   }
-  if (semantic.inflection_points.length > 0) {
-    chunks.push(`Pontos de inflexão:\n- ${semantic.inflection_points.join('\n- ')}`);
+  if (semantic.inflectionPoints.length > 0) {
+    chunks.push(`Pontos de inflexão:\n- ${semantic.inflectionPoints.join('\n- ')}`);
   }
-  if (semantic.tacit_basis.length > 0) {
-    chunks.push(`Embasamento tácito:\n- ${semantic.tacit_basis.join('\n- ')}`);
+  if (semantic.tacitBasis.length > 0) {
+    chunks.push(`Embasamento tácito:\n- ${semantic.tacitBasis.join('\n- ')}`);
   }
 
-  const tactical = semantic.tactical_formula;
-  if (tactical.action || tactical.owner || tactical.timing || tactical.expected_outcome) {
+  const tactical = semantic.tacticalFormula;
+  if (tactical.action || tactical.owner || tactical.timing || tactical.expectedOutcome) {
     chunks.push([
       'Fórmula tática:',
       `Ação: ${tactical.action || 'N/A'}`,
       `Owner: ${tactical.owner || 'N/A'}`,
       `Timing: ${tactical.timing || 'N/A'}`,
-      `Resultado esperado: ${tactical.expected_outcome || 'N/A'}`,
+      `Resultado esperado: ${tactical.expectedOutcome || 'N/A'}`,
     ].join('\n'));
   }
 
@@ -481,6 +454,7 @@ async function fetchSupabaseEventsBatch({ cursor, batchSize }) {
 
 async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } = {}) {
   const semantic = resolveSemanticLayerFromEvent(event);
+  const semanticSnake = toSnakeSynSemanticLayer(semantic);
   const sourceTs = toClickHouseDateTime64(event.updated_at);
   const canonicalId = event.canonical_id_v2;
   const entityKind = resolveEntityKind(event);
@@ -490,16 +464,16 @@ async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } =
   const signalRow = {
     canonical_id_v2: canonicalId,
     entity_kind: entityKind,
-    causal_hypotheses: semantic.causal_hypotheses,
-    counterintuitive_signals: semantic.counterintuitive_signals,
-    relational_conflicts: semantic.relational_conflicts,
-    inflection_points: semantic.inflection_points,
-    tacit_basis: semantic.tacit_basis,
-    executive_summary: semantic.executive_summary,
-    tactical_action: semantic.tactical_formula.action,
-    tactical_owner: semantic.tactical_formula.owner,
-    tactical_timing: semantic.tactical_formula.timing,
-    tactical_expected_outcome: semantic.tactical_formula.expected_outcome,
+    causal_hypotheses: semanticSnake.causal_hypotheses,
+    counterintuitive_signals: semanticSnake.counterintuitive_signals,
+    relational_conflicts: semanticSnake.relational_conflicts,
+    inflection_points: semanticSnake.inflection_points,
+    tacit_basis: semanticSnake.tacit_basis,
+    executive_summary: semanticSnake.executive_summary,
+    tactical_action: semanticSnake.tactical_formula.action,
+    tactical_owner: semanticSnake.tactical_formula.owner,
+    tactical_timing: semanticSnake.tactical_formula.timing,
+    tactical_expected_outcome: semanticSnake.tactical_formula.expected_outcome,
     owner_user_id: ownerUserId,
     source_ref: sourceRef,
     source_ts: sourceTs,
@@ -520,11 +494,11 @@ async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } =
       metadata_json: JSON.stringify({
         source_ts: sourceTs,
         semantic_counts: {
-          causality: semantic.causal_hypotheses.length,
-          counterintuitive: semantic.counterintuitive_signals.length,
-          relational: semantic.relational_conflicts.length,
-          inflection: semantic.inflection_points.length,
-          tacit: semantic.tacit_basis.length,
+          causality: semantic.causalHypotheses.length,
+          counterintuitive: semantic.counterintuitiveSignals.length,
+          relational: semantic.relationalConflicts.length,
+          inflection: semantic.inflectionPoints.length,
+          tacit: semantic.tacitBasis.length,
         },
       }),
       created_at: sourceTs,

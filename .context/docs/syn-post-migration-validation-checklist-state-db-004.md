@@ -70,6 +70,23 @@ npm run syn:validate:post-migration
 3. `SUPABASE_VALIDATION_EMAIL` / `SUPABASE_VALIDATION_PASSWORD`
    - Se não definidos, o script usa usuário efêmero.
 
+## Gate CI (homolog)
+
+Workflow ativo:
+
+1. `.github/workflows/ci.yml` job `syn-post-migration-gate`
+2. `environment: homolog`
+3. execução obrigatória: `npm run syn:validate:post-migration`
+
+Regras:
+
+1. O gate é habilitado por `vars.SYN_HOMOLOG_GATE_ENABLED == 'true'`.
+2. Se o script falhar, o job falha e o merge deve ser bloqueado por branch protection.
+3. Segredos exigidos no ambiente homolog:
+   - `SUPABASE_PROJECT_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_PUBLISHABLE_KEY`
+
 ## Falhas comuns e mitigação já coberta
 
 1. **Schema cache desatualizado (PostgREST)**:
