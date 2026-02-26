@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Download, Printer, BarChart3, Users, TrendingUp, Zap } from "lucide-react";
-import { leadsRegistry } from "./SynContext";
+import { useSynContext } from "./SynContext";
 
 interface PresentationModalProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ const slides = [
   { id: 4, title: "Projeções & Forecast", icon: TrendingUp, color: "#8B5CF6", tag: "SLIDE 04" },
 ];
 
-function generatePresentationHTML() {
+function generatePresentationHTML(leadsRegistry: Array<{ id: string; name: string; company: string; sector: string; value: string; status: string; statusColor: string }>) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -161,10 +161,12 @@ function generatePresentationHTML() {
 }
 
 export function PresentationModal({ isOpen, onClose }: PresentationModalProps) {
+  const { analytics } = useSynContext();
+  const leadsRegistry = analytics.leadsRegistry;
   const [activeSlide, setActiveSlide] = useState(0);
 
   const handleExportHTML = () => {
-    const html = generatePresentationHTML();
+    const html = generatePresentationHTML(leadsRegistry);
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -175,7 +177,7 @@ export function PresentationModal({ isOpen, onClose }: PresentationModalProps) {
   };
 
   const handlePrint = () => {
-    const html = generatePresentationHTML();
+    const html = generatePresentationHTML(leadsRegistry);
     const printWin = window.open("", "_blank", "width=1280,height=800");
     if (!printWin) return;
     printWin.document.write(html);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Printer, Download, TrendingUp, Target, Users, AlertTriangle, CheckCircle2, Zap } from "lucide-react";
-import { leadsRegistry } from "./SynContext";
+import { useSynContext } from "./SynContext";
 
 interface BoardViewModalProps {
   isOpen: boolean;
@@ -14,22 +14,28 @@ const today = new Date().toLocaleDateString("pt-BR", {
   year: "numeric",
 });
 
-const boardKPIs = [
-  { label: "Pipeline Total", value: "R$ 12.4M", sub: "+23% vs Q2", color: "#2E4C3B", icon: TrendingUp },
-  { label: "Leads Quentes", value: "12", sub: "Alta probabilidade", color: "#C64928", icon: Target },
-  { label: "Win Rate", value: "73%", sub: "+5pp vs meta", color: "#10B981", icon: CheckCircle2 },
-  { label: "At Risk", value: "R$ 3.2M", sub: "Requer atenção C-Level", color: "#F43F5E", icon: AlertTriangle },
-];
-
-const strategicActions = [
-  { priority: "ALTA", action: "Aprovar proposta técnica LogiTech (WMS + Frotas NE)", owner: "VP Comercial", date: "28/02" },
-  { priority: "ALTA", action: "Agendar demo plataforma para FarmaVida Group", owner: "Pre-Sales", date: "03/03" },
-  { priority: "ALTA", action: "Escalar negociação FinanceCore com C-Level", owner: "CEO", date: "07/03" },
-  { priority: "MÉDIA", action: "Revisar forecast Q2 com base em novas oportunidades", owner: "Revenue Ops", date: "05/03" },
-  { priority: "MÉDIA", action: "Preparar board summary setorial (Varejo + Finance)", owner: "Strategy", date: "10/03" },
-];
-
 export function BoardViewModal({ isOpen, onClose }: BoardViewModalProps) {
+  const { analytics } = useSynContext();
+  const leadsRegistry = analytics.leadsRegistry;
+  const strategicActions = analytics.heatmap.strategicActions.map((action) => ({
+    ...action,
+    priority: action.priority || 'MÉDIA',
+  }));
+  const boardKPIs = analytics.heatmap.kpiCards.map((kpi) => ({
+    label: kpi.label,
+    value: kpi.value,
+    sub: kpi.sub || "Atualização operacional",
+    color: kpi.color,
+    icon: kpi.iconKey === "alert-triangle"
+      ? AlertTriangle
+      : kpi.iconKey === "check-circle"
+        ? CheckCircle2
+        : kpi.iconKey === "git-branch"
+          ? Users
+          : kpi.iconKey === "target"
+            ? Target
+            : TrendingUp,
+  }));
   const printRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape

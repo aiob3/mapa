@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GlassCard } from "../GlassCard";
 import { motion } from "motion/react";
 import {
@@ -24,144 +24,55 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { PresentationModal } from "./PresentationModal";
-
-// Performance Heatmap scatter data (ROI vs Engagement)
-const scatterData = [
-  { name: "Varejo", roi: 68, engagement: 92, size: 120, color: "#C64928" },
-  { name: "Financeiro", roi: 82, engagement: 78, size: 100, color: "#3B82F6" },
-  { name: "Tecnologia", roi: 75, engagement: 65, size: 80, color: "#6366F1" },
-  { name: "Logística", roi: 55, engagement: 45, size: 90, color: "#F59E0B" },
-  { name: "Farmacêutico", roi: 40, engagement: 35, size: 70, color: "#10B981" },
-  { name: "Indústria", roi: 35, engagement: 28, size: 60, color: "#8B7355" },
-];
-
-// Conversion insights
-const conversionInsights = [
-  {
-    sector: "Varejo",
-    metric: "Penetração de Mercado",
-    value: 14,
-    target: 100,
-    change: "+13pp",
-    changeColor: "#2E4C3B",
-    barColor: "#C64928",
-    tags: ["Retail", "7%"],
-  },
-  {
-    sector: "Financeiro",
-    metric: "Taxa de Conversão",
-    value: 72,
-    target: 100,
-    change: "+5pp",
-    changeColor: "#2E4C3B",
-    barColor: "#10B981",
-    tags: [],
-  },
-  {
-    sector: "Tecnologia",
-    metric: "Expansão de Conta",
-    value: 43,
-    target: 100,
-    change: "+8pp",
-    changeColor: "#2E4C3B",
-    barColor: "#6366F1",
-    tags: [],
-  },
-  {
-    sector: "Logística",
-    metric: "Penetração de Mercado",
-    value: 41,
-    target: 100,
-    change: "+15pp",
-    changeColor: "#2E4C3B",
-    barColor: "#F59E0B",
-    tags: [],
-  },
-  {
-    sector: "Farmacêutico",
-    metric: "Taxa de Conversão",
-    value: 15,
-    target: 100,
-    change: "+7pp",
-    changeColor: "#2E4C3B",
-    barColor: "#10B981",
-    tags: ["Neto", "14%"],
-  },
-  {
-    sector: "Indústria",
-    metric: "Expansão de Conta",
-    value: 48,
-    target: 100,
-    change: "-3pp",
-    changeColor: "#C64928",
-    barColor: "#8B7355",
-    tags: [],
-  },
-];
-
-// AI recommendations
-const aiRecommendations = [
-  {
-    level: "Alto",
-    levelColor: "#2E4C3B",
-    sector: "Varejo",
-    title: "Aproveitar onda omnichannel",
-    desc: "O setor de varejo apresenta o maior engajamento (92%). Recomenda-se focar em soluções de integração digital-física para capturar o crescimento de +23% projetado.",
-  },
-  {
-    level: "Crítico",
-    levelColor: "#C64928",
-    sector: "Logística",
-    title: "Expansão acelerada no Nordeste",
-    desc: "Com crescimento de +45%, logística é o setor com mais momentum. A demanda por WMS e automação de frotas cria janela de oportunidade de próximos 90 dias.",
-  },
-  {
-    level: "Médio",
-    levelColor: "#F59E0B",
-    sector: "Indústria",
-    title: "Atenção ao sentimento cauteloso",
-    desc: "Recomenda-se abordagem consultiva com ROI comprovado. Investir em cases de sucesso para reverter a penetração de mercado.",
-  },
-];
-
-// Radar chart data (comparative)
-const radarComparative = [
-  { subject: "ROI", Varejo: 68, Financeiro: 82, Tecnologia: 75, fullMark: 100 },
-  { subject: "NPS", Varejo: 85, Financeiro: 72, Tecnologia: 68, fullMark: 100 },
-  { subject: "Engajamento", Varejo: 92, Financeiro: 78, Tecnologia: 65, fullMark: 100 },
-  { subject: "Retenção", Varejo: 78, Financeiro: 88, Tecnologia: 72, fullMark: 100 },
-  { subject: "Penetração", Varejo: 45, Financeiro: 60, Tecnologia: 55, fullMark: 100 },
-  { subject: "Crescimento", Varejo: 88, Financeiro: 65, Tecnologia: 72, fullMark: 100 },
-];
-
-// Board synthesis items
-const boardSynthesis = [
-  {
-    type: "Oportunidade Estratégica",
-    typeColor: "#2E4C3B",
-    content:
-      "O setor apresenta engajamento excepcional (92%) com espaço significativo para expansão de penetração (58 → 75%). A onda crescimento cria janela de 6 meses.",
-  },
-  {
-    type: "Ação Recomendada",
-    typeColor: "#3B82F6",
-    content:
-      "Investir R$ 3M em equipe dedicada para vertical Retail. Projeção de ROI 4.2x em 18 meses com foco em integração omnichannel.",
-  },
-  {
-    type: "Riscos Mapeados",
-    typeColor: "#C64928",
-    content:
-      "Concorrência agressiva de players globais. Necessário diferenciação por localização e suporte premium.",
-  },
-];
+import { useSynContext } from "./SynContext";
 
 export function SectorAnalysis() {
+  const { analytics, analyticsStatus } = useSynContext();
   const [presentationOpen, setPresentationOpen] = useState(false);
   const [selectedSector, setSelectedSector] = useState<string>("Varejo");
+  const scatterData = analytics.sector.scatterData;
+  const conversionInsights = analytics.sector.conversionInsights;
+  const aiRecommendations = analytics.sector.aiRecommendations;
+  const radarComparative = analytics.sector.radarComparative;
+  const boardSynthesis = analytics.sector.boardSynthesis;
+  const sectorKpis = analytics.sector.kpiCards;
+  const radarLegend = analytics.sector.radarLegend;
+  const selectedSectorReport = analytics.sector.sectorReportByName[selectedSector];
+  const semanticSummary = analytics.sector.semanticSignalsSummary;
+  const semanticSummaryRows = semanticSummary?.rows || [];
+  const semanticSummaryTotals = semanticSummary?.totals || null;
+  const semanticGeneratedAtLabel = semanticSummary?.generatedAt
+    ? new Date(semanticSummary.generatedAt).toLocaleString("pt-BR")
+    : null;
+
+  useEffect(() => {
+    if (scatterData.length === 0) {
+      return;
+    }
+    const exists = scatterData.some((item) => item.name === selectedSector);
+    if (!exists) {
+      setSelectedSector(scatterData[0].name);
+    }
+  }, [scatterData, selectedSector]);
 
   return (
     <div className="max-w-7xl mx-auto">
+      {analyticsStatus.loading && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Carregando análise setorial...
+          </p>
+        </GlassCard>
+      )}
+
+      {analyticsStatus.error && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#C64928]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            Falha parcial de analytics: {analyticsStatus.error}
+          </p>
+        </GlassCard>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -201,33 +112,7 @@ export function SectorAnalysis() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-5 mb-8">
-        {[
-          {
-            label: "Revenue Total por Setor",
-            value: "R$ 84.6M",
-            change: "+19%",
-            icon: <TrendingUp size={12} />,
-          },
-          {
-            label: "Deals Ativos Cross-Sector",
-            value: "69",
-            change: "+12",
-            icon: <ArrowUpRight size={12} />,
-          },
-          {
-            label: "Market Penetration Média",
-            value: "53%",
-            change: "+6pp",
-            icon: <ArrowUpRight size={12} />,
-          },
-          {
-            label: "Setor com Maior Growth",
-            value: "Logística (+45%)",
-            change: null,
-            icon: <TrendingUp size={12} />,
-            isHighlight: true,
-          },
-        ].map((kpi) => (
+        {sectorKpis.map((kpi) => (
           <GlassCard key={kpi.label} className="!p-5">
             <p
               className="text-[10px] text-[#717182] tracking-wider uppercase mb-2"
@@ -250,7 +135,7 @@ export function SectorAnalysis() {
             </p>
             {kpi.change && (
               <div className="flex items-center gap-1 mt-1">
-                {kpi.icon}
+                <ArrowUpRight size={12} className="text-[#2E4C3B]" />
                 <span
                   className="text-[11px] text-[#2E4C3B]"
                   style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
@@ -267,6 +152,13 @@ export function SectorAnalysis() {
             )}
           </GlassCard>
         ))}
+        {sectorKpis.length === 0 && (
+          <GlassCard className="!p-5 col-span-4">
+            <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Nenhum KPI setorial disponível para o usuário atual.
+            </p>
+          </GlassCard>
+        )}
       </div>
 
       {/* Main Content: Scatter + Insights + AI Advisor */}
@@ -586,14 +478,14 @@ export function SectorAnalysis() {
                   fontWeight: 600,
                 }}
               >
-                Relatório: Varejo
+                Relatório: {selectedSector}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <span
                   className="text-[10px] text-[#2E4C3B]"
                   style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}
                 >
-                  Sentimento: Muito Positivo
+                  Sentimento: {selectedSectorReport?.sentimento || "N/A"}
                 </span>
               </div>
             </div>
@@ -616,7 +508,7 @@ export function SectorAnalysis() {
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                R$ 12.2M
+                {selectedSectorReport?.revenue || "N/A"}
               </p>
             </div>
             <div>
@@ -635,7 +527,7 @@ export function SectorAnalysis() {
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                +22%
+                {selectedSectorReport?.growth || "N/A"}
               </p>
             </div>
             <div>
@@ -654,7 +546,7 @@ export function SectorAnalysis() {
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                68%
+                {selectedSectorReport?.roi || "N/A"}
               </p>
             </div>
             <div>
@@ -673,7 +565,7 @@ export function SectorAnalysis() {
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                18
+                {selectedSectorReport?.dealsAtivos || "N/A"}
               </p>
             </div>
           </div>
@@ -747,11 +639,7 @@ export function SectorAnalysis() {
           </div>
 
           <div className="flex items-center justify-center gap-5 mt-3">
-            {[
-              { label: "Varejo", color: "#C64928" },
-              { label: "Financeiro", color: "#3B82F6" },
-              { label: "Tecnologia", color: "#6366F1" },
-            ].map((item) => (
+            {radarLegend.map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <div
                   className="w-2 h-2 rounded-full"
@@ -792,6 +680,57 @@ export function SectorAnalysis() {
           </div>
 
           <div className="flex flex-col gap-3 flex-1">
+            {semanticSummaryTotals && (semanticSummaryRows.length > 0 || semanticSummary?.generatedAt) && (
+              <div
+                className="p-3 rounded-2xl border border-white/40"
+                style={{ background: "rgba(198,73,40,0.06)" }}
+              >
+                <span
+                  className="text-[10px] tracking-wider mb-2 block"
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 700,
+                    color: "#C64928",
+                  }}
+                >
+                  LENTE SEMÂNTICA (CLICKHOUSE)
+                </span>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className="text-[10px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Eventos: <strong className="text-[#1A1A1A]">{semanticSummaryTotals.events}</strong>
+                  </div>
+                  <div className="text-[10px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Inflexões: <strong className="text-[#1A1A1A]">{semanticSummaryTotals.inflectionPoints}</strong>
+                  </div>
+                  <div className="text-[10px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Causalidade: <strong className="text-[#1A1A1A]">{semanticSummaryTotals.causalitySignals}</strong>
+                  </div>
+                  <div className="text-[10px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Conflitos: <strong className="text-[#1A1A1A]">{semanticSummaryTotals.relationalConflicts}</strong>
+                  </div>
+                </div>
+                {semanticSummaryRows.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    {semanticSummaryRows.slice(0, 3).map((row) => (
+                      <div
+                        key={row.entityKind}
+                        className="text-[10px] text-[#717182] flex items-center justify-between"
+                        style={{ fontFamily: "'Inter', sans-serif" }}
+                      >
+                        <span>{row.entityKind}</span>
+                        <span className="text-[#1A1A1A]">{row.inflectionPoints} inflexões</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {semanticGeneratedAtLabel && (
+                  <p className="text-[9px] text-[#717182] mt-2" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Atualizado em {semanticGeneratedAtLabel}
+                  </p>
+                )}
+              </div>
+            )}
+
             {boardSynthesis.map((item, i) => (
               <motion.div
                 key={item.type}

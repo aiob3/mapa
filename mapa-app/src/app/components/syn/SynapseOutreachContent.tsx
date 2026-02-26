@@ -14,79 +14,36 @@ import {
 } from 'recharts';
 
 import { GlassCard } from '../GlassCard';
-
-const chartData = [
-  { week: 'Semana 1', value: 18 },
-  { week: 'Semana 2', value: 22 },
-  { week: 'Semana 3', value: 28 },
-  { week: 'Semana 4', value: 32 },
-];
-
-const radarData = [
-  { subject: 'Analítico', A: 90, fullMark: 100 },
-  { subject: 'Visionário', A: 75, fullMark: 100 },
-  { subject: 'Empático', A: 60, fullMark: 100 },
-  { subject: 'Direto', A: 50, fullMark: 100 },
-  { subject: 'Provocativo', A: 85, fullMark: 100 },
-];
-
-interface Lead {
-  name: string;
-  sector: string;
-  tone: string;
-  toneColor: string;
-  openRate: string;
-  clickRate: string;
-  scoreIA: string;
-  scoreColor: string;
-}
-
-const leads: Lead[] = [
-  {
-    name: 'Banco Horizon',
-    sector: 'Setor Financeiro',
-    tone: 'ANALÍTICO',
-    toneColor: '#4A6FA5',
-    openRate: '88%',
-    clickRate: '42%',
-    scoreIA: '9.2',
-    scoreColor: '#2E4C3B',
-  },
-  {
-    name: 'Grupo Varejo Sul',
-    sector: 'Varejo Premium',
-    tone: 'PROVOCATIVO',
-    toneColor: '#C64928',
-    openRate: '65%',
-    clickRate: '28%',
-    scoreIA: '7.8',
-    scoreColor: '#1A1A1A',
-  },
-  {
-    name: 'TechSolutions',
-    sector: 'Tecnologia',
-    tone: 'VISIONÁRIO',
-    toneColor: '#2E4C3B',
-    openRate: '92%',
-    clickRate: '58%',
-    scoreIA: '9.5',
-    scoreColor: '#2E4C3B',
-  },
-  {
-    name: 'Construct Base',
-    sector: 'Construção Civil',
-    tone: 'PRAGMÁTICO',
-    toneColor: '#8B7355',
-    openRate: '45%',
-    clickRate: '12%',
-    scoreIA: '5.1',
-    scoreColor: '#C64928',
-  },
-];
+import { useSynContext } from './SynContext';
 
 export function SynapseOutreachContent() {
+  const { analytics, analyticsStatus } = useSynContext();
+  const chartData = analytics.outreach.chartData;
+  const radarData = analytics.outreach.radarData;
+  const leads = analytics.outreach.leads;
+  const globalConversionRate = analytics.outreach.globalConversionRate;
+  const globalConversionDelta = analytics.outreach.globalConversionDelta;
+  const scriptsGenerated = analytics.outreach.scriptsGenerated;
+  const toneInsights = analytics.outreach.toneInsights;
+
   return (
     <div className="max-w-7xl mx-auto">
+        {analyticsStatus.loading && (
+          <GlassCard className="!p-4 mb-5">
+            <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Carregando dados de outreach...
+            </p>
+          </GlassCard>
+        )}
+
+        {analyticsStatus.error && (
+          <GlassCard className="!p-4 mb-5">
+            <p className="text-[12px] text-[#C64928]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+              Falha parcial de analytics: {analyticsStatus.error}
+            </p>
+          </GlassCard>
+        )}
+
         <div className="flex items-center justify-between mb-8">
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '28px', fontWeight: 600, fontStyle: 'italic' }}>
             Análise de Outreach
@@ -125,10 +82,10 @@ export function SynapseOutreachContent() {
 
               <div className="flex items-end gap-3 mb-2">
                 <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '42px', fontWeight: 400, color: '#C64928' }}>
-                  24.8%
+                  {globalConversionRate}
                 </span>
                 <span className="flex items-center gap-1 text-[#2E4C3B] text-[13px] mb-2" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>
-                  <ArrowUpRight size={14} /> 4.2%
+                  <ArrowUpRight size={14} /> {globalConversionDelta}
                 </span>
               </div>
               <span className="text-[10px] text-[#717182] tracking-[0.1em] uppercase" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
@@ -180,7 +137,7 @@ export function SynapseOutreachContent() {
                   </span>
                   <div className="mt-1">
                     <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '36px', fontWeight: 700, color: '#1A1A1A' }}>
-                      1,248
+                      {scriptsGenerated}
                     </span>
                   </div>
                 </div>
@@ -285,11 +242,7 @@ export function SynapseOutreachContent() {
               </div>
 
               <div className="flex flex-col gap-2 mt-4">
-                {[
-                  { label: 'Financeiro', tone: 'Analítico', score: '(9.8)', color: '#4A6FA5' },
-                  { label: 'Varejo', tone: 'Provocativo', score: '(8.4)', color: '#C64928' },
-                  { label: 'Tecnologia', tone: 'Visionário', score: '(9.1)', color: '#2E4C3B' },
-                ].map((item) => (
+                {toneInsights.map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>{item.label}</span>
                     <span className="text-[12px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: item.color }}>

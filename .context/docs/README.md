@@ -13,6 +13,10 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Security & Compliance Notes](./security.md)
 - [Tooling & Productivity Guide](./tooling.md)
 - [UI Pattern Normalization (PLAN-NORMA-UI-002)](./ui-pattern-normalization-plan-norma-ui-002.md)
+- [Syn Analytics Widget Catalog (STATE-DB-002)](./syn-analytics-widget-catalog-state-db-002.md)
+- [Legacy CRM Ingestion Analysis (STATE-DB-003)](./legacy-crm-ingestion-analysis-state-db-003.md)
+- [ClickHouse Activation Runbook (STATE-DB-004)](./clickhouse-activation-state-db-004.md)
+- [ClickHouse Role in Architecture (STATE-DB-004)](./clickhouse-role-architecture-state-db-004.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
@@ -42,6 +46,10 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Security & Compliance Notes | `security.md` | agent-update:security | Auth model, secrets management, compliance requirements |
 | Tooling & Productivity Guide | `tooling.md` | agent-update:tooling | CLI scripts, IDE configs, automation workflows |
 | UI Pattern Normalization (PLAN-NORMA-UI-002) | `ui-pattern-normalization-plan-norma-ui-002.md` | agent-update:ui-pattern-normalization | Routes inventory, pattern IDs, adoption matrix, HITL checklist |
+| Syn Analytics Widget Catalog (STATE-DB-002) | `syn-analytics-widget-catalog-state-db-002.md` | agent-update:syn-widget-catalog | Widget IDs PAT-WIDGET-*, composição modal/rota e contratos de binding `api_syn_*_v1` |
+| Legacy CRM Ingestion Analysis (STATE-DB-003) | `legacy-crm-ingestion-analysis-state-db-003.md` | agent-update:legacy-crm-state-db-003 | Exports Pipedrive (`deals/leads/activities`), schema `canonical_events`, estratégia Supabase + ClickHouse |
+| ClickHouse Activation Runbook (STATE-DB-004) | `clickhouse-activation-state-db-004.md` | agent-update:clickhouse-activation-state-db-004 | Bootstrap de instância ClickHouse, schema vetorial/sinais e fluxo de integração com `semantic_layer` |
+| ClickHouse Role in Architecture (STATE-DB-004) | `clickhouse-role-architecture-state-db-004.md` | agent-update:clickhouse-role-architecture-state-db-004 | Papel arquitetural incorporado, limites de responsabilidade e contrato operacional Supabase -> Middleware -> ClickHouse -> Syn |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

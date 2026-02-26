@@ -42,6 +42,12 @@ success_criteria:
 | `PAT-STATUS-001` | Status | Insights na sidebar sem invadir área funcional principal. |
 | `PAT-STATUS-002` | Status Compat | Redirecionamento de status legado do Bridge para painel lateral. |
 
+| `PAT-WIDGET-001` | Widget KPI | Card de métricas executivas vinculadas ao domínio analítico. |
+| `PAT-WIDGET-002` | Widget Chart | Visualizações de série/comparação para leitura narrativa. |
+| `PAT-WIDGET-003` | Widget Matrix | Heatmap e matrizes para correlação regional/setorial. |
+| `PAT-WIDGET-004` | Widget Narrative | Lista priorizada de insights e recomendações. |
+| `PAT-WIDGET-005` | Widget Lead | Componente de lead com score/status/valor e binding analítico. |
+
 ## Inventário de Adoção por Rota
 
 | Rota | Shell | Nav | Sidebar | Cards | Modal | Status | Exceções |
@@ -52,6 +58,7 @@ success_criteria:
 | `/team` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-001` | Subviews internas por rota (`/team/*`). |
 | `/team/overview` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-002` | Absorve Bridge e recebe compatibilidade de `/bridge`. |
 | `/syn` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `N/A` | `PAT-STATUS-001` | Módulo unificado: absorve recursos de Synapse (outreach) em `/syn/outreach`. |
+| `/syn/composer` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-001` | Rota dedicada para composição avançada de widgets (`PAT-WIDGET-*`). |
 | `/war-room` | `PAT-SHELL-001` | `PAT-SHELL-001` | `N/A` | `PAT-CARD-001` | `N/A` | `N/A` | Conformidade parcial; canvas preservado por exceção funcional. |
 | `/bridge` | `PAT-SHELL-001` | `PAT-SHELL-001` | `PAT-SIDEBAR-001` | `PAT-CARD-001` | `PAT-MODAL-001` | `PAT-STATUS-002` | Redireciona para `/team/overview` (compatibilidade). |
 
@@ -108,6 +115,7 @@ success_criteria:
 3. Evitar criar sidebars customizadas quando `SidebarNav` já cobre o caso.
 4. Não introduzir ticker inferior para status sistêmico; usar painel lateral.
 5. Usar `ActionComposerModal` para novos fluxos de adição transversais.
+6. Para composição avançada de widgets, usar rota dedicada `/syn/composer` com binding versionado (`api_syn_*_v1`).
 
 <!-- agent-update:end -->
 

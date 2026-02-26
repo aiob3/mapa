@@ -20,10 +20,9 @@ import {
   Zap,
   X,
 } from "lucide-react";
-import { useSynContext, leadsRegistry } from "./SynContext";
+import { useSynContext } from "./SynContext";
 import { BoardViewModal } from "./BoardViewModal";
 
-// Heatmap data
 interface HeatmapCell {
   value: number;
   intensity: "critico" | "atencao" | "estavel" | "forte";
@@ -33,84 +32,6 @@ interface RegionData {
   name: string;
   metrics: HeatmapCell[];
 }
-
-const heatmapMetrics = [
-  "Revenue",
-  "Growth",
-  "Market Share",
-  "Innovation",
-  "Customer Sat.",
-  "Pipeline",
-];
-
-const heatmapData: RegionData[] = [
-  {
-    name: "São Paulo",
-    metrics: [
-      { value: 85, intensity: "forte" },
-      { value: 88, intensity: "forte" },
-      { value: 82, intensity: "forte" },
-      { value: 75, intensity: "estavel" },
-      { value: 90, intensity: "forte" },
-      { value: 92, intensity: "forte" },
-    ],
-  },
-  {
-    name: "Rio de Janeiro",
-    metrics: [
-      { value: 78, intensity: "estavel" },
-      { value: 72, intensity: "estavel" },
-      { value: 68, intensity: "atencao" },
-      { value: 60, intensity: "atencao" },
-      { value: 82, intensity: "forte" },
-      { value: 74, intensity: "estavel" },
-    ],
-  },
-  {
-    name: "Minas Gerais",
-    metrics: [
-      { value: 65, intensity: "atencao" },
-      { value: 80, intensity: "forte" },
-      { value: 55, intensity: "atencao" },
-      { value: 70, intensity: "estavel" },
-      { value: 75, intensity: "estavel" },
-      { value: 68, intensity: "atencao" },
-    ],
-  },
-  {
-    name: "Nordeste",
-    metrics: [
-      { value: 40, intensity: "critico" },
-      { value: 92, intensity: "forte" },
-      { value: 35, intensity: "critico" },
-      { value: 85, intensity: "forte" },
-      { value: 70, intensity: "estavel" },
-      { value: 68, intensity: "atencao" },
-    ],
-  },
-  {
-    name: "Sul",
-    metrics: [
-      { value: 70, intensity: "estavel" },
-      { value: 60, intensity: "atencao" },
-      { value: 75, intensity: "estavel" },
-      { value: 65, intensity: "atencao" },
-      { value: 78, intensity: "estavel" },
-      { value: 63, intensity: "atencao" },
-    ],
-  },
-  {
-    name: "Centro-Oeste",
-    metrics: [
-      { value: 55, intensity: "atencao" },
-      { value: 75, intensity: "estavel" },
-      { value: 42, intensity: "critico" },
-      { value: 65, intensity: "atencao" },
-      { value: 70, intensity: "estavel" },
-      { value: 58, intensity: "atencao" },
-    ],
-  },
-];
 
 const getHeatmapColor = (intensity: string) => {
   switch (intensity) {
@@ -127,103 +48,6 @@ const getHeatmapColor = (intensity: string) => {
   }
 };
 
-// Pipeline data
-const pipelineData = [
-  { month: "Mar", projetado: 4.2, atual: 4.0, meta: 5.0 },
-  { month: "Abr", projetado: 6.8, atual: 5.5, meta: 6.0 },
-  { month: "Mai", projetado: 9.2, atual: 8.8, meta: 8.0 },
-  { month: "Jun", projetado: 11.5, atual: 10.2, meta: 10.0 },
-  { month: "Jul", projetado: 13.8, atual: 12.0, meta: 12.0 },
-  { month: "Ago", projetado: 16.0, atual: null, meta: 14.0 },
-];
-
-// Narrative items
-const narrativeItems = [
-  {
-    priority: "ALTA",
-    tag: "NOVO",
-    tagColor: "#8B5CF6",
-    title: "Expansão Logística Nordeste",
-    desc: "Roberto Almeida — LogiTech Brasil — R$ 2.4M WMS+Frotas",
-    time: "2min",
-  },
-  {
-    priority: "ALTA",
-    tag: null,
-    tagColor: null,
-    title: "Transformação Digital Farma",
-    desc: "Mariana Costa — FarmaVida — R$ 1.8M automação supply chain",
-    time: "1h",
-  },
-  {
-    priority: "MÉDIA",
-    tag: null,
-    tagColor: null,
-    title: "Cloud Migration Finance",
-    desc: "Pedro Santos — FinanceCore — R$ 4.2M Infraestrutura",
-    time: "9h",
-  },
-  {
-    priority: "MÉDIA",
-    tag: null,
-    tagColor: null,
-    title: "IoT Industrial Mining",
-    desc: "Carolina Dias — MineralTech — R$ 2.8M sensores",
-    time: "1d",
-  },
-  {
-    priority: "BAIXA",
-    tag: null,
-    tagColor: null,
-    title: "Retail Omnichannel",
-    desc: "Ana Beatriz — RetailMax — R$ 950K integração",
-    time: "2d",
-  },
-];
-
-// Strategic Actions
-const strategicActions = [
-  {
-    color: "#C64928",
-    action: "Aprovar proposta técnica LogiTech (WMS + Frotas NE)",
-    owner: "VP Comercial",
-    date: "28/02",
-  },
-  {
-    color: "#F59E0B",
-    action: "Agendar demo plataforma para FarmaVida Group",
-    owner: "Pre-Sales",
-    date: "03/03",
-  },
-  {
-    color: "#C64928",
-    action: "Revisar forecast Q2 com base em novas oportunidades",
-    owner: "Revenue Ops",
-    date: "05/03",
-  },
-  {
-    color: "#F59E0B",
-    action: "Preparar board summary setorial (Varejo + Finance)",
-    owner: "Strategy",
-    date: "10/03",
-  },
-  {
-    color: "#C64928",
-    action: "Escalar negociação FinanceCore com C-Level",
-    owner: "CEO",
-    date: "07/03",
-  },
-];
-
-// KPI status cards data
-const kpiCards = [
-  { label: "New Logo", value: "12", amount: "R$ 4.2M", color: "#8B5CF6", icon: <Star size={14} /> },
-  { label: "Mapped", value: "18", amount: "R$ 6.8M", color: "#3B82F6", icon: <GitBranch size={14} /> },
-  { label: "Ongoing", value: "15", amount: "R$ 8.1M", color: "#06B6D4", icon: <Clock size={14} /> },
-  { label: "Committed", value: "8", amount: "R$ 5.4M", color: "#10B981", icon: <CheckCircle2 size={14} /> },
-  { label: "At Risk", value: "5", amount: "R$ 3.2M", color: "#F43F5E", icon: <AlertTriangle size={14} /> },
-];
-
 type TimeFilter = "presente" | "proximo_mes" | "trimestre" | "semestre";
 type HeatmapFilter = "regiao" | "segmento" | "estado";
 
@@ -232,7 +56,26 @@ export function StrategicHeatmap() {
   const [heatmapFilter, setHeatmapFilter] = useState<HeatmapFilter>("regiao");
   const [boardOpen, setBoardOpen] = useState(false);
 
-  const { mirrorLeadId, setMirrorLeadId } = useSynContext();
+  const { mirrorLeadId, setMirrorLeadId, analytics, analyticsStatus } = useSynContext();
+  const leadsRegistry = analytics.leadsRegistry;
+  const heatmapMetrics = analytics.heatmap.heatmapMetrics;
+  const heatmapData = analytics.heatmap.heatmapData;
+  const pipelineData = analytics.heatmap.pipelineData;
+  const narrativeItems = analytics.heatmap.narrativeItems;
+  const strategicActions = analytics.heatmap.strategicActions;
+  const kpiCards = analytics.heatmap.kpiCards;
+  const kpiIconByKey = {
+    star: Star,
+    "git-branch": GitBranch,
+    clock: Clock,
+    "check-circle": CheckCircle2,
+    "alert-triangle": AlertTriangle,
+    "trending-up": TrendingUp,
+    activity: Zap,
+    users: Star,
+    "file-text": Star,
+    target: Star,
+  } as const;
 
   // Resolve which region to highlight from the mirrored lead
   const mirrorLead = mirrorLeadId ? leadsRegistry.find((l) => l.id === mirrorLeadId) : null;
@@ -241,6 +84,22 @@ export function StrategicHeatmap() {
   return (
     <div className="max-w-7xl mx-auto">
       <BoardViewModal isOpen={boardOpen} onClose={() => setBoardOpen(false)} />
+
+      {analyticsStatus.loading && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Carregando camada analítica...
+          </p>
+        </GlassCard>
+      )}
+
+      {analyticsStatus.error && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#C64928]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            Falha parcial de analytics: {analyticsStatus.error}
+          </p>
+        </GlassCard>
+      )}
 
       {/* Strategic Mirror Banner */}
       <AnimatePresence>
@@ -335,7 +194,9 @@ export function StrategicHeatmap() {
 
       {/* KPI Status Cards */}
       <div className="grid grid-cols-5 gap-4 mb-8">
-        {kpiCards.map((kpi) => (
+        {kpiCards.map((kpi) => {
+          const Icon = kpiIconByKey[kpi.iconKey] || Star;
+          return (
           <GlassCard
             key={kpi.label}
             className="!p-4"
@@ -345,7 +206,7 @@ export function StrategicHeatmap() {
               className="flex items-center gap-2 mb-2"
               style={{ color: kpi.color }}
             >
-              {kpi.icon}
+              <Icon size={14} />
               <span
                 className="text-[12px]"
                 style={{
@@ -375,7 +236,8 @@ export function StrategicHeatmap() {
               {kpi.amount}
             </p>
           </GlassCard>
-        ))}
+          );
+        })}
       </div>
 
       {/* Main Grid: Heatmap + Narrative */}
@@ -435,6 +297,13 @@ export function StrategicHeatmap() {
 
           {/* Heatmap Grid */}
           <div className="overflow-x-auto">
+            {heatmapData.length === 0 && (
+              <div className="py-8">
+                <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  Nenhum dado de heatmap disponível para o usuário atual.
+                </p>
+              </div>
+            )}
             <table className="w-full border-collapse">
               <thead>
                 <tr>

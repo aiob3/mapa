@@ -1,121 +1,164 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-// ─── Shared lead registry (single source of truth across views) ───────────────
-export interface LeadSummary {
-  id: string;
-  name: string;
-  initials: string;
-  company: string;
-  value: string;
-  location: string;
-  region: string; // maps to heatmap row name
-  sector: string;
-  score: number;
-  status: string;
-  statusColor: string;
-}
+import { useAuth } from '../../auth/AuthContext';
+import type { SynAnalyticsStatus, SynAnalyticsViewModel } from '../../types/analytics';
+import {
+  fetchSynAnalyticsBundleV1,
+  fetchSynKpisV1,
+} from '../../services/analytics/analyticsApi';
+import {
+  createEmptySynAnalyticsViewModel,
+  mapSynBundleToViewModel,
+  mergeKpisIntoViewModel,
+} from '../../services/analytics/mappers';
 
-export const leadsRegistry: LeadSummary[] = [
-  {
-    id: "1",
-    name: "Roberto Almeida",
-    initials: "RA",
-    company: "LogiTech Brasil",
-    value: "R$ 2.4M",
-    location: "SP",
-    region: "São Paulo",
-    sector: "Logística",
-    score: 91,
-    status: "Quente",
-    statusColor: "#C64928",
-  },
-  {
-    id: "2",
-    name: "Mariana Costa",
-    initials: "MC",
-    company: "FarmaVida Group",
-    value: "R$ 1.8M",
-    location: "RJ",
-    region: "Rio de Janeiro",
-    sector: "Farmacêutico",
-    score: 78,
-    status: "Morno",
-    statusColor: "#F59E0B",
-  },
-  {
-    id: "3",
-    name: "Carlos Ferreira",
-    initials: "CF",
-    company: "TechNova Solutions",
-    value: "R$ 3.1M",
-    location: "MG",
-    region: "Minas Gerais",
-    sector: "Tecnologia",
-    score: 85,
-    status: "Quente",
-    statusColor: "#C64928",
-  },
-  {
-    id: "4",
-    name: "Ana Beatriz Lima",
-    initials: "AB",
-    company: "RetailMax S.A.",
-    value: "R$ 950K",
-    location: "PR",
-    region: "Sul",
-    sector: "Varejo",
-    score: 54,
-    status: "Frio",
-    statusColor: "#6B7280",
-  },
-  {
-    id: "5",
-    name: "Pedro Santos",
-    initials: "PS",
-    company: "FinanceCore",
-    value: "R$ 4.2M",
-    location: "SP",
-    region: "São Paulo",
-    sector: "Financeiro",
-    score: 87,
-    status: "Morno",
-    statusColor: "#F59E0B",
-  },
-];
+const KPI_POLLING_MS = 45_000;
 
-// ─── Context type ─────────────────────────────────────────────────────────────
 interface SynContextValue {
-  /** ID of the lead currently "mirrored" from Leads view to Heatmap view */
   mirrorLeadId: string | null;
   setMirrorLeadId: (id: string | null) => void;
-  /** Called by LeadsInsights to jump to the Heatmap sub-view */
   navigateToHeatmap: () => void;
+  analytics: SynAnalyticsViewModel;
+  analyticsStatus: SynAnalyticsStatus;
+  refreshAll: () => Promise<void>;
+  refreshKpis: () => Promise<void>;
 }
 
 export const SynContext = createContext<SynContextValue>({
   mirrorLeadId: null,
   setMirrorLeadId: () => {},
   navigateToHeatmap: () => {},
+  analytics: createEmptySynAnalyticsViewModel(),
+  analyticsStatus: {
+    loading: false,
+    error: null,
+    lastUpdatedAt: null,
+    pollingMs: KPI_POLLING_MS,
+  },
+  refreshAll: async () => {},
+  refreshKpis: async () => {},
 });
 
 export function useSynContext() {
   return useContext(SynContext);
 }
 
-// ─── Provider (mounted in MapaSyn) ───────────────────────────────────────────
 interface SynProviderProps {
   navigateToHeatmap: () => void;
   children: ReactNode;
 }
 
 export function SynProvider({ navigateToHeatmap, children }: SynProviderProps) {
-  const [mirrorLeadId, setMirrorLeadId] = useState<string | null>(null);
+  const { session, canAccess } = useAuth();
 
-  return (
-    <SynContext.Provider
-      value={{ mirrorLeadId, setMirrorLeadId, navigateToHeatmap }}
-    >
-      {children}
-    </SynContext.Provider>
+  const [mirrorLeadId, setMirrorLeadId] = useState<string | null>(null);
+  const [analytics, setAnalytics] = useState<SynAnalyticsViewModel>(createEmptySynAnalyticsViewModel);
+  const [analyticsStatus, setAnalyticsStatus] = useState<SynAnalyticsStatus>({
+    loading: true,
+    error: null,
+    lastUpdatedAt: null,
+    pollingMs: KPI_POLLING_MS,
+  });
+
+  const canReadSyn = canAccess('mapa-syn', 'read') || canAccess('synapse', 'read');
+
+  const refreshAll = useCallback(async () => {
+    if (!session?.accessToken || !canReadSyn) {
+      setAnalytics(createEmptySynAnalyticsViewModel());
+      setAnalyticsStatus((prev) => ({
+        ...prev,
+        loading: false,
+        error: canReadSyn ? 'Sessão inválida para leitura analítica.' : null,
+      }));
+      return;
+    }
+
+    setAnalyticsStatus((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const result = await fetchSynAnalyticsBundleV1(session.accessToken);
+      setAnalytics(mapSynBundleToViewModel(result.bundle));
+      setAnalyticsStatus((prev) => ({
+        ...prev,
+        loading: false,
+        error: result.errors.length > 0 ? `Falhas parciais em analytics: ${result.errors.join(' | ')}` : null,
+        lastUpdatedAt: new Date().toISOString(),
+      }));
+    } catch (error) {
+      setAnalyticsStatus((prev) => ({
+        ...prev,
+        loading: false,
+        error: error instanceof Error ? error.message : 'Falha ao carregar analytics.',
+      }));
+    }
+  }, [canReadSyn, session?.accessToken]);
+
+  const refreshKpis = useCallback(async () => {
+    if (!session?.accessToken || !canReadSyn) {
+      return;
+    }
+
+    try {
+      const kpis = await fetchSynKpisV1(session.accessToken);
+      setAnalytics((prev) => mergeKpisIntoViewModel(prev, kpis));
+      setAnalyticsStatus((prev) => ({ ...prev, lastUpdatedAt: new Date().toISOString() }));
+    } catch (error) {
+      setAnalyticsStatus((prev) => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Falha ao atualizar KPIs.',
+      }));
+    }
+  }, [canReadSyn, session?.accessToken]);
+
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      if (!active) {
+        return;
+      }
+      await refreshAll();
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [refreshAll]);
+
+  useEffect(() => {
+    if (!session?.accessToken || !canReadSyn) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      void refreshKpis();
+    }, KPI_POLLING_MS);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [canReadSyn, refreshKpis, session?.accessToken]);
+
+  const value = useMemo<SynContextValue>(
+    () => ({
+      mirrorLeadId,
+      setMirrorLeadId,
+      navigateToHeatmap,
+      analytics,
+      analyticsStatus,
+      refreshAll,
+      refreshKpis,
+    }),
+    [mirrorLeadId, navigateToHeatmap, analytics, analyticsStatus, refreshAll, refreshKpis],
   );
+
+  return <SynContext.Provider value={value}>{children}</SynContext.Provider>;
 }

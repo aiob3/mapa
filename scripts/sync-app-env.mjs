@@ -32,6 +32,8 @@ const supabaseAnonKey =
   getFromParsed(rootEnv, 'SUPABASE_ANOM_PUBLIC_KEY') ||
   getFromParsed(appEnvExisting, 'VITE_SUPABASE_ANON_KEY');
 const authDomain = getFromParsed(appEnvExisting, 'VITE_AUTH_DEFAULT_EMAIL_DOMAIN') || 'mapa.local';
+const synMiddlewareUrl =
+  getFromParsed(rootEnv, 'SYN_MIDDLEWARE_URL') || getFromParsed(appEnvExisting, 'VITE_SYN_MIDDLEWARE_URL');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   const missing = [];
@@ -51,8 +53,13 @@ const output = [
   `VITE_SUPABASE_URL=${supabaseUrl}`,
   `VITE_SUPABASE_ANON_KEY=${supabaseAnonKey}`,
   `VITE_AUTH_DEFAULT_EMAIL_DOMAIN=${authDomain}`,
-  '',
-].join('\n');
+];
 
-fs.writeFileSync(appEnvPath, output, 'utf8');
+if (synMiddlewareUrl) {
+  output.push(`VITE_SYN_MIDDLEWARE_URL=${synMiddlewareUrl}`);
+}
+
+output.push('');
+
+fs.writeFileSync(appEnvPath, output.join('\n'), 'utf8');
 console.log('[sync:env:app] mapa-app/.env atualizado com sucesso.');

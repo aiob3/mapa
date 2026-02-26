@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { GlassCard } from "../GlassCard";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -21,7 +21,7 @@ import {
   GitBranch,
   X,
 } from "lucide-react";
-import { useSynContext, leadsRegistry } from "./SynContext";
+import { useSynContext } from "./SynContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -115,16 +115,7 @@ function parseTranscript(content: string, filename: string): TranscriptLine[] {
 
 // ─── Default transcript (for lead "1") ───────────────────────────────────────
 
-const defaultTranscriptLines: TranscriptLine[] = [
-  { time: "14:32", speaker: "Roberto Almeida", text: "Olá, estamos expandindo nossa operação logística para o Nordeste e precisamos de uma solução que integre nosso WMS com a gestão de frotas." },
-  { time: "14:33", speaker: "Consultor", text: "Entendo, Roberto. Qual o volume de operações previsto para essa expansão?" },
-  { time: "14:34", speaker: "Roberto Almeida", text: "Estamos falando de 3 centros de distribuição novos, com capacidade para 50 mil pedidos/dia cada. O orçamento aprovado pelo board é de R$ 2.4 milhões para a fase 1." },
-  { time: "14:35", speaker: "Consultor", text: "E qual o prazo ideal para implementação?" },
-  { time: "14:36", speaker: "Roberto Almeida", text: "Precisamos estar operacionais até julho de 2026. O principal pain point hoje é a falta de visibilidade em tempo real das entregas. Perdemos 12% em devoluções por falhas no rastreamento." },
-  { time: "14:37", speaker: "Roberto Almeida", text: "Outro ponto crítico é a integração com os marketplaces. Atualmente temos processos manuais que geram erros de estoque. Precisamos automatizar isso urgentemente." },
-  { time: "14:38", speaker: "Consultor", text: "Vou mapear essas necessidades. Há algum concorrente que vocês estão avaliando?" },
-  { time: "14:39", speaker: "Roberto Almeida", text: "Sim, temos proposta da SAP e da Oracle, mas achamos que o custo-benefício de vocês é melhor. Precisamos de uma decisão até final de março." },
-];
+const defaultTranscriptLines: TranscriptLine[] = [];
 
 // ─── CRM field extraction ─────────────────────────────────────────────────────
 
@@ -135,23 +126,41 @@ interface CRMField {
   color?: string;
 }
 
-const extractedCRMFields: CRMField[] = [
-  { label: "Deal Size", value: "R$ 2.4M", icon: <DollarSign size={14} />, color: "#2E4C3B" },
-  { label: "Pain Points", value: "Visibilidade real-time, Integração marketplaces, Erros de estoque", icon: <AlertTriangle size={14} />, color: "#C64928" },
-  { label: "Orçamento Aprovado", value: "R$ 2.4M (Fase 1)", icon: <Target size={14} />, color: "#2E4C3B" },
-  { label: "Timeline", value: "Julho 2026 (operacional)", icon: <Calendar size={14} />, color: "#3B82F6" },
-  { label: "Concorrência", value: "SAP, Oracle", icon: <AlertTriangle size={14} />, color: "#F59E0B" },
-  { label: "Decisão", value: "Final de março", icon: <Clock size={14} />, color: "#C64928" },
-  { label: "Escopo", value: "3 CDs, 50K pedidos/dia cada", icon: <Building2 size={14} />, color: "#6366F1" },
-  { label: "To-Do", value: "Proposta técnica, Demo WMS+Frotas, Pricing competitivo", icon: <CheckCircle2 size={14} />, color: "#10B981" },
-];
+function buildCRMFields(selectedLead: {
+  value: string;
+  status: string;
+  company: string;
+  sector: string;
+  region: string;
+  executiveSummary: string;
+  inflectionPointsCount: number;
+  tacitBasis: string[];
+}): CRMField[] {
+  const tacitHints = selectedLead.tacitBasis.length > 0
+    ? selectedLead.tacitBasis.slice(0, 2).join(', ')
+    : 'Sem embasamento tácito consolidado nesta janela.';
+
+  return [
+    { label: "Deal Size", value: selectedLead.value, icon: <DollarSign size={14} />, color: "#2E4C3B" },
+    { label: "Pain Points", value: "Consolidação de dados, correlação operacional, priorização de execução", icon: <AlertTriangle size={14} />, color: "#C64928" },
+    { label: "Orçamento Aprovado", value: `${selectedLead.value} (janela ativa)`, icon: <Target size={14} />, color: "#2E4C3B" },
+    { label: "Timeline", value: "Próxima janela operacional", icon: <Calendar size={14} />, color: "#3B82F6" },
+    { label: "Concorrência", value: "Análise competitiva em andamento", icon: <AlertTriangle size={14} />, color: "#F59E0B" },
+    { label: "Decisão", value: selectedLead.executiveSummary || "Governança + Comitê de Receita", icon: <Clock size={14} />, color: "#C64928" },
+    { label: "Ponto de Inflexão", value: `${selectedLead.inflectionPointsCount} sinais ativos`, icon: <GitBranch size={14} />, color: "#C64928" },
+    { label: "Embasamento Tácito", value: tacitHints, icon: <FileText size={14} />, color: "#8B5CF6" },
+    { label: "Escopo", value: `${selectedLead.company} · ${selectedLead.sector} · ${selectedLead.region}`, icon: <Building2 size={14} />, color: "#6366F1" },
+    { label: "To-Do", value: "Atualizar briefing técnico, validar hipótese e acionar plano de execução", icon: <CheckCircle2 size={14} />, color: "#10B981" },
+  ];
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function LeadsInsights() {
-  const { setMirrorLeadId, navigateToHeatmap } = useSynContext();
+  const { setMirrorLeadId, navigateToHeatmap, analytics, analyticsStatus } = useSynContext();
+  const leadsRegistry = analytics.leadsRegistry;
 
-  const [selectedLeadId, setSelectedLeadId] = useState<string>("1");
+  const [selectedLeadId, setSelectedLeadId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractionComplete, setExtractionComplete] = useState(false);
@@ -165,7 +174,31 @@ export function LeadsInsights() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (!selectedLeadId && leadsRegistry.length > 0) {
+      setSelectedLeadId(leadsRegistry[0].id);
+    }
+  }, [leadsRegistry, selectedLeadId]);
+
   const selectedLead = leadsRegistry.find((l) => l.id === selectedLeadId) ?? leadsRegistry[0];
+  const extractedCRMFields = selectedLead
+    ? buildCRMFields({
+      value: selectedLead.value,
+      status: selectedLead.status,
+      company: selectedLead.company,
+      sector: selectedLead.sector,
+      region: selectedLead.region,
+      executiveSummary: selectedLead.semanticSignals.executiveSummary,
+      inflectionPointsCount: selectedLead.semanticSignals.inflectionPointsCount,
+      tacitBasis: selectedLead.semanticLayer.tacitBasis,
+    })
+    : [];
+  const leadKpis = [
+    { label: "Leads Ativos", value: String(analytics.kpis.leadsAtivos), change: `+${Math.max(0, Math.round(analytics.kpis.leadsAtivos * 0.1))}`, color: "#C64928", icon: <Users size={16} className="text-white" /> },
+    { label: "Contratos Vigentes", value: String(analytics.kpis.contratosVigentes), change: `+${Math.max(0, Math.round(analytics.kpis.contratosVigentes * 0.1))}`, color: "#10B981", icon: <FileText size={16} className="text-white" /> },
+    { label: "Leads em Aberto", value: String(analytics.kpis.leadsEmAberto), change: `+${Math.max(0, Math.round(analytics.kpis.leadsEmAberto * 0.12))}`, color: "#F59E0B", icon: <Activity size={16} className="text-white" /> },
+    { label: "Eventos Monitorados", value: String(analytics.kpis.eventosMonitorados), change: `+${Math.max(0, Math.round(analytics.kpis.eventosMonitorados * 0.08))}`, color: "#6366F1", icon: <Activity size={16} className="text-white" /> },
+  ];
 
   // ── Transcript import handlers ────────────────────────────────────────────
   const processFile = useCallback((file: File) => {
@@ -220,7 +253,7 @@ export function LeadsInsights() {
       setIsExtracting(false);
       setExtractionComplete(true);
     }, 600 + extractedCRMFields.length * 400 + 500);
-  }, []);
+  }, [extractedCRMFields]);
 
   // ── Strategic Mirror ──────────────────────────────────────────────────────
   const handleMirrorLead = (leadId: string) => {
@@ -236,6 +269,22 @@ export function LeadsInsights() {
 
   return (
     <div className="max-w-7xl mx-auto h-full flex flex-col">
+      {analyticsStatus.loading && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#717182]" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Carregando dados de leads...
+          </p>
+        </GlassCard>
+      )}
+
+      {analyticsStatus.error && (
+        <GlassCard className="!p-4 mb-5">
+          <p className="text-[12px] text-[#C64928]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+            Falha parcial de analytics: {analyticsStatus.error}
+          </p>
+        </GlassCard>
+      )}
+
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -321,12 +370,7 @@ export function LeadsInsights() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-5 mb-8 flex-shrink-0">
-        {[
-          { label: "Leads Ativos", value: "47", change: "+8", color: "#C64928", icon: <Users size={16} className="text-white" /> },
-          { label: "Contratos Vigentes", value: "23", change: "+3", color: "#10B981", icon: <FileText size={16} className="text-white" /> },
-          { label: "Leads em Aberto", value: "18", change: "+5", color: "#F59E0B", icon: <Activity size={16} className="text-white" /> },
-          { label: "Eventos Monitorados", value: "156", change: "+22", color: "#6366F1", icon: <Activity size={16} className="text-white" /> },
-        ].map((kpi) => (
+        {leadKpis.map((kpi) => (
           <GlassCard key={kpi.label} className="!p-5">
             <div className="flex items-start justify-between mb-3">
               <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: `${kpi.color}20` }}>
@@ -492,22 +536,31 @@ export function LeadsInsights() {
 
           {/* Lead info bar */}
           <div className="px-5 py-3 flex items-center justify-between bg-white/30 border-b border-black/5">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 max-w-[70%]">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ background: `linear-gradient(135deg, ${selectedLead.statusColor}, ${selectedLead.statusColor}88)` }}
+                style={{ background: `linear-gradient(135deg, ${selectedLead?.statusColor || "#717182"}, ${(selectedLead?.statusColor || "#717182")}88)` }}
               >
                 <span className="text-white text-[10px]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700 }}>
-                  {selectedLead.initials}
+                  {selectedLead?.initials || "--"}
                 </span>
               </div>
               <div>
                 <span className="text-[13px] text-[#1A1A1A]" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
-                  {selectedLead.name}
+                  {selectedLead?.name || "Nenhum lead selecionado"}
                 </span>
                 <span className="text-[11px] text-[#717182] ml-2" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  {selectedLead.company} · {selectedLead.sector}
+                  {selectedLead ? `${selectedLead.company} · ${selectedLead.sector}` : "Sem dados"}
                 </span>
+                {selectedLead?.semanticSignals.executiveSummary && (
+                  <p
+                    className="text-[10px] text-[#4A4A5A] mt-1 max-w-[520px] truncate"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                    title={selectedLead.semanticSignals.executiveSummary}
+                  >
+                    {selectedLead.semanticSignals.executiveSummary}
+                  </p>
+                )}
               </div>
             </div>
             <div className="text-right">
@@ -515,8 +568,19 @@ export function LeadsInsights() {
                 Deal Size
               </span>
               <p className="text-[#1A1A1A]" style={{ fontFamily: "'Space Mono', monospace", fontSize: "14px", fontVariantNumeric: "tabular-nums" }}>
-                {selectedLead.value}
+                {selectedLead?.value || "N/A"}
               </p>
+              <span
+                className="inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px]"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 600,
+                  color: "#C64928",
+                  background: "rgba(198,73,40,0.1)",
+                }}
+              >
+                Inflexões: {selectedLead?.semanticSignals.inflectionPointsCount ?? 0}
+              </span>
             </div>
           </div>
 

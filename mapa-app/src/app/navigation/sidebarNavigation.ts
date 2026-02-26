@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Phone,
   PieChart,
+  PlusSquare,
   Settings,
   Target,
   Users,
@@ -46,6 +47,13 @@ export const MAPA_SYN_SIDEBAR_ITEMS: SidebarNavItem[] = [
     subLabel: 'Sector Performance',
     path: '/syn/sector',
     icon: PieChart,
+    exact: true,
+  },
+  {
+    label: 'Composer',
+    subLabel: 'Composição avançada',
+    path: '/syn/composer',
+    icon: PlusSquare,
     exact: true,
   },
 ];

@@ -39,7 +39,12 @@ export type PatternId =
   | 'PAT-CARD-001'
   | 'PAT-MODAL-001'
   | 'PAT-STATUS-001'
-  | 'PAT-STATUS-002';
+  | 'PAT-STATUS-002'
+  | 'PAT-WIDGET-001'
+  | 'PAT-WIDGET-002'
+  | 'PAT-WIDGET-003'
+  | 'PAT-WIDGET-004'
+  | 'PAT-WIDGET-005';
 
 export interface RoutePatternInventory {
   route: string;

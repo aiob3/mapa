@@ -10,10 +10,11 @@ import { SynProvider } from '../components/syn/SynContext';
 import { SynToolbar } from '../components/syn/SynHeader';
 import { SynapseOutreachContent } from '../components/syn/SynapseOutreachContent';
 import { SectorAnalysis } from '../components/syn/SectorAnalysis';
+import { SynComposer } from '../components/syn/SynComposer';
 import { MAPA_SYN_SIDEBAR_ITEMS } from '../navigation/sidebarNavigation';
 import type { SidebarStatusPanelConfig } from '../types/patterns';
 
-type SynView = 'leads' | 'heatmap' | 'sector' | 'outreach';
+type SynView = 'leads' | 'heatmap' | 'sector' | 'outreach' | 'composer';
 
 const synStatusPanel: SidebarStatusPanelConfig = {
   title: 'Status do Sistema',
@@ -56,6 +57,9 @@ const synStatusPanel: SidebarStatusPanelConfig = {
 };
 
 function resolveViewFromPath(pathname: string): SynView {
+  if (pathname.startsWith('/syn/composer')) {
+    return 'composer';
+  }
   if (pathname.startsWith('/syn/outreach')) {
     return 'outreach';
   }
@@ -139,6 +143,17 @@ export function MapaSyn() {
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
                   <SynapseOutreachContent />
+                </motion.div>
+              )}
+              {activeView === 'composer' && (
+                <motion.div
+                  key="composer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                >
+                  <SynComposer />
                 </motion.div>
               )}
             </AnimatePresence>

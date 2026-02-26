@@ -28,4 +28,13 @@ export const DEFAULT_ADD_ITEMS: ActionComposerItem[] = [
     requiredAnyModule: ['mapa-syn', 'synapse'],
     contexts: ['dashboard', 'syn'],
   },
+  {
+    id: 'add-syn-composer-advanced',
+    label: 'Composição Avançada de Widgets',
+    description: 'Abrir o Composer Analítico para vincular widgets canônicos aos domínios do Syn.',
+    targetPath: '/syn/composer',
+    payload: { focus: 'widget-composer' },
+    requiredAnyModule: ['mapa-syn', 'synapse'],
+    contexts: ['dashboard', 'syn', 'team-overview'],
+  },
 ];

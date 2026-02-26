@@ -1,0 +1,23 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: mapa-clickhouse
+    restart: unless-stopped
+    ports:
+      - '${CLICKHOUSE_HTTP_PORT:-8123}:8123'
+      - '${CLICKHOUSE_NATIVE_PORT:-9000}:9000'
+    environment:
+      CLICKHOUSE_DB: '${CLICKHOUSE_DB:-mapa_semantic}'
+      CLICKHOUSE_USER: '${CLICKHOUSE_USER:-mapa_app}'
+      CLICKHOUSE_PASSWORD: '${CLICKHOUSE_PASSWORD:-mapa_local_dev_password}'
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: '1'
+    volumes:
+      - ./data:/var/lib/clickhouse
+      - ./logs:/var/log/clickhouse-server
+      - ./initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://127.0.0.1:8123/ping']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
