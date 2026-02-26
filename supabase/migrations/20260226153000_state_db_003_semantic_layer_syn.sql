@@ -307,6 +307,7 @@ select
   coalesce(nullif(se.event_layer ->> 'tone', ''), nullif(se.raw_payload ->> 'tone', ''), 'ANALÍTICO') as tone,
   coalesce(nullif(se.event_layer ->> 'tone_color', ''), nullif(se.raw_payload ->> 'tone_color', ''), '#4A6FA5') as tone_color,
   greatest(0, least(10, public.parse_numeric_safe(coalesce(se.event_layer ->> 'score_ia', se.raw_payload ->> 'score_ia'), 0))) as score_ia,
+  se.updated_at,
   se.normalized_semantic as semantic_layer,
   jsonb_array_length(se.normalized_semantic -> 'causal_hypotheses')::integer as causal_hypotheses_count,
   jsonb_array_length(se.normalized_semantic -> 'counterintuitive_signals')::integer as counterintuitive_signals_count,
@@ -314,8 +315,7 @@ select
   jsonb_array_length(se.normalized_semantic -> 'inflection_points')::integer as inflection_points_count,
   jsonb_array_length(se.normalized_semantic -> 'tacit_basis')::integer as tacit_basis_count,
   coalesce(se.normalized_semantic ->> 'executive_summary', '') as executive_summary,
-  se.normalized_semantic -> 'tactical_formula' as tactical_formula,
-  se.updated_at
+  se.normalized_semantic -> 'tactical_formula' as tactical_formula
 from semantic_enriched se
 order by se.updated_at desc;
 
@@ -463,10 +463,15 @@ as $$
           'color', case when l.score >= 80 then '#C64928' else '#F59E0B' end,
           'action', 'Acionar frente comercial para ' || l.company,
           'owner', 'Revenue Ops',
-          'date', to_char(now() + ((row_number() over()) || ' days')::interval, 'DD/MM')
+          'date', to_char(now() + ((l.rn || ' days')::interval), 'DD/MM')
         )
       )
-      from (select * from leads order by score desc limit 5) l
+      from (
+        select
+          l.*,
+          row_number() over(order by l.score desc) as rn
+        from (select * from leads order by score desc limit 5) l
+      ) l
     ), '[]'::jsonb),
     'kpiCards', (
       select jsonb_build_array(
@@ -551,19 +556,27 @@ as $$
     'toneInsights', coalesce((
       select jsonb_agg(
         jsonb_build_object(
-          'label', x.sector,
-          'tone', initcap(x.tone),
-          'score', '(' || round(avg(x.score_ia), 1)::text || ')',
-          'color', max(x.tone_color)
+          'label', t.sector,
+          'tone', initcap(t.tone),
+          'score', '(' || round(t.avg_score_ia, 1)::text || ')',
+          'color', t.max_tone_color
         )
+        order by t.avg_score_ia desc
       )
       from (
-        select l.sector, l.tone, l.tone_color, coalesce(l.score_ia, l.score / 10.0) as score_ia
-        from leads l
-      ) x
-      group by x.sector, x.tone
-      order by avg(x.score_ia) desc
-      limit 3
+        select
+          x.sector,
+          x.tone,
+          avg(x.score_ia) as avg_score_ia,
+          max(x.tone_color) as max_tone_color
+        from (
+          select l.sector, l.tone, l.tone_color, coalesce(l.score_ia, l.score / 10.0) as score_ia
+          from leads l
+        ) x
+        group by x.sector, x.tone
+        order by avg(x.score_ia) desc
+        limit 3
+      ) t
     ), '[]'::jsonb),
     'semanticHighlights', coalesce((
       select jsonb_agg(
@@ -618,6 +631,12 @@ as $$
   kpis as (
     select * from public.api_syn_kpis_view_v1
   ),
+  ranked_sectors as (
+    select
+      s.*,
+      row_number() over(order by s.revenue desc) as revenue_rank
+    from sectors s
+  ),
   top_recommendations as (
     select
       s.*,
@@ -635,14 +654,14 @@ as $$
           'engagement', s.engagement,
           'size', least(140, greatest(60, s.n * 10)),
           'color', case
-            when row_number() over(order by s.revenue desc) = 1 then '#C64928'
-            when row_number() over(order by s.revenue desc) = 2 then '#3B82F6'
-            when row_number() over(order by s.revenue desc) = 3 then '#6366F1'
+            when s.revenue_rank = 1 then '#C64928'
+            when s.revenue_rank = 2 then '#3B82F6'
+            when s.revenue_rank = 3 then '#6366F1'
             else '#8B7355'
           end
         )
       )
-      from sectors s
+      from ranked_sectors s
     ), '[]'::jsonb),
     'conversionInsights', coalesce((
       select jsonb_agg(

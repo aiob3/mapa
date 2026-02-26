@@ -17,6 +17,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Legacy CRM Ingestion Analysis (STATE-DB-003)](./legacy-crm-ingestion-analysis-state-db-003.md)
 - [ClickHouse Activation Runbook (STATE-DB-004)](./clickhouse-activation-state-db-004.md)
 - [ClickHouse Role in Architecture (STATE-DB-004)](./clickhouse-role-architecture-state-db-004.md)
+- [Syn Post-Migration Validation Checklist (STATE-DB-004)](./syn-post-migration-validation-checklist-state-db-004.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
@@ -50,6 +51,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Legacy CRM Ingestion Analysis (STATE-DB-003) | `legacy-crm-ingestion-analysis-state-db-003.md` | agent-update:legacy-crm-state-db-003 | Exports Pipedrive (`deals/leads/activities`), schema `canonical_events`, estratégia Supabase + ClickHouse |
 | ClickHouse Activation Runbook (STATE-DB-004) | `clickhouse-activation-state-db-004.md` | agent-update:clickhouse-activation-state-db-004 | Bootstrap de instância ClickHouse, schema vetorial/sinais e fluxo de integração com `semantic_layer` |
 | ClickHouse Role in Architecture (STATE-DB-004) | `clickhouse-role-architecture-state-db-004.md` | agent-update:clickhouse-role-architecture-state-db-004 | Papel arquitetural incorporado, limites de responsabilidade e contrato operacional Supabase -> Middleware -> ClickHouse -> Syn |
+| Syn Post-Migration Validation Checklist (STATE-DB-004) | `syn-post-migration-validation-checklist-state-db-004.md` | agent-update:syn-post-migration-validation-checklist-state-db-004 | Checklist/script único para validar migrations e RPCs `api_syn_*_v1` com token `authenticated` e mitigação automática de inconsistências |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist
