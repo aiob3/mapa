@@ -33,6 +33,7 @@
     "clickhouse:provision-user": "node scripts/clickhouse-provision-user.mjs",
     "syn:middleware": "node scripts/syn-middleware.mjs",
     "syn:ingest": "node scripts/syn-ingest-semantic-layer.mjs",
+    "syn:ingest:raw": "node scripts/syn-ingest-raw-db.mjs",
     "syn:validate:post-migration": "node scripts/validate-syn-post-migration.mjs",
     "prepublishOnly": "npm run build",
     "version": "npm run build",

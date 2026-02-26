@@ -1,0 +1,16 @@
+{
+  "version": "PAT-SYN-SOURCE-v1",
+  "requiredFields": [
+    "sourceSystem",
+    "sourceEntity",
+    "sourceId",
+    "subjectKey",
+    "sourceUpdatedAt",
+    "payloadHash",
+    "ingestionBatchId"
+  ],
+  "rules": {
+    "canonicalSubjectId": "csv1_${md5(source_system + ':' + subject_key_normalized)}",
+    "idempotencyKey": "md5(source_system + ':' + source_entity + ':' + source_id + ':' + payload_hash)"
+  }
+}

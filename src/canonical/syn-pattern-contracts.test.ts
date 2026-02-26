@@ -8,6 +8,14 @@ interface SynCatalog {
   rpcContracts: string[];
   scoreBands: Array<{ id: string; minScore: number; maxScore: number; status: string; color: string }>;
   signals: Array<{ id: string; dtoKey: string; storageKey: string; summaryKey: string; summaryColumn: string }>;
+  sourceContract?: {
+    version: string;
+    requiredFields: string[];
+    rules: {
+      canonicalSubjectId: string;
+      idempotencyKey: string;
+    };
+  };
   patternOriginMatrix: Array<{ id: string; pattern: string; origin: string; stage: string }>;
 }
 
@@ -114,11 +122,29 @@ describe('syn pattern contracts', () => {
     }
   });
 
+  it('validates source contract schema and pattern mapping', () => {
+    expect(catalog.sourceContract).toBeDefined();
+    expect(catalog.sourceContract?.version).toBe('PAT-SYN-SOURCE-v1');
+    expect(Array.isArray(catalog.sourceContract?.requiredFields)).toBe(true);
+    expect(catalog.sourceContract?.requiredFields).toEqual([
+      'sourceSystem',
+      'sourceEntity',
+      'sourceId',
+      'subjectKey',
+      'sourceUpdatedAt',
+      'payloadHash',
+      'ingestionBatchId',
+    ]);
+
+    expect(catalog.patternOriginMatrix.some((item) => item.id === 'PAT-SYN-SOURCE-001')).toBe(true);
+  });
+
   it('enforces shared normalizer adoption in app and middleware layers', () => {
     const analyticsApiSource = fs.readFileSync(path.resolve(__dirname, '../../mapa-app/src/app/services/analytics/analyticsApi.ts'), 'utf8');
     const mappersSource = fs.readFileSync(path.resolve(__dirname, '../../mapa-app/src/app/services/analytics/mappers.ts'), 'utf8');
     const runtimeSource = fs.readFileSync(path.resolve(__dirname, '../../scripts/lib/syn-semantic-runtime.mjs'), 'utf8');
     const validatorSource = fs.readFileSync(path.resolve(__dirname, '../../scripts/validate-syn-post-migration.mjs'), 'utf8');
+    const rawIngestSource = fs.readFileSync(path.resolve(__dirname, '../../scripts/syn-ingest-raw-db.mjs'), 'utf8');
 
     expect(analyticsApiSource).toContain('@syn-patterns');
     expect(analyticsApiSource).toContain('SYN_ANALYTICS_RPC');
@@ -126,8 +152,12 @@ describe('syn pattern contracts', () => {
     expect(mappersSource).toContain('deriveSynStatusByScore');
     expect(runtimeSource).toContain('../../shared/syn/pat-syn-v1.mjs');
     expect(runtimeSource).toContain('normalizeSynSemanticLayer');
+    expect(runtimeSource).toContain('../../shared/syn/pat-syn-source-v1.mjs');
+    expect(runtimeSource).toContain('semantic_signals_v2');
     expect(validatorSource).toContain('../shared/syn/pat-syn-v1.mjs');
     expect(validatorSource).toContain('SYN_ANALYTICS_RPCS');
+    expect(rawIngestSource).toContain('../shared/syn/pat-syn-source-v1.mjs');
+    expect(rawIngestSource).toContain('upsert_canonical_source_registry_v1');
   });
 
   it('keeps stable snapshot for PAT-SYN catalog and RPC fixtures', () => {

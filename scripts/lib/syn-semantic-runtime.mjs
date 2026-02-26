@@ -1,10 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import dotenv from 'dotenv';
 import {
   normalizeSynSemanticLayer,
   toSnakeSynSemanticLayer,
 } from '../../shared/syn/pat-syn-v1.mjs';
+import {
+  buildCanonicalSubjectId,
+  buildPayloadHash,
+  normalizeSourceContract,
+} from '../../shared/syn/pat-syn-source-v1.mjs';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 dotenv.config({ path: path.resolve(process.cwd(), '.env.clickhouse'), quiet: true });
@@ -126,6 +132,91 @@ async function insertJsonEachRow(config, tableName, rows) {
   );
 }
 
+let semanticSchemaEnsured = false;
+
+async function ensureSemanticSchemaV2(config) {
+  if (semanticSchemaEnsured) {
+    return;
+  }
+
+  const statements = [
+    `CREATE TABLE IF NOT EXISTS ${config.database}.semantic_chunks_v2 (
+      canonical_id_v2 String,
+      canonical_subject_id String,
+      entity_kind LowCardinality(String),
+      source_system LowCardinality(String),
+      source_entity LowCardinality(String),
+      source_id String,
+      payload_hash String,
+      chunk_id UUID DEFAULT generateUUIDv4(),
+      chunk_text String,
+      embedding Array(Float32),
+      embedding_model LowCardinality(String),
+      source_ref String,
+      owner_user_id String,
+      metadata_json String DEFAULT '{}',
+      created_at DateTime64(3, 'UTC') DEFAULT now64(3),
+      updated_at DateTime64(3, 'UTC') DEFAULT now64(3)
+    ) ENGINE = MergeTree
+    PARTITION BY toYYYYMM(created_at)
+    ORDER BY (entity_kind, canonical_subject_id, canonical_id_v2, created_at, chunk_id)
+    SETTINGS index_granularity = 8192`,
+    `CREATE TABLE IF NOT EXISTS ${config.database}.semantic_signals_v2 (
+      canonical_id_v2 String,
+      canonical_subject_id String,
+      entity_kind LowCardinality(String),
+      source_system LowCardinality(String),
+      source_entity LowCardinality(String),
+      source_id String,
+      payload_hash String,
+      causal_hypotheses Array(String),
+      counterintuitive_signals Array(String),
+      relational_conflicts Array(String),
+      inflection_points Array(String),
+      tacit_basis Array(String),
+      executive_summary String,
+      tactical_action String,
+      tactical_owner String,
+      tactical_timing String,
+      tactical_expected_outcome String,
+      owner_user_id String,
+      source_ref String,
+      source_ts DateTime64(3, 'UTC'),
+      ingested_at DateTime64(3, 'UTC') DEFAULT now64(3)
+    ) ENGINE = ReplacingMergeTree(ingested_at)
+    PARTITION BY toYYYYMM(source_ts)
+    ORDER BY (entity_kind, canonical_subject_id, canonical_id_v2, source_ts)
+    SETTINGS index_granularity = 8192`,
+    `CREATE OR REPLACE VIEW ${config.database}.semantic_signals_summary_v2 AS
+    SELECT
+      entity_kind,
+      count() AS events,
+      sum(length(causal_hypotheses)) AS causality_signals,
+      sum(length(counterintuitive_signals)) AS counterintuitive_signals,
+      sum(length(relational_conflicts)) AS relational_conflicts,
+      sum(length(inflection_points)) AS inflection_points,
+      sum(length(tacit_basis)) AS tacit_basis_signals
+    FROM ${config.database}.semantic_signals_v2
+    GROUP BY entity_kind`,
+    `CREATE OR REPLACE VIEW ${config.database}.semantic_signals_summary_v1 AS
+    SELECT
+      entity_kind,
+      events,
+      causality_signals,
+      counterintuitive_signals,
+      relational_conflicts,
+      inflection_points,
+      tacit_basis_signals
+    FROM ${config.database}.semantic_signals_summary_v2`,
+  ];
+
+  for (const query of statements) {
+    await clickHouseRequest(config, query);
+  }
+
+  semanticSchemaEnsured = true;
+}
+
 function resolveSemanticLayerFromEvent(event) {
   const semanticLayer = event.semantic_layer;
   const eventLayerSemantic = event.event_layer && typeof event.event_layer === 'object'
@@ -181,6 +272,49 @@ function resolveOwnerUserId(event) {
     return fromRawPayload.trim();
   }
   return 'unknown';
+}
+
+function md5Hash(value) {
+  return createHash('md5').update(String(value ?? '')).digest('hex');
+}
+
+function resolveSourceContractFromEvent(event, entityKind) {
+  const fromEventLayer = event.event_layer && typeof event.event_layer === 'object'
+    ? event.event_layer.source_contract
+    : null;
+  const fromRawPayload = event.raw_payload && typeof event.raw_payload === 'object'
+    ? event.raw_payload.source_contract
+    : null;
+
+  const sourceContract = normalizeSourceContract(
+    (fromEventLayer && typeof fromEventLayer === 'object' ? fromEventLayer : null)
+    || (fromRawPayload && typeof fromRawPayload === 'object' ? fromRawPayload : null)
+    || {},
+    {
+      sourceSystem: 'supabase',
+      sourceEntity: entityKind,
+      sourceId: String(event.canonical_id_v2 || ''),
+      subjectKey: event.event_layer?.canonical_subject_id || `supabase:${entityKind}:${event.canonical_id_v2}`,
+      sourceUpdatedAt: event.updated_at,
+      payloadHash: buildPayloadHash(event.raw_payload || {}),
+      ingestionBatchId: 'supabase-semantic-sync',
+    },
+  );
+
+  const canonicalSubjectId = typeof event.event_layer?.canonical_subject_id === 'string' && event.event_layer.canonical_subject_id.trim()
+    ? event.event_layer.canonical_subject_id.trim()
+    : sourceContract.canonicalSubjectId || buildCanonicalSubjectId(
+      sourceContract.sourceSystem,
+      sourceContract.subjectKeyNormalized || sourceContract.subjectKey || `supabase:${entityKind}:${event.canonical_id_v2}`,
+    );
+
+  return {
+    sourceSystem: sourceContract.sourceSystem || 'supabase',
+    sourceEntity: sourceContract.sourceEntity || entityKind,
+    sourceId: sourceContract.sourceId || String(event.canonical_id_v2 || ''),
+    payloadHash: sourceContract.payloadHash || md5Hash(JSON.stringify(event.raw_payload || {})),
+    canonicalSubjectId,
+  };
 }
 
 function eventValue(event, key, fallback = '') {
@@ -460,10 +594,16 @@ async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } =
   const entityKind = resolveEntityKind(event);
   const sourceRef = resolveSourceRef(event);
   const ownerUserId = resolveOwnerUserId(event);
+  const sourceContract = resolveSourceContractFromEvent(event, entityKind);
 
   const signalRow = {
     canonical_id_v2: canonicalId,
+    canonical_subject_id: sourceContract.canonicalSubjectId,
     entity_kind: entityKind,
+    source_system: sourceContract.sourceSystem,
+    source_entity: sourceContract.sourceEntity,
+    source_id: sourceContract.sourceId,
+    payload_hash: sourceContract.payloadHash,
     causal_hypotheses: semanticSnake.causal_hypotheses,
     counterintuitive_signals: semanticSnake.counterintuitive_signals,
     relational_conflicts: semanticSnake.relational_conflicts,
@@ -485,7 +625,12 @@ async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } =
     const embedding = await createEmbedding(chunkText);
     chunks.push({
       canonical_id_v2: canonicalId,
+      canonical_subject_id: sourceContract.canonicalSubjectId,
       entity_kind: entityKind,
+      source_system: sourceContract.sourceSystem,
+      source_entity: sourceContract.sourceEntity,
+      source_id: sourceContract.sourceId,
+      payload_hash: sourceContract.payloadHash,
       chunk_text: chunkText,
       embedding: embedding.embedding,
       embedding_model: embedding.model,
@@ -507,8 +652,8 @@ async function ingestEventIntoClickHouse(clickhouse, event, { dryRun = false } =
   }
 
   if (!dryRun) {
-    await insertJsonEachRow(clickhouse, 'semantic_signals_v1', [signalRow]);
-    await insertJsonEachRow(clickhouse, 'semantic_chunks_v1', chunks);
+    await insertJsonEachRow(clickhouse, 'semantic_signals_v2', [signalRow]);
+    await insertJsonEachRow(clickhouse, 'semantic_chunks_v2', chunks);
   }
 
   return {
@@ -524,6 +669,7 @@ export async function runSupabaseClickHouseSemanticSync(options = {}) {
   const checkpointFile = path.resolve(process.cwd(), options.checkpointFile || env('SYN_INGEST_CHECKPOINT_PATH', DEFAULT_CHECKPOINT_PATH));
 
   const clickhouse = resolveClickHouseConfig();
+  await ensureSemanticSchemaV2(clickhouse);
   const checkpoint = await readCheckpoint(checkpointFile);
 
   const stats = {
@@ -585,6 +731,7 @@ export async function runSupabaseClickHouseSemanticSync(options = {}) {
 
 export async function fetchSemanticSignalsSummary() {
   const clickhouse = resolveClickHouseConfig();
+  await ensureSemanticSchemaV2(clickhouse);
   const payload = await clickHouseRequest(
     clickhouse,
     [
@@ -661,6 +808,7 @@ export async function provisionClickHouseSynUser(options = {}) {
 
 export async function pingClickHouse() {
   const clickhouse = resolveClickHouseConfig();
+  await ensureSemanticSchemaV2(clickhouse);
   const ping = await clickHouseRequest(clickhouse, 'SELECT 1 AS ok FORMAT JSON', { expectJson: true });
   const ok = Array.isArray(ping?.data) && Number(ping.data[0]?.ok) === 1;
   return {

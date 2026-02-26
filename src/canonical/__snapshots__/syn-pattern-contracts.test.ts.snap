@@ -88,6 +88,12 @@ exports[`syn pattern contracts keeps stable snapshot for PAT-SYN catalog and RPC
         "pattern": "summary row snake_case -> camelCase",
         "stage": "Middleware transform",
       },
+      {
+        "id": "PAT-SYN-SOURCE-001",
+        "origin": "raw ingestion -> event_layer.source_contract + source registry",
+        "pattern": "source_contract envelope",
+        "stage": "Ingestion source contract",
+      },
     ],
     "rpcContracts": [
       "api_syn_leads_v1",
@@ -156,6 +162,22 @@ exports[`syn pattern contracts keeps stable snapshot for PAT-SYN catalog and RPC
         "summaryKey": "tacitBasisSignals",
       },
     ],
+    "sourceContract": {
+      "requiredFields": [
+        "sourceSystem",
+        "sourceEntity",
+        "sourceId",
+        "subjectKey",
+        "sourceUpdatedAt",
+        "payloadHash",
+        "ingestionBatchId",
+      ],
+      "rules": {
+        "canonicalSubjectId": "csv1_\${md5(source_system + ':' + subject_key_normalized)}",
+        "idempotencyKey": "md5(source_system + ':' + source_entity + ':' + source_id + ':' + payload_hash)",
+      },
+      "version": "PAT-SYN-SOURCE-v1",
+    },
     "version": "PAT-SYN-v1",
   },
   "fixtures": {

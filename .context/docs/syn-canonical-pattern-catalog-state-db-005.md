@@ -40,6 +40,7 @@ success_criteria:
 | `PAT-SYN-SIGNAL-005` | Taxonomia | `tacitBasis` |
 | `PAT-SYN-RPC-001` | RPC Contract | lista única `api_syn_*_v1` usada por app + validador |
 | `PAT-SYN-TRANSFORM-001` | Transform | conversão `snake_case -> camelCase` para summary semântico |
+| `PAT-SYN-SOURCE-001` | Source Contract | envelope `source_contract` para ingestão idempotente por fonte |
 
 ## 3) Contrato de score/status e score IA
 
@@ -87,6 +88,7 @@ Regras adicionais:
 | `PAT-SYN-SIGNAL-001..005` | taxonomia de sinais | `semantic_layer` + `semantic_signals_v1` + summary | Supabase + ClickHouse + App |
 | `PAT-SYN-RPC-001` | lista de RPCs | `analyticsApi.ts` + `validate-syn-post-migration.mjs` | App + Gate homolog |
 | `PAT-SYN-TRANSFORM-001` | summary transform | resposta middleware `snake_case` -> app `camelCase` | Middleware transform |
+| `PAT-SYN-SOURCE-001` | contrato de origem | `source_contract` + `canonical_source_registry_v1` | Raw ingest -> Supabase -> ClickHouse |
 
 ## 7) Pontos de consumo (implementação)
 
@@ -95,6 +97,26 @@ Regras adicionais:
 3. `mapa-app/src/app/services/analytics/analyticsApi.ts` (RPC names e summary mapping)
 4. `scripts/lib/syn-semantic-runtime.mjs` (normalização para ingestão ClickHouse)
 5. `scripts/validate-syn-post-migration.mjs` (lista de RPCs para gate de contrato)
+6. `scripts/syn-ingest-raw-db.mjs` (ingestão raw `deals` com contrato de origem)
+7. `shared/syn/pat-syn-source-v1.mjs` (SSOT do contrato de origem)
+
+## 7.1) PAT-SYN-SOURCE-v1 (STATE-DB-006)
+
+Campos obrigatórios:
+
+1. `sourceSystem`
+2. `sourceEntity`
+3. `sourceId`
+4. `subjectKey`
+5. `sourceUpdatedAt`
+6. `payloadHash`
+7. `ingestionBatchId`
+
+Regras:
+
+1. `canonical_subject_id = csv1_${md5(source_system + ':' + subject_key_normalized)}`
+2. `idempotency_key = md5(source_system + ':' + source_entity + ':' + source_id + ':' + payload_hash)`
+3. `source_contract` deve ser persistido em `event_layer.source_contract`.
 
 ## 8) Política de evolução
 

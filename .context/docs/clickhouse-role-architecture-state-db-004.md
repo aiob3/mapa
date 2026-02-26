@@ -58,9 +58,9 @@ Não responsável por:
 
 Responsável por:
 
-1. Armazenar chunks e embeddings (`semantic_chunks_v1`).
-2. Armazenar sinais executivos (`semantic_signals_v1`).
-3. Entregar resumo agregado por tipo de entidade (`semantic_signals_summary_v1`).
+1. Armazenar chunks e embeddings (`semantic_chunks_v2`).
+2. Armazenar sinais executivos (`semantic_signals_v2`).
+3. Entregar resumo agregado por tipo de entidade (`semantic_signals_summary_v1` compatível via view).
 
 Não responsável por:
 
@@ -80,17 +80,20 @@ Campos mínimos utilizados:
 4. `iam_layer`
 5. `updated_at`
 6. `semantic_layer` (quando disponível; com fallback quando a coluna não existe no remoto)
+7. `event_layer.source_contract` (`PAT-SYN-SOURCE-v1`)
+8. `event_layer.canonical_subject_id`
 
 ### Saída (middleware -> ClickHouse)
 
 Tabelas:
 
-1. `mapa_semantic.semantic_signals_v1`
-2. `mapa_semantic.semantic_chunks_v1`
+1. `mapa_semantic.semantic_signals_v2`
+2. `mapa_semantic.semantic_chunks_v2`
 
 View:
 
-1. `mapa_semantic.semantic_signals_summary_v1`
+1. `mapa_semantic.semantic_signals_summary_v1` (compatível com frontend)
+2. `mapa_semantic.semantic_signals_summary_v2` (fonte real da agregação)
 
 ### Consumo (middleware -> Syn)
 
@@ -146,6 +149,7 @@ Os contratos transversais de DTO, score/status, taxonomia e RPC do Syn foram con
 
 1. `.context/docs/syn-canonical-pattern-catalog-state-db-005.md`
 2. `shared/syn/pat-syn-v1.mjs`
+3. `shared/syn/pat-syn-source-v1.mjs`
 
 Essas referências devem ser tratadas como SSOT para evitar deriva entre Supabase, middleware e mapa-app.
 

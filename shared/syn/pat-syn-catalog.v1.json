@@ -19,6 +19,22 @@
     { "id": "PAT-SYN-SIGNAL-004", "dtoKey": "inflectionPoints", "storageKey": "inflection_points", "summaryKey": "inflectionPoints", "summaryColumn": "inflection_points" },
     { "id": "PAT-SYN-SIGNAL-005", "dtoKey": "tacitBasis", "storageKey": "tacit_basis", "summaryKey": "tacitBasisSignals", "summaryColumn": "tacit_basis_signals" }
   ],
+  "sourceContract": {
+    "version": "PAT-SYN-SOURCE-v1",
+    "requiredFields": [
+      "sourceSystem",
+      "sourceEntity",
+      "sourceId",
+      "subjectKey",
+      "sourceUpdatedAt",
+      "payloadHash",
+      "ingestionBatchId"
+    ],
+    "rules": {
+      "canonicalSubjectId": "csv1_${md5(source_system + ':' + subject_key_normalized)}",
+      "idempotencyKey": "md5(source_system + ':' + source_entity + ':' + source_id + ':' + payload_hash)"
+    }
+  },
   "patternOriginMatrix": [
     { "id": "PAT-SYN-DTO-001", "pattern": "SynLeadDto", "origin": "Supabase RPC api_syn_leads_v1", "stage": "DTO" },
     { "id": "PAT-SYN-DTO-002", "pattern": "SynSemanticLayerDto", "origin": "Supabase semantic_layer + middleware normalize", "stage": "DTO" },
@@ -33,6 +49,7 @@
     { "id": "PAT-SYN-SIGNAL-004", "pattern": "inflectionPoints", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
     { "id": "PAT-SYN-SIGNAL-005", "pattern": "tacitBasis", "origin": "semantic_layer -> ClickHouse + app", "stage": "Taxonomia de sinais" },
     { "id": "PAT-SYN-RPC-001", "pattern": "RPC contract list", "origin": "validate-syn-post-migration + analyticsApi", "stage": "Contract gate" },
-    { "id": "PAT-SYN-TRANSFORM-001", "pattern": "summary row snake_case -> camelCase", "origin": "syn-middleware response map", "stage": "Middleware transform" }
+    { "id": "PAT-SYN-TRANSFORM-001", "pattern": "summary row snake_case -> camelCase", "origin": "syn-middleware response map", "stage": "Middleware transform" },
+    { "id": "PAT-SYN-SOURCE-001", "pattern": "source_contract envelope", "origin": "raw ingestion -> event_layer.source_contract + source registry", "stage": "Ingestion source contract" }
   ]
 }

@@ -185,6 +185,14 @@ Regras:
 5. Decidir se ClickHouse entra primeiro para vetor, OLAP, ou ambos.
 6. Formalizar DDL da `semantic_layer` (JSONB inicial ou tabelas normalizadas) e politicas de curadoria.
 
+## Atualizacao aplicada (STATE-DB-006)
+
+1. A camada idempotente por origem foi implementada com `public.canonical_source_registry_v1`.
+2. O contrato de origem `PAT-SYN-SOURCE-v1` foi oficializado em `shared/syn/pat-syn-source-v1.mjs`.
+3. O pipeline `raw_db -> canonical_events` foi iniciado para `deals` com `npm run syn:ingest:raw`.
+4. A correlacao vetorial evoluiu para `semantic_signals_v2`/`semantic_chunks_v2` mantendo `semantic_signals_summary_v1` compativel.
+5. O principio de independencia semantica foi mantido: CRM segue como evidencia de entrada, nao como verdade final de decisao.
+
 <!-- agent-update:end -->
 
 <!-- agent-readonly:guidance -->

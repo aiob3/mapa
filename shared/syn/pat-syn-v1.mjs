@@ -87,7 +87,25 @@ export const PAT_SYN_PATTERN_ORIGIN_MATRIX = Object.freeze([
   Object.freeze({ id: 'PAT-SYN-SIGNAL-005', pattern: 'tacitBasis', origin: 'semantic_layer -> ClickHouse + app', stage: 'Taxonomia de sinais' }),
   Object.freeze({ id: 'PAT-SYN-RPC-001', pattern: 'RPC contract list', origin: 'validate-syn-post-migration + analyticsApi', stage: 'Contract gate' }),
   Object.freeze({ id: 'PAT-SYN-TRANSFORM-001', pattern: 'summary row snake_case -> camelCase', origin: 'syn-middleware response map', stage: 'Middleware transform' }),
+  Object.freeze({ id: 'PAT-SYN-SOURCE-001', pattern: 'source_contract envelope', origin: 'raw ingestion -> event_layer.source_contract + source registry', stage: 'Ingestion source contract' }),
 ]);
+
+export const PAT_SYN_SOURCE_CONTRACT = Object.freeze({
+  version: 'PAT-SYN-SOURCE-v1',
+  requiredFields: Object.freeze([
+    'sourceSystem',
+    'sourceEntity',
+    'sourceId',
+    'subjectKey',
+    'sourceUpdatedAt',
+    'payloadHash',
+    'ingestionBatchId',
+  ]),
+  rules: Object.freeze({
+    canonicalSubjectId: "csv1_${md5(source_system + ':' + subject_key_normalized)}",
+    idempotencyKey: "md5(source_system + ':' + source_entity + ':' + source_id + ':' + payload_hash)",
+  }),
+});
 
 export const PAT_SYN_CATALOG = Object.freeze({
   version: PAT_SYN_VERSION,
@@ -95,6 +113,7 @@ export const PAT_SYN_CATALOG = Object.freeze({
   signals: SYN_SEMANTIC_SIGNAL_TAXONOMY,
   rpcContracts: SYN_ANALYTICS_RPCS,
   patternOriginMatrix: PAT_SYN_PATTERN_ORIGIN_MATRIX,
+  sourceContract: PAT_SYN_SOURCE_CONTRACT,
 });
 
 function isObject(value) {
