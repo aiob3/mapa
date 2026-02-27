@@ -66,6 +66,73 @@ related_agents:
 - **Evidence Expectations:** `npm run syn:validate:post-migration` verde + revisao de grants em migration.
 - **Git Checkpoint:** Commit `test(syn): validate contract conformance for state-db-006`
 
+### Phase 1.1 - Execution Blueprint (Data Contract Conformance)
+- **Execution window:** Iteracao `260227-121425` (planejar).
+- **Layer boundaries:**
+  - `mapa`: scripts de validacao, catalogos compartilhados e testes canônicos.
+  - `mapa-app`: somente leitura para verificar aderencia de consumo (`analyticsApi`/mappers), sem mudanca visual.
+  - `.context`: registro de evidencias e checkpoint da fase.
+- **Mandatory contracts:** `READ-CORE-001`, `READ-CONTRACTS-003`, `READ-TRIGGER-005`.
+
+#### Step A - Preconditions and guardrails
+- Confirmar `.env` com `SUPABASE_PROJECT_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_PUBLISHABLE_KEY` (ou `SUPABASE_ANOM_PUBLIC_KEY`).
+- Confirmar baseline canônica ativa: `PAT-SYN-v1`, `PAT-SYN-SOURCE-v1` e migration backend-only `20260226203000_state_db_006_ingestion_rpcs_backend_only.sql`.
+- Rodar guardrail de seguranca para evitar regressao de grants:
+
+```bash
+npm run security:guardrails
+```
+
+#### Step B - Contract validation gate
+- Executar gate principal de conformidade pós-migration:
+
+```bash
+npm run syn:validate:post-migration
+```
+
+- Critério de sucesso do gate:
+  - `success: true` no JSON final do script.
+  - `semanticLayerColumn.ok = true`.
+  - `authenticatedRpcValidation.ok = true` para todos RPCs em `SYN_ANALYTICS_RPCS`.
+- Em falha:
+  - Capturar `mitigation.serviceRoleDiagnostics`.
+  - Classificar causa: `schema-cache`, `grant`, `auth`, `contract drift`.
+  - Abrir correção apenas na camada afetada e repetir Step B.
+
+#### Step C - Catalog and fixture conformance
+- Validar consistencia do catalogo/fixtures e adoção de normalizadores compartilhados:
+
+```bash
+npm run test -- syn-pattern-contracts.test.ts
+```
+
+- Critério de sucesso:
+  - Snapshot de `PAT-SYN` estável.
+  - `rpcContracts` alinhado ao fixture e aos imports compartilhados.
+
+#### Step D - Grant matrix review (manual + diffable)
+- Revisar grants efetivos nas migrations:
+  - `supabase/migrations/20260226203000_state_db_006_ingestion_rpcs_backend_only.sql`
+  - `supabase/migrations/20260226190000_state_db_006_canonical_source_registry.sql`
+- Regra obrigatória da fase:
+  - Ingestão (`upsert_canonical_event_v2`, `upsert_canonical_source_registry_v1`) executável apenas por `service_role`.
+  - Leitura de `canonical_source_registry_v1` restrita a `service_role`.
+
+#### Step E - Evidence package and exit gate
+- Evidencias minimas da fase:
+  - Log JSON resumido do `syn:validate:post-migration` com timestamp.
+  - Resultado do teste `syn-pattern-contracts`.
+  - Registro de revisão de grants com conclusão (`conforme`/`nao conforme`).
+- Exit status da fase:
+  - `phase1=done` quando Steps A-E concluirem com sucesso.
+  - `phase1=blocked:<motivo>` quando qualquer gate critico falhar.
+
+#### Step F - Rollback and containment
+- Se houver regressao de contrato:
+  - Reverter apenas mudancas da iteração na camada responsável.
+  - Manter `shared/syn` como SSOT e evitar hotfix direto em consumidor sem atualização de contrato.
+  - Registrar checkpoint `retomar` com causa-raiz e próxima ação priorizada.
+
 ### Phase 2 - Consumption Readiness (mapa-app + middleware)
 - **Owner:** Backend Specialist + Frontend Specialist
 - **Deliverables:** Checklist de readiness para consumo Syn no frontend sem quebra de contrato.

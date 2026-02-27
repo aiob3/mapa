@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.browser.enableChatTools": true
+	},
+	"extensions": {
+		"recommendations": [
+			"animaapp.vscode-anima",
+			"firefox-devtools.vscode-firefox-debug",
+			"github.copilot-chat"
+		]
+	}
+}
