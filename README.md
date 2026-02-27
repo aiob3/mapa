@@ -67,6 +67,10 @@ npm run dev:app
 npm run preview:app
 ```
 
+Observação operacional:
+- `npm run dev:app` e `npm run preview:app` iniciam automaticamente o middleware Syn antes do app e validam `GET /health`.
+- `VITE_SYN_MIDDLEWARE_URL` é preenchida automaticamente pelo `sync:env:app` (default local `http://127.0.0.1:8787`).
+
 Alternativamente dentro de `mapa-app/`:
 
 ```bash

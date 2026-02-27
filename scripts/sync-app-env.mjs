@@ -41,7 +41,9 @@ const supabaseAnonKey =
   getFromParsed(appEnvExisting, 'VITE_SUPABASE_ANON_KEY');
 const authDomain = getFromParsed(appEnvExisting, 'VITE_AUTH_DEFAULT_EMAIL_DOMAIN') || 'mapa.local';
 const synMiddlewareUrl =
-  getFromParsed(rootEnv, 'SYN_MIDDLEWARE_URL') || getFromParsed(appEnvExisting, 'VITE_SYN_MIDDLEWARE_URL');
+  getFromParsed(rootEnv, 'SYN_MIDDLEWARE_URL') ||
+  getFromParsed(appEnvExisting, 'VITE_SYN_MIDDLEWARE_URL') ||
+  'http://127.0.0.1:8787';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   const missing = [];
@@ -61,11 +63,8 @@ const output = [
   `VITE_SUPABASE_URL=${supabaseUrl}`,
   `VITE_SUPABASE_ANON_KEY=${supabaseAnonKey}`,
   `VITE_AUTH_DEFAULT_EMAIL_DOMAIN=${authDomain}`,
+  `VITE_SYN_MIDDLEWARE_URL=${synMiddlewareUrl}`,
 ];
-
-if (synMiddlewareUrl) {
-  output.push(`VITE_SYN_MIDDLEWARE_URL=${synMiddlewareUrl}`);
-}
 
 output.push('');
 
