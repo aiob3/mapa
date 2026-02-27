@@ -19,11 +19,13 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [ClickHouse Role in Architecture (STATE-DB-004)](./clickhouse-role-architecture-state-db-004.md)
 - [Syn Post-Migration Validation Checklist (STATE-DB-004)](./syn-post-migration-validation-checklist-state-db-004.md)
 - [Syn Canonical Pattern Catalog (STATE-DB-005)](./syn-canonical-pattern-catalog-state-db-005.md)
+- [Architecture Visual Portal (STATE-DB-006)](./architecture-visual-portal-state-db-006.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.
 - `docs/` — Living documentation produced by this tool.
 - `mapa-app/` — Main application directory.
+- `mapa-visual/` — Portal visual executivo para blueprint de arquitetura.
 - `prompts/` — AI prompt templates and system instructions.
 - `scripts/` — Utility and automation scripts.
 - `snippets/` — Reusable code snippets.
@@ -54,6 +56,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | ClickHouse Role in Architecture (STATE-DB-004) | `clickhouse-role-architecture-state-db-004.md` | agent-update:clickhouse-role-architecture-state-db-004 | Papel arquitetural incorporado, limites de responsabilidade e contrato operacional Supabase -> Middleware -> ClickHouse -> Syn |
 | Syn Post-Migration Validation Checklist (STATE-DB-004) | `syn-post-migration-validation-checklist-state-db-004.md` | agent-update:syn-post-migration-validation-checklist-state-db-004 | Checklist/script único para validar migrations e RPCs `api_syn_*_v1` com token `authenticated` e mitigação automática de inconsistências |
 | Syn Canonical Pattern Catalog (STATE-DB-005) | `syn-canonical-pattern-catalog-state-db-005.md` | agent-update:syn-canonical-pattern-catalog-state-db-005 | Catálogo PAT-SYN-* versionado, matriz pattern->origem, SSOT de score/status, taxonomia semântica e contratos de RPC |
+| Architecture Visual Portal (STATE-DB-006) | `architecture-visual-portal-state-db-006.md` | agent-update:architecture-visual-portal-state-db-006 | Portal `mapa-visual` com 3 vistas executivas (dados, mapa-app e mapa-app x dados) e snapshot arquitetural gerado por script |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

@@ -19,7 +19,9 @@ mapa/
 ├── .context/             # Scaffold canônico (docs/, agents/, plans/, runtime/)
 ├── mapa-app/             # Aplicação web (React + Vite)
 │   ├── src/
-│   ├── guidelines/
+│   └── dist/             # Build web (gerado por vite build)
+├── mapa-visual/          # Portal visual executivo da arquitetura (React + Vite)
+│   ├── src/
 │   └── dist/             # Build web (gerado por vite build)
 ├── AGENTS.md             # Regras operacionais para agentes
 └── README.md             # Este documento
@@ -29,6 +31,7 @@ mapa/
 
 - `mapa` (raiz) não é app web; é CLI para geração e preenchimento de contexto.
 - `mapa-app` é o alvo correto para tarefas visuais, interface e validação HITL por URL.
+- `mapa-visual` é o alvo correto para blueprint arquitetural executivo e leitura de arquitetura vigente.
 - Nome legado `mapa-extracted` está descontinuado e não deve ser reutilizado.
 
 ## Fluxos Principais
@@ -86,10 +89,35 @@ URL padrão de validação HITL:
 http://localhost:4173/
 ```
 
+### 3) Portal Visual de Arquitetura (`mapa-visual`)
+
+Portal executivo independente para leitura arquitetural da plataforma (fora de `mapa-app`), com snapshot gerado a partir do estado real do repositório.
+
+No root:
+
+```bash
+npm run visual:refresh
+npm run dev:visual
+npm run build:visual
+npm run preview:visual
+```
+
+URL padrão:
+
+```text
+http://localhost:4273/
+```
+
+Escopo visual atual:
+- Arquitetura de Dados (Supabase + Syn Middleware + ClickHouse)
+- Arquitetura do `mapa-app` (módulos, rotas e menus)
+- Arquitetura `mapa-app` x Dados (bindings e contratos)
+
 ## Mapa de Decisão para Agentes
 
 - Pedido sobre `docs`, `agents`, `.context`, prompts, scaffolding: atuar no root (`mapa`).
 - Pedido sobre páginas, componentes, estilos, UX, rotas, captura visual: atuar em `mapa-app`.
+- Pedido sobre blueprint arquitetural visual e apresentação executiva: atuar em `mapa-visual`.
 - Sempre explicitar no PR/commit qual contexto foi alterado para evitar drift arquitetural.
 
 ## Convenções de Documentação para Agentes
@@ -155,6 +183,7 @@ Regras de integração:
 | Operador HITL | `mapa-app` | Validar comportamento visual e fluxo de tela | `npm run build:app` ; `npm run preview:app` ; abrir `http://localhost:4173/` |
 | Desenvolvedor CLI | `mapa` | Evoluir geradores/serviços do context engineering | `npm run build` ; `npm run test` ; `npm run dev` |
 | Desenvolvedor Frontend | `mapa-app` | Evoluir UI, rotas e estilos | `npm run dev:app` ; `npm run build:app` |
+| Operador Executivo | `mapa-visual` | Ler blueprint arquitetural vigente | `npm run dev:visual` ; `npm run build:visual` ; `npm run preview:visual` |
 | Agente de documentação | `mapa` | Atualizar contexto para execução assistida | `node dist/index.js init <repo> both` ; `node dist/index.js fill <repo> --output ./.context` |
 | Agente de planejamento | `mapa` | Criar/atualizar planos operacionais | `node dist/index.js plan <plan-name> --output ./.context` |
 | Revisor técnico | `mapa` + `mapa-app` | Verificar consistência estrutural entre camadas | `npm run build` ; `npm run build:app` ; revisão de contratos neste README |

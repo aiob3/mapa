@@ -1,0 +1,385 @@
+{
+  "version": "ARCH-SNAPSHOT-v1",
+  "generatedAt": "2026-02-27T17:14:14.643Z",
+  "sourceFiles": [
+    "mapa-app/src/app/routes.ts",
+    "mapa-app/src/app/navigation/moduleNavigation.ts",
+    "mapa-app/src/app/navigation/sidebarNavigation.ts",
+    "mapa-app/src/app/services/analytics/analyticsApi.ts",
+    "scripts/syn-middleware.mjs",
+    ".context/docs/clickhouse-role-architecture-state-db-004.md",
+    ".context/docs/syn-canonical-pattern-catalog-state-db-005.md",
+    ".context/docs/syn-analytics-widget-catalog-state-db-002.md"
+  ],
+  "dataArchitecture": {
+    "nodes": [
+      {
+        "id": "supabase",
+        "label": "Supabase (SoR)",
+        "kind": "database",
+        "description": "Fonte transacional canônica com auth, RLS e contratos RPC api_syn_*_v1.",
+        "group": "Dados",
+        "x": 40,
+        "y": 90
+      },
+      {
+        "id": "syn-middleware",
+        "label": "Syn Middleware",
+        "kind": "service",
+        "description": "Orquestra ingestão semântica, aplica guardrails e expõe endpoint de summary.",
+        "group": "Orquestração",
+        "x": 410,
+        "y": 90
+      },
+      {
+        "id": "clickhouse",
+        "label": "ClickHouse",
+        "kind": "olap",
+        "description": "Camada de performance para sinais semânticos e sumarização executiva.",
+        "group": "Dados",
+        "x": 780,
+        "y": 90
+      },
+      {
+        "id": "mapa-app",
+        "label": "mapa-app /syn",
+        "kind": "frontend",
+        "description": "Consome RPCs Syn e summary semântico para vistas de leads, heatmap, outreach e setor.",
+        "group": "Consumo",
+        "x": 410,
+        "y": 360
+      },
+      {
+        "id": "contracts",
+        "label": "Contratos PAT-SYN",
+        "kind": "contract",
+        "description": "SSOT com regras de binding, taxonomia de sinais e evolução versionada.",
+        "group": "Governança",
+        "x": 780,
+        "y": 360
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "supabase",
+        "to": "syn-middleware",
+        "label": "canonical_events + source_contract"
+      },
+      {
+        "id": "e2",
+        "from": "syn-middleware",
+        "to": "clickhouse",
+        "label": "semantic_signals_v2 / semantic_chunks_v2"
+      },
+      {
+        "id": "e3",
+        "from": "clickhouse",
+        "to": "syn-middleware",
+        "label": "semantic_signals_summary_v1"
+      },
+      {
+        "id": "e4",
+        "from": "syn-middleware",
+        "to": "mapa-app",
+        "label": "GET /api/syn/semantic-signals-summary"
+      },
+      {
+        "id": "e5",
+        "from": "supabase",
+        "to": "mapa-app",
+        "label": "RPC api_syn_*_v1 (authenticated)"
+      },
+      {
+        "id": "e6",
+        "from": "contracts",
+        "to": "mapa-app",
+        "label": "PAT-SYN-RPC-001"
+      },
+      {
+        "id": "e7",
+        "from": "contracts",
+        "to": "syn-middleware",
+        "label": "PAT-SYN-SOURCE-001"
+      }
+    ],
+    "mermaid": "flowchart LR\n  SB[\"Supabase SoR\"] -->|\"canonical_events + source_contract\"| MW[\"Syn Middleware\"]\n  MW -->|\"semantic_signals_v2 / semantic_chunks_v2\"| CH[\"ClickHouse\"]\n  CH -->|\"semantic_signals_summary_v1\"| MW\n  SB -->|\"api_syn_*_v1\"| APP[\"mapa-app /syn\"]\n  MW -->|\"/api/syn/semantic-signals-summary\"| APP\n  CT[\"PAT-SYN Contracts\"] --> APP\n  CT --> MW",
+    "mermaidVertical": "flowchart TB\n  SB[\"Supabase SoR\"] -->|\"canonical_events + source_contract\"| MW[\"Syn Middleware\"]\n  MW -->|\"semantic_signals_v2 / semantic_chunks_v2\"| CH[\"ClickHouse\"]\n  CH -->|\"semantic_signals_summary_v1\"| MW\n  SB -->|\"api_syn_*_v1\"| APP[\"mapa-app /syn\"]\n  MW -->|\"/api/syn/semantic-signals-summary\"| APP\n  CT[\"PAT-SYN Contracts\"] --> APP\n  CT --> MW",
+    "mermaidSankey": "sankey-beta\nSupabase SoR,Syn Middleware,100\nSyn Middleware,ClickHouse,82\nClickHouse,Semantic Summary,62\nSemantic Summary,mapa-app syn,54\nSupabase SoR,mapa-app syn,48\nPAT-SYN Contracts,Syn Middleware,28\nPAT-SYN Contracts,mapa-app syn,30"
+  },
+  "appArchitecture": {
+    "modules": [
+      {
+        "id": "dashboard",
+        "label": "Dashboard",
+        "path": "/dashboard",
+        "primaryModule": "mapa-syn",
+        "accessModules": []
+      },
+      {
+        "id": "mapa-syn",
+        "label": "MAPA Syn",
+        "path": "/syn",
+        "primaryModule": "mapa-syn",
+        "accessModules": [
+          "mapa-syn",
+          "synapse"
+        ]
+      },
+      {
+        "id": "war-room",
+        "label": "War Room",
+        "path": "/war-room",
+        "primaryModule": "war-room",
+        "accessModules": []
+      },
+      {
+        "id": "team-hub",
+        "label": "Team Hub",
+        "path": "/team",
+        "primaryModule": "team-hub",
+        "accessModules": [
+          "team-hub",
+          "the-bridge"
+        ]
+      },
+      {
+        "id": "the-vault",
+        "label": "The Vault",
+        "path": "/vault",
+        "primaryModule": "the-vault",
+        "accessModules": []
+      }
+    ],
+    "topNav": [
+      "Dashboard",
+      "MAPA Syn",
+      "War Room",
+      "Team Hub",
+      "The Vault"
+    ],
+    "sidebars": [
+      {
+        "context": "mapa-syn",
+        "label": "Leads & Insights",
+        "subLabel": "Call Intelligence Hub",
+        "path": "/syn"
+      },
+      {
+        "context": "mapa-syn",
+        "label": "Outreach IA",
+        "subLabel": "Recursos absorvidos do Synapse",
+        "path": "/syn/outreach"
+      },
+      {
+        "context": "mapa-syn",
+        "label": "MAPA Syn",
+        "subLabel": "Strategic Heatmap",
+        "path": "/syn/heatmap"
+      },
+      {
+        "context": "mapa-syn",
+        "label": "Análise Setorial",
+        "subLabel": "Sector Performance",
+        "path": "/syn/sector"
+      },
+      {
+        "context": "mapa-syn",
+        "label": "Composer",
+        "subLabel": "Composição avançada",
+        "path": "/syn/composer"
+      },
+      {
+        "context": "team-hub",
+        "label": "Visão Geral",
+        "subLabel": "Bridge integrado",
+        "path": "/team/overview"
+      },
+      {
+        "context": "team-hub",
+        "label": "Consultores",
+        "subLabel": "People ops",
+        "path": "/team"
+      },
+      {
+        "context": "team-hub",
+        "label": "Desafios",
+        "subLabel": "Pipeline de execução",
+        "path": "/team/challenges"
+      },
+      {
+        "context": "team-hub",
+        "label": "Performance",
+        "subLabel": "Leitura de capacidade",
+        "path": "/team/performance"
+      },
+      {
+        "context": "team-hub",
+        "label": "Configurações",
+        "subLabel": "Governança do módulo",
+        "path": "/team/settings"
+      }
+    ],
+    "routes": [
+      "/",
+      "/400",
+      "/401",
+      "/403",
+      "/404",
+      "/500",
+      "/dashboard",
+      "/bridge",
+      "/bridge/*",
+      "/syn",
+      "/syn/*",
+      "/war-room",
+      "/team",
+      "/team/overview",
+      "/team/*",
+      "/analytics",
+      "/analytics/*",
+      "/vault",
+      "*"
+    ],
+    "mermaid": "flowchart LR\n  OP[\"Operador\"] --> TN[\"Top Navigation\"]\n  TN --> M0[\"Dashboard\\n/dashboard\"]\n  TN --> M1[\"MAPA Syn\\n/syn\"]\n  TN --> M2[\"War Room\\n/war-room\"]\n  TN --> M3[\"Team Hub\\n/team\"]\n  TN --> M4[\"The Vault\\n/vault\"]\n  R0[\"/syn\"]\n  M1 --> R0\n  R1[\"/syn/*\"]\n  M1 --> R1\n  R2[\"/team\"]\n  M1 --> R2\n  R3[\"/team/overview\"]\n  M1 --> R3\n  R4[\"/team/*\"]\n  M1 --> R4\n  R5[\"/analytics\"]\n  M1 --> R5\n  R6[\"/analytics/*\"]\n  M1 --> R6\n  S0[\"mapa-syn: Leads & Insights\"]\n  M1 --> S0\n  S1[\"mapa-syn: Outreach IA\"]\n  M1 --> S1\n  S2[\"mapa-syn: MAPA Syn\"]\n  M1 --> S2\n  S3[\"mapa-syn: Análise Setorial\"]\n  M1 --> S3\n  S4[\"mapa-syn: Composer\"]\n  M1 --> S4\n  S5[\"team-hub: Visão Geral\"]\n  M1 --> S5\n  S6[\"team-hub: Consultores\"]\n  M1 --> S6\n  S7[\"team-hub: Desafios\"]\n  M1 --> S7\n  S8[\"team-hub: Performance\"]\n  M1 --> S8\n  S9[\"team-hub: Configurações\"]\n  M1 --> S9",
+    "mermaidVertical": "flowchart TB\n  OP[\"Operador\"] --> TN[\"Top Navigation\"]\n  TN --> M0[\"Dashboard\\n/dashboard\"]\n  TN --> M1[\"MAPA Syn\\n/syn\"]\n  TN --> M2[\"War Room\\n/war-room\"]\n  TN --> M3[\"Team Hub\\n/team\"]\n  TN --> M4[\"The Vault\\n/vault\"]\n  R0[\"/syn\"]\n  M1 --> R0\n  R1[\"/syn/*\"]\n  M1 --> R1\n  R2[\"/team\"]\n  M1 --> R2\n  R3[\"/team/overview\"]\n  M1 --> R3\n  R4[\"/team/*\"]\n  M1 --> R4\n  R5[\"/analytics\"]\n  M1 --> R5\n  R6[\"/analytics/*\"]\n  M1 --> R6\n  S0[\"mapa-syn: Leads & Insights\"]\n  M1 --> S0\n  S1[\"mapa-syn: Outreach IA\"]\n  M1 --> S1\n  S2[\"mapa-syn: MAPA Syn\"]\n  M1 --> S2\n  S3[\"mapa-syn: Análise Setorial\"]\n  M1 --> S3\n  S4[\"mapa-syn: Composer\"]\n  M1 --> S4\n  S5[\"team-hub: Visão Geral\"]\n  M1 --> S5\n  S6[\"team-hub: Consultores\"]\n  M1 --> S6\n  S7[\"team-hub: Desafios\"]\n  M1 --> S7\n  S8[\"team-hub: Performance\"]\n  M1 --> S8\n  S9[\"team-hub: Configurações\"]\n  M1 --> S9",
+    "mermaidSankey": "sankey-beta\nOperador,Top Navigation,100\nTop Navigation,Dashboard,12\nTop Navigation,MAPA Syn,43\nTop Navigation,War Room,14\nTop Navigation,Team Hub,27\nTop Navigation,The Vault,16\nMAPA Syn,SYN Routes,12\nMAPA Syn,Analytics Routes,10\nMAPA Syn,Sidebar MAPA Syn,25\nTeam Hub,Team Routes,18\nTeam Hub,Sidebar Team Hub,25"
+  },
+  "appDataArchitecture": {
+    "bindings": [
+      {
+        "viewPath": "/syn",
+        "uiArea": "Leads & Insights",
+        "sourceType": "supabase-rpc",
+        "endpoint": "api_syn_leads_v1",
+        "contractRefs": [
+          "PAT-SYN-RPC-001"
+        ],
+        "riskLevel": "medium",
+        "failureModes": [
+          "falha parcial de analytics",
+          "token de sessão expirado"
+        ]
+      },
+      {
+        "viewPath": "/syn/heatmap",
+        "uiArea": "Strategic Heatmap",
+        "sourceType": "supabase-rpc",
+        "endpoint": "api_syn_heatmap_v1",
+        "contractRefs": [
+          "PAT-SYN-RPC-001"
+        ],
+        "riskLevel": "medium",
+        "failureModes": [
+          "schema cache miss",
+          "rpc indisponível"
+        ]
+      },
+      {
+        "viewPath": "/syn/outreach",
+        "uiArea": "Outreach IA",
+        "sourceType": "supabase-rpc",
+        "endpoint": "api_syn_outreach_v1",
+        "contractRefs": [
+          "PAT-SYN-RPC-001"
+        ],
+        "riskLevel": "low",
+        "failureModes": [
+          "degradação de dados",
+          "timeout de fetch"
+        ]
+      },
+      {
+        "viewPath": "/syn/sector",
+        "uiArea": "Análise Setorial",
+        "sourceType": "supabase-rpc",
+        "endpoint": "api_syn_sector_v1",
+        "contractRefs": [
+          "PAT-SYN-RPC-001",
+          "PAT-SYN-SCORE-001",
+          "PAT-SYN-SIGNAL-001"
+        ],
+        "riskLevel": "medium",
+        "failureModes": [
+          "drift de mapper",
+          "payload parcial"
+        ]
+      },
+      {
+        "viewPath": "/syn/sector",
+        "uiArea": "Resumo Semântico",
+        "sourceType": "middleware-http",
+        "endpoint": "/api/syn/semantic-signals-summary",
+        "contractRefs": [
+          "PAT-SYN-SOURCE-001",
+          "WEB-HITL-005"
+        ],
+        "riskLevel": "high",
+        "failureModes": [
+          "Failed to fetch",
+          "middleware indisponível",
+          "token inválido"
+        ]
+      }
+    ],
+    "contracts": [
+      "PAT-SYN-DTO-001",
+      "PAT-SYN-DTO-002",
+      "PAT-SYN-DTO-003",
+      "PAT-SYN-STATUS-001",
+      "PAT-SYN-SCORE-001",
+      "PAT-SYN-SCORE-002",
+      "PAT-SYN-SCORE-003",
+      "PAT-SYN-SIGNAL-001",
+      "PAT-SYN-SIGNAL-002",
+      "PAT-SYN-SIGNAL-003",
+      "PAT-SYN-SIGNAL-004",
+      "PAT-SYN-SIGNAL-005",
+      "PAT-SYN-RPC-001",
+      "PAT-SYN-TRANSFORM-001",
+      "PAT-SYN-SOURCE-001",
+      "PAT-SYN-SOURCE-",
+      "PAT-WIDGET-001",
+      "PAT-WIDGET-002",
+      "PAT-WIDGET-003",
+      "PAT-WIDGET-004",
+      "PAT-WIDGET-005",
+      "WEB-BUILD-004",
+      "WEB-HITL-005"
+    ],
+    "mermaid": "flowchart LR\n  subgraph UI[\"UI Views\"]\n    V0[\"/syn\\nLeads & Insights\"]\n    V1[\"/syn/heatmap\\nStrategic Heatmap\"]\n    V2[\"/syn/outreach\\nOutreach IA\"]\n    V3[\"/syn/sector\\nAnálise Setorial\"]\n    V4[\"/syn/sector\\nResumo Semântico\"]\n  end\n  subgraph API[\"Chamadas / Endpoints\"]\n    E0[\"api_syn_leads_v1\"]\n    E1[\"api_syn_heatmap_v1\"]\n    E2[\"api_syn_outreach_v1\"]\n    E3[\"api_syn_sector_v1\"]\n    E4[\"/api/syn/semantic-signals-summary\"]\n  end\n  subgraph DATA[\"Dados e Serviços\"]\n    SB[\"Supabase SoR\"]\n    MW[\"Syn Middleware\"]\n    CH[\"ClickHouse Summary\"]\n    IDM[\"Idempotent Summary Read\"]\n  end\n  CT1[\"PAT-SYN-RPC-001\"]\n  CT2[\"PAT-SYN-SOURCE-001\"]\n  V0 --> E0\n  V1 --> E1\n  V2 --> E2\n  V3 --> E3\n  V4 --> E4\n  E0 -->|\"RPC authenticated\"| SB\n  CT1 --> E0\n  E1 -->|\"RPC authenticated\"| SB\n  CT1 --> E1\n  E2 -->|\"RPC authenticated\"| SB\n  CT1 --> E2\n  E3 -->|\"RPC authenticated\"| SB\n  CT1 --> E3\n  E4 -->|\"HTTP GET idempotente\"| MW\n  CT2 --> E4\n  MW --> IDM\n  IDM --> CH\n  CH --> IDM\n  IDM --> MW",
+    "mermaidVertical": "flowchart TB\n  subgraph UI[\"UI Views\"]\n    V0[\"/syn\\nLeads & Insights\"]\n    V1[\"/syn/heatmap\\nStrategic Heatmap\"]\n    V2[\"/syn/outreach\\nOutreach IA\"]\n    V3[\"/syn/sector\\nAnálise Setorial\"]\n    V4[\"/syn/sector\\nResumo Semântico\"]\n  end\n  subgraph API[\"Chamadas / Endpoints\"]\n    E0[\"api_syn_leads_v1\"]\n    E1[\"api_syn_heatmap_v1\"]\n    E2[\"api_syn_outreach_v1\"]\n    E3[\"api_syn_sector_v1\"]\n    E4[\"/api/syn/semantic-signals-summary\"]\n  end\n  subgraph DATA[\"Dados e Serviços\"]\n    SB[\"Supabase SoR\"]\n    MW[\"Syn Middleware\"]\n    CH[\"ClickHouse Summary\"]\n    IDM[\"Idempotent Summary Read\"]\n  end\n  CT1[\"PAT-SYN-RPC-001\"]\n  CT2[\"PAT-SYN-SOURCE-001\"]\n  V0 --> E0\n  V1 --> E1\n  V2 --> E2\n  V3 --> E3\n  V4 --> E4\n  E0 -->|\"RPC authenticated\"| SB\n  CT1 --> E0\n  E1 -->|\"RPC authenticated\"| SB\n  CT1 --> E1\n  E2 -->|\"RPC authenticated\"| SB\n  CT1 --> E2\n  E3 -->|\"RPC authenticated\"| SB\n  CT1 --> E3\n  E4 -->|\"HTTP GET idempotente\"| MW\n  CT2 --> E4\n  MW --> IDM\n  IDM --> CH\n  CH --> IDM\n  IDM --> MW"
+  },
+  "executivePillars": [
+    {
+      "id": "pillar-data-authority",
+      "title": "Autoridade do Dado",
+      "status": "stable",
+      "description": "Supabase mantém a verdade transacional e contratos RPC com governança explícita.",
+      "evidenceRefs": [
+        ".context/docs/clickhouse-role-architecture-state-db-004.md",
+        ".context/docs/syn-canonical-pattern-catalog-state-db-005.md"
+      ]
+    },
+    {
+      "id": "pillar-semantic-runtime",
+      "title": "Runtime Semântico",
+      "status": "attention",
+      "description": "Middleware Syn opera como camada crítica para summary e precisa monitoria de disponibilidade.",
+      "evidenceRefs": [
+        "scripts/syn-middleware.mjs",
+        "mapa-app/src/app/services/analytics/analyticsApi.ts"
+      ]
+    },
+    {
+      "id": "pillar-contract-conformance",
+      "title": "Conformidade de Contratos",
+      "status": "critical",
+      "description": "Bindings UI↔dados dependem de aderência PAT-SYN e validação pós-migration sem drift.",
+      "evidenceRefs": [
+        ".context/docs/syn-canonical-pattern-catalog-state-db-005.md",
+        ".context/docs/syn-analytics-widget-catalog-state-db-002.md"
+      ]
+    }
+  ]
+}
