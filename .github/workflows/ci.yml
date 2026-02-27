@@ -57,6 +57,9 @@ jobs:
     
     - name: Run Tests
       run: npm test
+
+    - name: Validate Security Guardrails
+      run: npm run security:guardrails
     
     - name: Test CLI
       run: |

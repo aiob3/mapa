@@ -10,6 +10,12 @@ const PORT = Number(process.env.SYN_MIDDLEWARE_PORT || 8787);
 const HOST = process.env.SYN_MIDDLEWARE_HOST || '0.0.0.0';
 const CORS_ORIGIN = process.env.SYN_MIDDLEWARE_CORS_ORIGIN || '*';
 const JOB_TOKEN = process.env.SYN_MIDDLEWARE_TOKEN || '';
+const REQUIRE_JOB_TOKEN = (process.env.SYN_MIDDLEWARE_REQUIRE_TOKEN || 'true').toLowerCase() !== 'false';
+
+if (REQUIRE_JOB_TOKEN && !JOB_TOKEN.trim()) {
+  console.error('[syn-middleware] SYN_MIDDLEWARE_TOKEN obrigatório (defina SYN_MIDDLEWARE_REQUIRE_TOKEN=false apenas para ambiente controlado).');
+  process.exit(1);
+}
 
 function setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
@@ -61,7 +67,7 @@ function extractToken(req) {
 }
 
 function assertJobToken(req) {
-  if (!JOB_TOKEN) {
+  if (!JOB_TOKEN.trim()) {
     return;
   }
 

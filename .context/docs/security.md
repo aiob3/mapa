@@ -29,6 +29,12 @@ Capture the policies and guardrails that keep this project secure and compliant.
   - Highly sensitive keys or tokens required by the database are managed using **Supabase Vault**.
 - **Data Classification:** User profiles, authentication data, and location-based data (implied by `mapa-app`) are classified as Personally Identifiable Information (PII) and are encrypted at rest by the Supabase infrastructure.
 
+## Syn Pipeline Guardrails (STATE-DB-006)
+- **Client Secret Boundary:** `SUPABASE_SERVICE_ROLE_KEY` é proibida no contexto cliente (`mapa-app`). Apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` podem ser publicados no frontend.
+- **Middleware Job Protection:** `SYN_MIDDLEWARE_TOKEN` é obrigatório por padrão (`SYN_MIDDLEWARE_REQUIRE_TOKEN=true`) para rotas de job/refresh no middleware Syn.
+- **Backend-only Ingestion RPCs:** RPCs de ingestão canônica (`upsert_canonical_event_v2`, `upsert_canonical_source_registry_v1`) são restritas a `service_role`; `authenticated` não deve ter `EXECUTE`.
+- **Automated Pipeline Check:** CI executa `npm run security:guardrails` para detectar exposição de `SERVICE_ROLE` no cliente, ausência de enforce de token no middleware e regressões de grants de ingestão.
+
 ## Compliance & Policies
 - **Infrastructure Standard:** The project relies on Supabase's managed infrastructure, which maintains SOC2 Type II compliance and provides underlying encryption in transit (TLS) and at rest (AES-256).
 - **GDPR & Privacy:** 

@@ -35,6 +35,7 @@
     "syn:ingest": "node scripts/syn-ingest-semantic-layer.mjs",
     "syn:ingest:raw": "node scripts/syn-ingest-raw-db.mjs",
     "syn:validate:post-migration": "node scripts/validate-syn-post-migration.mjs",
+    "security:guardrails": "node scripts/validate-security-guardrails.mjs",
     "prepublishOnly": "npm run build",
     "version": "npm run build",
     "release": "npm version patch && npm publish --access public",

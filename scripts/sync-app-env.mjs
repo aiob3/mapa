@@ -24,6 +24,14 @@ function getFromParsed(parsed, key) {
 
 const rootEnv = parseEnvFile(rootEnvPath);
 const appEnvExisting = parseEnvFile(appEnvPath);
+const forbiddenAppKeys = ['VITE_SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_SERVICE_ROLE_KEY'];
+
+for (const key of forbiddenAppKeys) {
+  if (getFromParsed(appEnvExisting, key)) {
+    console.error(`[sync:env:app] Chave proibida detectada em mapa-app/.env: ${key}. Remova para evitar exposição de credencial sensível no cliente.`);
+    process.exit(1);
+  }
+}
 
 const supabaseUrl =
   getFromParsed(rootEnv, 'SUPABASE_PROJECT_URL') || getFromParsed(appEnvExisting, 'VITE_SUPABASE_URL');
