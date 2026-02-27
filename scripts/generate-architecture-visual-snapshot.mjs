@@ -100,6 +100,45 @@ function unique(values) {
   return [...new Set(values)];
 }
 
+function uniqueBy(values, keySelector) {
+  const map = new Map();
+  values.forEach((value) => {
+    const key = keySelector(value);
+    if (!map.has(key)) {
+      map.set(key, value);
+    }
+  });
+  return [...map.values()];
+}
+
+function mermaidLabel(value) {
+  return String(value)
+    .replace(/\\n|\n/g, '<br/>')
+    .replace(/<br\s*\/?>/gi, '<br/>')
+    .trim();
+}
+
+function addMermaidNode(lines, nodeSet, nodeId, label) {
+  if (nodeSet.has(nodeId)) {
+    return;
+  }
+  nodeSet.add(nodeId);
+  lines.push(`  ${nodeId}["${mermaidLabel(label)}"]`);
+}
+
+function addMermaidEdge(lines, edgeSet, from, to, label) {
+  const edgeKey = `${from}->${to}|${label || ''}`;
+  if (edgeSet.has(edgeKey)) {
+    return;
+  }
+  edgeSet.add(edgeKey);
+  if (label) {
+    lines.push(`  ${from} -->|"${mermaidLabel(label)}"| ${to}`);
+    return;
+  }
+  lines.push(`  ${from} --> ${to}`);
+}
+
 function parseModuleNavigation(source) {
   const content = extractArrayContent(source, 'export const MODULE_NAVIGATION');
   const objects = splitObjectLiterals(content);
@@ -184,10 +223,18 @@ function buildDataArchitectureGraph() {
     '  SB["Supabase SoR"] -->|"canonical_events + source_contract"| MW["Syn Middleware"]',
     '  MW -->|"semantic_signals_v2 / semantic_chunks_v2"| CH["ClickHouse"]',
     '  CH -->|"semantic_signals_summary_v1"| MW',
-    '  SB -->|"api_syn_*_v1"| APP["mapa-app /syn"]',
+    '  SB -->|"api_syn_*_v1"| APP["mapa-app<br/>/syn"]',
     '  MW -->|"/api/syn/semantic-signals-summary"| APP',
     '  CT["PAT-SYN Contracts"] --> APP',
     '  CT --> MW',
+    '  classDef supabase fill:#e9f3ed,stroke:#2e4c3b,stroke-width:2px,color:#1f3b2d;',
+    '  classDef clickhouse fill:#fdebe4,stroke:#c64928,stroke-width:2px,color:#7f2f1a;',
+    '  classDef middleware fill:#edf0f4,stroke:#5b6170,stroke-width:1.8px,color:#2f3848;',
+    '  classDef contract fill:#fff8ec,stroke:#c64928,stroke-width:2px,stroke-dasharray:6 4,color:#7f2f1a;',
+    '  class SB supabase;',
+    '  class CH clickhouse;',
+    '  class MW middleware;',
+    '  class CT contract;',
   ].join('\n');
 
   const flowVertical = [
@@ -195,10 +242,18 @@ function buildDataArchitectureGraph() {
     '  SB["Supabase SoR"] -->|"canonical_events + source_contract"| MW["Syn Middleware"]',
     '  MW -->|"semantic_signals_v2 / semantic_chunks_v2"| CH["ClickHouse"]',
     '  CH -->|"semantic_signals_summary_v1"| MW',
-    '  SB -->|"api_syn_*_v1"| APP["mapa-app /syn"]',
+    '  SB -->|"api_syn_*_v1"| APP["mapa-app<br/>/syn"]',
     '  MW -->|"/api/syn/semantic-signals-summary"| APP',
     '  CT["PAT-SYN Contracts"] --> APP',
     '  CT --> MW',
+    '  classDef supabase fill:#e9f3ed,stroke:#2e4c3b,stroke-width:2px,color:#1f3b2d;',
+    '  classDef clickhouse fill:#fdebe4,stroke:#c64928,stroke-width:2px,color:#7f2f1a;',
+    '  classDef middleware fill:#edf0f4,stroke:#5b6170,stroke-width:1.8px,color:#2f3848;',
+    '  classDef contract fill:#fff8ec,stroke:#c64928,stroke-width:2px,stroke-dasharray:6 4,color:#7f2f1a;',
+    '  class SB supabase;',
+    '  class CH clickhouse;',
+    '  class MW middleware;',
+    '  class CT contract;',
   ].join('\n');
 
   const sankey = [
@@ -276,22 +331,58 @@ function buildDataArchitectureGraph() {
 }
 
 function buildAppArchitectureMermaid(modules, sidebars, routes, orientation) {
-  const lines = [`flowchart ${orientation}`, '  OP["Operador"] --> TN["Top Navigation"]'];
+  const lines = [`flowchart ${orientation}`];
+  const nodeSet = new Set();
+  const edgeSet = new Set();
+  addMermaidNode(lines, nodeSet, 'APP', 'MAPA-App<br/>Top-menu');
+  const moduleNodeIds = [];
 
   modules.forEach((module, index) => {
     const nodeId = `M${index}`;
-    lines.push(`  TN --> ${nodeId}["${module.label}\\n${module.path}"]`);
+    moduleNodeIds.push({ nodeId, module });
+    addMermaidNode(lines, nodeSet, nodeId, `${module.label}<br/>${module.path}`);
+    addMermaidEdge(lines, edgeSet, 'APP', nodeId);
   });
 
-  const highlightedRoutes = routes.filter((route) => route.startsWith('/syn') || route.startsWith('/analytics') || route.startsWith('/team'));
-  highlightedRoutes.slice(0, 10).forEach((route, index) => {
-    lines.push(`  R${index}["${route}"]`);
-    lines.push(`  M1 --> R${index}`);
-  });
+  const synModuleNode = moduleNodeIds.find((item) => item.module.path === '/syn')?.nodeId || moduleNodeIds[0]?.nodeId || 'M0';
+  const teamModuleNode = moduleNodeIds.find((item) => item.module.path === '/team')?.nodeId || moduleNodeIds[0]?.nodeId || 'M0';
+  const dashboardModuleNode = moduleNodeIds.find((item) => item.module.path === '/dashboard')?.nodeId || moduleNodeIds[0]?.nodeId || 'M0';
+  addMermaidNode(lines, nodeSet, 'SYN_AREAS', 'MAPA Syn<br/>Sub-áreas');
+  addMermaidNode(lines, nodeSet, 'TEAM_AREAS', 'Team Hub<br/>Sub-áreas');
+  addMermaidEdge(lines, edgeSet, synModuleNode, 'SYN_AREAS');
+  addMermaidEdge(lines, edgeSet, teamModuleNode, 'TEAM_AREAS');
 
-  sidebars.slice(0, 10).forEach((item, index) => {
-    lines.push(`  S${index}["${item.context}: ${item.label}"]`);
-    lines.push(`  M1 --> S${index}`);
+  const modulePaths = new Set(modules.map((module) => module.path));
+  const uniqueSidebars = uniqueBy(sidebars, (item) => `${item.context}:${item.path}`);
+  const sidebarPaths = new Set(uniqueSidebars.map((item) => item.path));
+  const highlightedRoutes = routes.filter(
+    (route) =>
+      route.startsWith('/syn') ||
+      route.startsWith('/analytics') ||
+      route.startsWith('/team') ||
+      route === '/dashboard',
+  );
+  highlightedRoutes
+    .filter((route) => !modulePaths.has(route) && !sidebarPaths.has(route))
+    .slice(0, 10)
+    .forEach((route, index) => {
+      addMermaidNode(lines, nodeSet, `R${index}`, route);
+      if (route.startsWith('/syn') || route.startsWith('/analytics')) {
+        addMermaidEdge(lines, edgeSet, 'SYN_AREAS', `R${index}`);
+      } else if (route.startsWith('/team')) {
+        addMermaidEdge(lines, edgeSet, 'TEAM_AREAS', `R${index}`);
+      } else {
+        addMermaidEdge(lines, edgeSet, dashboardModuleNode, `R${index}`);
+      }
+    });
+
+  uniqueSidebars.slice(0, 10).forEach((item, index) => {
+    addMermaidNode(lines, nodeSet, `S${index}`, item.subLabel || item.label);
+    if (item.context === 'mapa-syn') {
+      addMermaidEdge(lines, edgeSet, 'SYN_AREAS', `S${index}`);
+    } else {
+      addMermaidEdge(lines, edgeSet, 'TEAM_AREAS', `S${index}`);
+    }
   });
 
   return lines.join('\n');
@@ -303,11 +394,11 @@ function buildAppArchitectureSankey(modules, sidebars, routes) {
   const analyticsRoutes = routes.filter((route) => route.startsWith('/analytics')).length || 1;
   const synSidebarCount = sidebars.filter((item) => item.context === 'mapa-syn').length || 1;
   const teamSidebarCount = sidebars.filter((item) => item.context === 'team-hub').length || 1;
-  const lines = ['sankey-beta', 'Operador,Top Navigation,100'];
+  const lines = ['sankey-beta', 'MAPA-App Top-menu,Modules,100'];
 
   modules.forEach((module, index) => {
     const weight = module.path === '/syn' ? 42 : module.path === '/team' ? 24 : 12;
-    lines.push(`Top Navigation,${module.label},${weight + index}`);
+    lines.push(`Modules,${module.label},${weight + index}`);
   });
 
   lines.push(`MAPA Syn,SYN Routes,${synRoutes * 6}`);
@@ -373,48 +464,69 @@ function buildAppDataBindings(rpcContracts, middlewareEndpoint) {
 
 function buildAppDataMermaid(bindings, orientation) {
   const lines = [`flowchart ${orientation}`];
+  const nodeSet = new Set();
+  const edgeSet = new Set();
   const uniqueEndpoints = unique(bindings.map((binding) => binding.endpoint));
+  const uniqueViews = uniqueBy(
+    bindings.map((binding) => ({
+      viewPath: binding.viewPath,
+      uiArea: binding.uiArea,
+    })),
+    (view) => `${view.viewPath}|${view.uiArea}`,
+  );
 
   lines.push('  subgraph UI["UI Views"]');
-  bindings.forEach((binding, index) => {
-    lines.push(`    V${index}["${binding.viewPath}\\n${binding.uiArea}"]`);
+  uniqueViews.forEach((view, index) => {
+    addMermaidNode(lines, nodeSet, `V${index}`, `${view.viewPath}<br/>${view.uiArea}`);
   });
   lines.push('  end');
 
   lines.push('  subgraph API["Chamadas / Endpoints"]');
   uniqueEndpoints.forEach((endpoint, index) => {
-    lines.push(`    E${index}["${endpoint}"]`);
+    addMermaidNode(lines, nodeSet, `E${index}`, endpoint);
   });
   lines.push('  end');
 
   lines.push('  subgraph DATA["Dados e Serviços"]');
-  lines.push('    SB["Supabase SoR"]');
-  lines.push('    MW["Syn Middleware"]');
-  lines.push('    CH["ClickHouse Summary"]');
-  lines.push('    IDM["Idempotent Summary Read"]');
+  addMermaidNode(lines, nodeSet, 'SB', 'Supabase SoR');
+  addMermaidNode(lines, nodeSet, 'MW', 'Syn Middleware');
+  addMermaidNode(lines, nodeSet, 'CH', 'ClickHouse Summary');
+  addMermaidNode(lines, nodeSet, 'IDM', 'Idempotent Summary Read');
   lines.push('  end');
-  lines.push('  CT1["PAT-SYN-RPC-001"]');
-  lines.push('  CT2["PAT-SYN-SOURCE-001"]');
+  addMermaidNode(lines, nodeSet, 'CT1', 'PAT-SYN-RPC-001');
+  addMermaidNode(lines, nodeSet, 'CT2', 'PAT-SYN-SOURCE-001');
 
-  bindings.forEach((binding, index) => {
+  bindings.forEach((binding) => {
+    const viewIndex = uniqueViews.findIndex((view) => view.viewPath === binding.viewPath && view.uiArea === binding.uiArea);
     const endpointIndex = uniqueEndpoints.findIndex((endpoint) => endpoint === binding.endpoint);
-    lines.push(`  V${index} --> E${endpointIndex}`);
+    addMermaidEdge(lines, edgeSet, `V${viewIndex}`, `E${endpointIndex}`);
   });
 
   uniqueEndpoints.forEach((endpoint, index) => {
     if (endpoint.startsWith('api_syn_')) {
-      lines.push(`  E${index} -->|"RPC authenticated"| SB`);
-      lines.push(`  CT1 --> E${index}`);
+      addMermaidEdge(lines, edgeSet, `E${index}`, 'SB', 'RPC authenticated');
+      addMermaidEdge(lines, edgeSet, 'CT1', `E${index}`);
     } else {
-      lines.push(`  E${index} -->|"HTTP GET idempotente"| MW`);
-      lines.push(`  CT2 --> E${index}`);
+      addMermaidEdge(lines, edgeSet, `E${index}`, 'MW', 'HTTP GET idempotente');
+      addMermaidEdge(lines, edgeSet, 'CT2', `E${index}`);
     }
   });
 
-  lines.push('  MW --> IDM');
-  lines.push('  IDM --> CH');
-  lines.push('  CH --> IDM');
-  lines.push('  IDM --> MW');
+  addMermaidEdge(lines, edgeSet, 'MW', 'IDM');
+  addMermaidEdge(lines, edgeSet, 'IDM', 'CH');
+  addMermaidEdge(lines, edgeSet, 'CH', 'IDM');
+  addMermaidEdge(lines, edgeSet, 'IDM', 'MW');
+
+  // Visual differentiation of core platform solutions in MAPA palette.
+  lines.push('  classDef supabase fill:#e9f3ed,stroke:#2e4c3b,stroke-width:2px,color:#1f3b2d;');
+  lines.push('  classDef clickhouse fill:#fdebe4,stroke:#c64928,stroke-width:2px,color:#7f2f1a;');
+  lines.push('  classDef middleware fill:#edf0f4,stroke:#5b6170,stroke-width:1.8px,color:#2f3848;');
+  lines.push('  classDef contract fill:#fff8ec,stroke:#c64928,stroke-width:2px,stroke-dasharray:6 4,color:#7f2f1a;');
+  lines.push('  class SB supabase;');
+  lines.push('  class CH clickhouse;');
+  lines.push('  class MW middleware;');
+  lines.push('  class CT1 contract;');
+  lines.push('  class CT2 contract;');
 
   return lines.join('\n');
 }

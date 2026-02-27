@@ -43,7 +43,7 @@ export function AppArchitecturePage() {
         </p>
       </header>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="space-y-5">
         <MermaidDiagram
           title="Mapa de módulos e rotas"
           definition={snapshot.appArchitecture.mermaid}

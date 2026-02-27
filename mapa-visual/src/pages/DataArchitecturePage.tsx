@@ -21,15 +21,55 @@ export function DataArchitecturePage() {
         </p>
       </header>
 
-      <div className="grid gap-5 xl:grid-cols-2">
-        <MermaidDiagram
-          title="Fluxo canônico"
-          definition={snapshot.dataArchitecture.mermaid}
-          verticalDefinition={snapshot.dataArchitecture.mermaidVertical}
-          sankeyDefinition={snapshot.dataArchitecture.mermaidSankey}
-        />
-        <ArchitectureCanvas title="Organograma estrutural" nodes={snapshot.dataArchitecture.nodes} edges={snapshot.dataArchitecture.edges} />
-      </div>
+      <MermaidDiagram
+        title="Fluxo canônico"
+        definition={snapshot.dataArchitecture.mermaid}
+        verticalDefinition={snapshot.dataArchitecture.mermaidVertical}
+        sankeyDefinition={snapshot.dataArchitecture.mermaidSankey}
+      />
+
+      <section className="glass-panel p-5">
+        <h2 className="text-xl/7 font-semibold text-foreground">Componentes fundamentais da arquitetura de dados</h2>
+        <p className="mt-2 text-sm/6 text-muted-foreground">
+          Leitura executiva dos blocos que sustentam ingestão, sumarização e governança de contratos na camada de dados.
+        </p>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <article className="rounded-xl border-2 border-[#2e4c3b]/45 bg-[#e9f3ed] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#1f3b2d] uppercase">Supabase</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#1f3b2d]">Fonte de verdade transacional (SoR)</h3>
+            <p className="mt-1 text-sm/6 text-[#2d4a3b]">
+              Mantém contratos RPC authenticated e consistência operacional para o consumo no MAPA Syn.
+            </p>
+          </article>
+
+          <article className="rounded-xl border-[1.8px] border-[#5b6170]/45 bg-[#edf0f4] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#2f3848] uppercase">Syn Middleware</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#2f3848]">Orquestração e segregação de acesso</h3>
+            <p className="mt-1 text-sm/6 text-[#3a4454]">
+              Isola a UI da camada analítica, aplica guardrails e expõe o summary semântico via endpoint idempotente.
+            </p>
+          </article>
+
+          <article className="rounded-xl border-2 border-[#c64928]/45 bg-[#fdebe4] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#7f2f1a] uppercase">ClickHouse</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#7f2f1a]">Camada de performance analítica</h3>
+            <p className="mt-1 text-sm/6 text-[#8f3a20]">
+              Sustenta sumarização e leitura de sinais semânticos com alto desempenho para uso executivo.
+            </p>
+          </article>
+
+          <article className="rounded-xl border-2 border-dashed border-[#c64928]/60 bg-[#fff8ec] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#7f2f1a] uppercase">Contratos PAT-SYN</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#7f2f1a]">Governança de integração</h3>
+            <p className="mt-1 text-sm/6 text-[#8f3a20]">
+              Delimitam acoplamento permitido entre fontes, middleware e UI, reduzindo drift entre releases.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <ArchitectureCanvas title="Organograma estrutural" nodes={snapshot.dataArchitecture.nodes} edges={snapshot.dataArchitecture.edges} />
 
       <section className="glass-panel p-5">
         <h2 className="text-xl/7 font-semibold text-foreground">Guardrails mandatórios</h2>

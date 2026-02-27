@@ -2,6 +2,8 @@ import type { ArchitectureSnapshotV1 } from '@/types/architecture';
 
 interface ExecutiveSummaryPanelProps {
   snapshot: ArchitectureSnapshotV1;
+  className?: string;
+  sticky?: boolean;
 }
 
 function statusClass(status: ArchitectureSnapshotV1['executivePillars'][number]['status']) {
@@ -14,9 +16,10 @@ function statusClass(status: ArchitectureSnapshotV1['executivePillars'][number][
   return 'bg-success/15 text-success border-success/30';
 }
 
-export function ExecutiveSummaryPanel({ snapshot }: ExecutiveSummaryPanelProps) {
+export function ExecutiveSummaryPanel({ snapshot, className, sticky = true }: ExecutiveSummaryPanelProps) {
+  const asideClassName = `glass-panel flex h-fit flex-col gap-4 p-5 ${sticky ? 'sticky top-6' : ''} ${className || ''}`.trim();
   return (
-    <aside className="glass-panel sticky top-6 flex h-fit flex-col gap-4 p-5">
+    <aside className={asideClassName}>
       <header className="space-y-2">
         <p className="text-xs/5 font-semibold tracking-[0.08em] text-accent uppercase">Resumo Executivo</p>
         <h2 className="text-xl/7 font-semibold text-foreground">Arquitetura vigente</h2>

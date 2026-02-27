@@ -2,6 +2,10 @@ import { MermaidDiagram } from '@/components/MermaidDiagram';
 import { snapshot } from '@/data/snapshot';
 
 export function AppDataArchitecturePage() {
+  const rpcBindings = snapshot.appDataArchitecture.bindings.filter((binding) => binding.sourceType === 'supabase-rpc').length;
+  const middlewareBindings = snapshot.appDataArchitecture.bindings.filter((binding) => binding.sourceType === 'middleware-http').length;
+  const contractCount = new Set(snapshot.appDataArchitecture.bindings.flatMap((binding) => binding.contractRefs)).size;
+
   return (
     <section className="space-y-5">
       <header className="space-y-2">
@@ -24,6 +28,44 @@ export function AppDataArchitecturePage() {
           A visão consolida chamadas por endpoint para eliminar leitura fragmentada por widget e explicita o fluxo idempotente
           do summary semântico (GET via middleware) antes do retorno para a UI.
         </p>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <article className="rounded-xl border-2 border-[#2e4c3b]/45 bg-[#e9f3ed] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#1f3b2d] uppercase">Supabase</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#1f3b2d]">Autoridade transacional e RPCs</h3>
+            <p className="mt-1 text-sm/6 text-[#2d4a3b]">
+              Centraliza leitura authenticated para features Syn com controle de consistência por contratos canônicos.
+            </p>
+            <p className="mt-2 text-xs/5 font-semibold text-[#2d4a3b]">Bindings ativos via RPC: {rpcBindings}</p>
+          </article>
+
+          <article className="rounded-xl border-[1.8px] border-[#5b6170]/45 bg-[#edf0f4] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#2f3848] uppercase">Syn Middleware</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#2f3848]">Orquestração semântica idempotente</h3>
+            <p className="mt-1 text-sm/6 text-[#3a4454]">
+              Encapsula o summary semântico via HTTP GET idempotente e garante isolamento operacional do frontend.
+            </p>
+            <p className="mt-2 text-xs/5 font-semibold text-[#3a4454]">Bindings via middleware: {middlewareBindings}</p>
+          </article>
+
+          <article className="rounded-xl border-2 border-[#c64928]/45 bg-[#fdebe4] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#7f2f1a] uppercase">ClickHouse</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#7f2f1a]">Performance analítica e sumarização</h3>
+            <p className="mt-1 text-sm/6 text-[#8f3a20]">
+              Sustenta a camada de performance para síntese de sinais, desacoplada da UI por meio do middleware.
+            </p>
+            <p className="mt-2 text-xs/5 font-semibold text-[#8f3a20]">Função no fluxo: summary read model</p>
+          </article>
+
+          <article className="rounded-xl border-2 border-dashed border-[#c64928]/60 bg-[#fff8ec] p-4">
+            <p className="text-xs/5 font-semibold tracking-[0.08em] text-[#7f2f1a] uppercase">Contratos Fundamentais</p>
+            <h3 className="mt-1 text-lg/7 font-semibold text-[#7f2f1a]">PAT-SYN-RPC-001 e PAT-SYN-SOURCE-001</h3>
+            <p className="mt-1 text-sm/6 text-[#8f3a20]">
+              Definem o acoplamento permitido entre UI, endpoints e origem de dados, preservando segregação lógica.
+            </p>
+            <p className="mt-2 text-xs/5 font-semibold text-[#8f3a20]">Contratos distintos referenciados: {contractCount}</p>
+          </article>
+        </div>
       </section>
 
       <section className="glass-panel overflow-hidden p-0">
