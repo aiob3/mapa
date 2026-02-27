@@ -1,6 +1,6 @@
 {
   "version": "ARCH-SNAPSHOT-v1",
-  "generatedAt": "2026-02-27T18:41:18.793Z",
+  "generatedAt": "2026-02-27T20:27:37.466Z",
   "sourceFiles": [
     "mapa-app/src/app/routes.ts",
     "mapa-app/src/app/navigation/moduleNavigation.ts",

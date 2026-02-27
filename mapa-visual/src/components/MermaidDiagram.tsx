@@ -6,15 +6,30 @@ interface MermaidDiagramProps {
   definition: string;
   verticalDefinition?: string;
   sankeyDefinition?: string;
+  initialMode?: MermaidMode;
+  initialOrientation?: MermaidOrientation;
+  showControls?: boolean;
+  showModeControls?: boolean;
+  showOrientationControls?: boolean;
 }
 
 type MermaidMode = 'flow' | 'sankey';
 type MermaidOrientation = 'horizontal' | 'vertical';
 
-export function MermaidDiagram({ title, definition, verticalDefinition, sankeyDefinition }: MermaidDiagramProps) {
+export function MermaidDiagram({
+  title,
+  definition,
+  verticalDefinition,
+  sankeyDefinition,
+  initialMode = 'flow',
+  initialOrientation = 'horizontal',
+  showControls = true,
+  showModeControls = true,
+  showOrientationControls = true,
+}: MermaidDiagramProps) {
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<MermaidMode>('flow');
-  const [orientation, setOrientation] = useState<MermaidOrientation>('horizontal');
+  const [mode, setMode] = useState<MermaidMode>(initialMode);
+  const [orientation, setOrientation] = useState<MermaidOrientation>(initialOrientation);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const id = useMemo(() => `mapa-mermaid-${Math.random().toString(36).slice(2, 10)}`, []);
   const supportsVertical = Boolean(verticalDefinition);
@@ -24,6 +39,18 @@ export function MermaidDiagram({ title, definition, verticalDefinition, sankeyDe
     : orientation === 'vertical' && verticalDefinition
       ? verticalDefinition
       : definition;
+
+  useEffect(() => {
+    if (mode === 'sankey' && !supportsSankey) {
+      setMode('flow');
+    }
+  }, [mode, supportsSankey]);
+
+  useEffect(() => {
+    if (orientation === 'vertical' && !supportsVertical) {
+      setOrientation('horizontal');
+    }
+  }, [orientation, supportsVertical]);
 
   useEffect(() => {
     let mounted = true;
@@ -78,43 +105,53 @@ export function MermaidDiagram({ title, definition, verticalDefinition, sankeyDe
         </span>
       </header>
 
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/80 bg-white/60 px-3 py-2 text-xs/5 text-muted-foreground">
-        <p className="font-semibold tracking-[0.08em] uppercase">Visão</p>
-        <button
-          type="button"
-          className={`rounded-lg px-2.5 py-1 font-semibold transition ${mode === 'flow' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
-          onClick={() => setMode('flow')}
-        >
-          Flowchart
-        </button>
-        {supportsSankey ? (
-          <button
-            type="button"
-            className={`rounded-lg px-2.5 py-1 font-semibold transition ${mode === 'sankey' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
-            onClick={() => setMode('sankey')}
-          >
-            Sankey
-          </button>
-        ) : null}
+      {showControls ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/80 bg-white/60 px-3 py-2 text-xs/5 text-muted-foreground">
+          {showModeControls ? (
+            <>
+              <p className="font-semibold tracking-[0.08em] uppercase">Visão</p>
+              <button
+                type="button"
+                className={`rounded-lg px-2.5 py-1 font-semibold transition ${mode === 'flow' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
+                onClick={() => setMode('flow')}
+              >
+                Flowchart
+              </button>
+            </>
+          ) : null}
+          {showModeControls && supportsSankey ? (
+            <button
+              type="button"
+              className={`rounded-lg px-2.5 py-1 font-semibold transition ${mode === 'sankey' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
+              onClick={() => setMode('sankey')}
+            >
+              Sankey
+            </button>
+          ) : null}
 
-        <p className="ml-2 font-semibold tracking-[0.08em] uppercase">Orientação</p>
-        <button
-          type="button"
-          className={`rounded-lg px-2.5 py-1 font-semibold transition ${orientation === 'horizontal' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
-          onClick={() => setOrientation('horizontal')}
-          disabled={mode === 'sankey'}
-        >
-          Horizontal
-        </button>
-        <button
-          type="button"
-          className={`rounded-lg px-2.5 py-1 font-semibold transition ${orientation === 'vertical' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'} disabled:cursor-not-allowed disabled:opacity-50`}
-          onClick={() => setOrientation('vertical')}
-          disabled={mode === 'sankey' || !supportsVertical}
-        >
-          Vertical
-        </button>
-      </div>
+          {showOrientationControls ? (
+            <>
+              <p className="ml-2 font-semibold tracking-[0.08em] uppercase">Orientação</p>
+              <button
+                type="button"
+                className={`rounded-lg px-2.5 py-1 font-semibold transition ${orientation === 'horizontal' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
+                onClick={() => setOrientation('horizontal')}
+                disabled={mode === 'sankey'}
+              >
+                Horizontal
+              </button>
+              <button
+                type="button"
+                className={`rounded-lg px-2.5 py-1 font-semibold transition ${orientation === 'vertical' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'} disabled:cursor-not-allowed disabled:opacity-50`}
+                onClick={() => setOrientation('vertical')}
+                disabled={mode === 'sankey' || !supportsVertical}
+              >
+                Vertical
+              </button>
+            </>
+          ) : null}
+        </div>
+      ) : null}
 
       {error ? (
         <div className="rounded-xl border border-accent/30 bg-accent/8 p-4 text-sm/6 text-accent">
