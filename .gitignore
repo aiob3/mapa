@@ -41,6 +41,7 @@ context-log.json
 *.tmp
 *.temp
 .cache/
+.notas_operador
 
 # ClickHouse local runtime (docker bind mounts)
 infra/clickhouse/data/
