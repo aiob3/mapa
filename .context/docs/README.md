@@ -20,6 +20,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Syn Post-Migration Validation Checklist (STATE-DB-004)](./syn-post-migration-validation-checklist-state-db-004.md)
 - [Syn Canonical Pattern Catalog (STATE-DB-005)](./syn-canonical-pattern-catalog-state-db-005.md)
 - [Architecture Visual Portal (STATE-DB-006)](./architecture-visual-portal-state-db-006.md)
+- [UI Components & Pattern Catalog](./patterns/ui-components-catalog.md)
 
 ## Repository Snapshot
 - `agents/` — AI agent playbooks and prompts.

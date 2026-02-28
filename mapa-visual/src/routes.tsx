@@ -5,11 +5,13 @@ import { ExecutiveSummaryPanel } from '@/components/ExecutiveSummaryPanel';
 import { DataArchitecturePage } from '@/pages/DataArchitecturePage';
 import { AppArchitecturePage } from '@/pages/AppArchitecturePage';
 import { AppDataArchitecturePage } from '@/pages/AppDataArchitecturePage';
+import { PatternsLibraryPage } from '@/pages/PatternsLibraryPage';
 
 const navItems = [
   { path: '/', label: 'Dados' },
   { path: '/app', label: 'Mapa-app' },
   { path: '/app-data', label: 'Mapa-app x Dados' },
+  { path: '/patterns', label: 'Pattern Library' },
 ];
 
 type LayoutMode = 'default' | 'focus';
@@ -163,6 +165,7 @@ export const router = createBrowserRouter([
       { index: true, Component: DataArchitecturePage },
       { path: '/app', Component: AppArchitecturePage },
       { path: '/app-data', Component: AppDataArchitecturePage },
+      { path: '/patterns', Component: PatternsLibraryPage },
     ],
   },
 ]);

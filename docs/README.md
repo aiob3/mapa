@@ -20,6 +20,7 @@ A fonte canônica dos guias scaffolded permanece em `.context/docs/`.
 
 - [Context Docs Index](../.context/docs/README.md)
 - [Architecture Visual Portal (STATE-DB-006)](../.context/docs/architecture-visual-portal-state-db-006.md)
+- [UI Components & Pattern Catalog](../.context/docs/patterns/ui-components-catalog.md)
 
 ## Convenção Operacional
 
