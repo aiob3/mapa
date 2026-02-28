@@ -47,5 +47,4 @@ context-log.json
 infra/clickhouse/data/
 infra/clickhouse/logs/
 
-# Replication v1 sensitive artefacts
-.context/runtime/evidence/replication-*/snapshot.csv
+# Replication v1 evidence is versioned by governance policy (STATE-DB-007).

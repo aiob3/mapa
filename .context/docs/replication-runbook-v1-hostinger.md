@@ -108,15 +108,13 @@ Mínimo obrigatório:
 3. `reconciliation.json`
 4. Relatórios em `.context/runtime/reports/replication-v1-*.json`
 
-### Segurança de evidências (obrigatório)
+### Governança de evidências (obrigatório)
 
-1. `snapshot.csv` contém `raw_payload_json` e deve ser classificado como dado sensível operacional.
-2. Não versionar snapshots reais no Git remoto; usar retenção local controlada ou cofre dedicado de evidências.
-3. Garantir criptografia em repouso no host de execução.
-4. Definir política de retenção mínima:
-   - evidência operacional quente: 7 dias
-   - evidência auditável resumida (`*.json`): 30 dias
-5. Quando necessário compartilhar evidência, usar versão mascarada (sem payload bruto).
+1. Neste projeto, `snapshot.csv` e os relatórios de replicação são tratados como **dados operacionais de auditoria não sensíveis**.
+2. Os arquivos de evidência (`snapshot.csv`, `manifest.json`, `reconciliation.json` e `replication-v1-*.json`) devem ser **versionados no Git remoto** para preservar memória operacional.
+3. Não mascarar payloads de evidência por padrão; a rastreabilidade integral é requisito para diagnóstico e continuidade entre sessões.
+4. Segredos continuam fora dos artefatos de evidência (tokens, chaves e credenciais devem permanecer somente em `.env`/secrets manager).
+5. Retenção mínima recomendada em repositório: manter histórico completo da trilha v1 até fechamento formal da fase de replicação externa.
 
 ## Contenção e rollback
 
