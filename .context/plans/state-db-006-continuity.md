@@ -178,6 +178,21 @@ npm run test -- syn-pattern-contracts.test.ts
   - `go-no-go-rigid-checklist-state-db-006.md` preenchido com decisão formal.
 - **Git Checkpoint:** Commit `docs(state-db): enforce pre-real-load governance gate for state-db-006`
 
+### Phase 5 - External Replication Readiness (STATE-DB-007)
+
+- **Owner:** Architect Specialist + Database Specialist + Devops Specialist + Security Auditor
+- **Deliverables:**
+  - Baseline de replicação externa v1 para Hostinger VPS formalizada.
+  - Scripts operacionais de preflight/export/import/reconciliação/go-no-go.
+  - Contrato de reconciliação e runbook versionados para execução diária + on-demand.
+- **Evidence Expectations:**
+  - `.context/docs/replication-readiness-state-db-007.md`
+  - `.context/docs/replication-runbook-v1-hostinger.md`
+  - `.context/docs/replication-reconciliation-contract-v1.md`
+  - `infra/postgres/hostinger/20260228070000_replication_target_v1.sql`
+  - `.context/runtime/reports/replication-v1-*.json`
+- **Git Checkpoint:** Commit `feat(replication): implement hostinger replication readiness baseline v1`
+
 ## Risk Assessment
 
 | Risk | Probability | Impact | Mitigation Strategy | Owner |

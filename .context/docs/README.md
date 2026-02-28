@@ -26,6 +26,9 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Canonical Data Norm v1 - Deals (STATE-DB-006)](./canonical-data-norm-deals-v1-state-db-006.md)
 - [Manual CSV Ingestion Runbook (STATE-DB-006)](./manual-csv-ingestion-runbook-state-db-006.md)
 - [GO/NO-GO Rigid Checklist (STATE-DB-006)](./go-no-go-rigid-checklist-state-db-006.md)
+- [Replication Readiness v1 (STATE-DB-007)](./replication-readiness-state-db-007.md)
+- [Replication Runbook v1 Hostinger (STATE-DB-007)](./replication-runbook-v1-hostinger.md)
+- [Replication Reconciliation Contract v1 (STATE-DB-007)](./replication-reconciliation-contract-v1.md)
 - [UI Components & Pattern Catalog](./patterns/ui-components-catalog.md)
 
 ## Repository Snapshot
@@ -71,6 +74,9 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Canonical Data Norm v1 - Deals (STATE-DB-006) | `canonical-data-norm-deals-v1-state-db-006.md` | agent-update:canonical-data-norm-deals-v1-state-db-006 | SSOT de contrato de dados para ingestão manual de deals, mapeamentos e SLOs |
 | Manual CSV Ingestion Runbook (STATE-DB-006) | `manual-csv-ingestion-runbook-state-db-006.md` | agent-update:manual-csv-ingestion-runbook-state-db-006 | Fluxo operacional completo (pré-check, dry-run, ingestão, reconciliação e contenção) |
 | GO/NO-GO Rigid Checklist (STATE-DB-006) | `go-no-go-rigid-checklist-state-db-006.md` | agent-update:go-no-go-rigid-checklist-state-db-006 | Gate bloqueante para autorização de carga real com evidências e decisão formal |
+| Replication Readiness v1 (STATE-DB-007) | `replication-readiness-state-db-007.md` | agent-update:replication-readiness-state-db-007 | Critérios bloqueantes para elegibilidade de replicação externa (Hostinger VPS) |
+| Replication Runbook v1 Hostinger (STATE-DB-007) | `replication-runbook-v1-hostinger.md` | agent-update:replication-runbook-v1-hostinger | Execução ponta a ponta do ciclo snapshot->import->reconciliação->gate |
+| Replication Reconciliation Contract v1 (STATE-DB-007) | `replication-reconciliation-contract-v1.md` | agent-update:replication-reconciliation-contract-v1 | Métricas/cortes determinísticos para classificar delta de replicação |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

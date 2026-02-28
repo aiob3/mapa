@@ -46,3 +46,6 @@ context-log.json
 # ClickHouse local runtime (docker bind mounts)
 infra/clickhouse/data/
 infra/clickhouse/logs/
+
+# Replication v1 sensitive artefacts
+.context/runtime/evidence/replication-*/snapshot.csv
