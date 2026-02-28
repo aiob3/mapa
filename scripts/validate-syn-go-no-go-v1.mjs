@@ -67,6 +67,18 @@ function runCommand(command, args) {
   };
 }
 
+function detectPendingRemoteMigrations(output) {
+  const pending = [];
+  const lines = String(output || '').split('\n');
+  for (const line of lines) {
+    const match = line.match(/^\s*(\d{14})\s*\|\s*\|\s*/);
+    if (match) {
+      pending.push(match[1]);
+    }
+  }
+  return pending;
+}
+
 function summarize(results) {
   const failed = results.filter((item) => !item.ok);
   return {
@@ -142,9 +154,19 @@ function main() {
           'Variáveis obrigatórias ausentes para validação completa. Defina SUPABASE_PROJECT_URL, SUPABASE_SERVICE_ROLE_KEY e SUPABASE_PUBLISHABLE_KEY (ou SUPABASE_ANOM_PUBLIC_KEY).',
       });
     } else {
+      const migrationListResult = runCommand('npx', ['--yes', 'supabase', 'migration', 'list']);
+      const pendingRemote = detectPendingRemoteMigrations(migrationListResult.stdout);
+      if (migrationListResult.ok && pendingRemote.length > 0) {
+        migrationListResult.ok = false;
+        migrationListResult.code = 3;
+        migrationListResult.stderr = `Pending migrations not applied to remote: ${pendingRemote.join(', ')}`;
+      }
+      commandResults.push(migrationListResult);
+
       commandResults.push(runCommand('npm', ['run', 'security:guardrails']));
       commandResults.push(runCommand('npm', ['run', 'test', '--', 'syn-pattern-contracts.test.ts']));
       commandResults.push(runCommand('npm', ['run', 'syn:validate:post-migration']));
+      commandResults.push(runCommand('node', ['scripts/validate-syn-deal-scope.mjs']));
     }
   }
 

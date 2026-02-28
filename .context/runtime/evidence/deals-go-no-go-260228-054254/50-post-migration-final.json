@@ -1,0 +1,518 @@
+
+> @ai-coders/context@0.4.0 syn:validate:post-migration
+> node scripts/validate-syn-post-migration.mjs
+
+{
+  "startedAt": "2026-02-28T08:44:54.046Z",
+  "projectUrl": "https://yyviidkkbbdocripaoma.supabase.co",
+  "migrationList": {
+    "ok": true,
+    "output": "\n  \n   Local          | Remote         | Time (UTC)          \n  ----------------|----------------|---------------------\n   20260225023531 | 20260225023531 | 2026-02-25 02:35:31 \n   20260225024110 | 20260225024110 | 2026-02-25 02:41:10 \n   20260226113000 | 20260226113000 | 2026-02-26 11:30:00 \n   20260226153000 | 20260226153000 | 2026-02-26 15:30:00 \n   20260226190000 | 20260226190000 | 2026-02-26 19:00:00 \n   20260226203000 | 20260226203000 | 2026-02-26 20:30:00 \n   20260228053500 |                | 2026-02-28 05:35:00 \n\n"
+  },
+  "semanticLayerColumn": {
+    "ok": true,
+    "status": 200,
+    "message": "[{\"semantic_layer\":{\"tacit_basis\": [], \"tactical_formula\": {\"owner\": \"\", \"action\": \"\", \"timing\": \"\", \"expected_outcome\": \"\"}, \"causal_hypotheses\": [], \"executive_summary\": \"\", \"inflection_points\": [], \"relational_conflic"
+  },
+  "authenticatedRpcValidation": {
+    "ok": true,
+    "cycles": [
+      {
+        "attempt": 1,
+        "results": [
+          {
+            "rpc": "api_syn_leads_v1",
+            "ok": true,
+            "status": 200,
+            "message": "[{\"id\": \"1\", \"name\": \"Lead cv2_ga\", \"tone\": \"ANALÍTICO\", \"score\": 50, \"region\": \"Sem região\", \"sector\": \"Geral\", \"status\": \"Frio\", \"company\": \"Conta sem nome\", \"scoreIA\": 0, \"location\": \"N/A\", \"openRate\": 0, \"clickRate\":"
+          },
+          {
+            "rpc": "api_syn_heatmap_v1",
+            "ok": true,
+            "status": 200,
+            "message": "{\"kpiCards\": [{\"sub\": \"Leads ativos\", \"color\": \"#8B5CF6\", \"label\": \"New Logo\", \"value\": \"1\", \"amount\": \"0\", \"iconKey\": \"star\"}, {\"sub\": \"Contratos vigentes\", \"color\": \"#3B82F6\", \"label\": \"Mapped\", \"value\": \"0\", \"amount\":"
+          },
+          {
+            "rpc": "api_syn_outreach_v1",
+            "ok": true,
+            "status": 200,
+            "message": "{\"leads\": [{\"name\": \"Lead cv2_ga\", \"tone\": \"ANALÍTICO\", \"sector\": \"Geral\", \"scoreIA\": \"0.0\", \"openRate\": \"0.0%\", \"clickRate\": \"0.0%\", \"toneColor\": \"#4A6FA5\", \"scoreColor\": \"#C64928\", \"executiveSummary\": \"\", \"inflectionPo"
+          },
+          {
+            "rpc": "api_syn_sector_v1",
+            "ok": true,
+            "status": 200,
+            "message": "{\"kpiCards\": [{\"label\": \"Revenue Total por Setor\", \"value\": \"0\", \"change\": \"+15%\"}, {\"label\": \"Deals Ativos Cross-Sector\", \"value\": \"1\", \"change\": \"+1\"}, {\"label\": \"Market Penetration Média\", \"value\": \"50%\", \"change\": \"+"
+          },
+          {
+            "rpc": "api_syn_kpis_v1",
+            "ok": true,
+            "status": 200,
+            "message": "{\"winRate\": 50.00, \"arrGrowth\": 15.00, \"atRiskValue\": 0, \"leadsAtivos\": 1, \"leadsEmAberto\": 1, \"pipelineTotal\": 0, \"conversionRate\": 0.00, \"conversionDelta\": 0.00, \"scriptsGenerated\": 3, \"contratosVigentes\": 0, \"eventosM"
+          }
+        ],
+        "schemaCacheMisses": []
+      }
+    ],
+    "finalResults": [
+      {
+        "rpcName": "api_syn_leads_v1",
+        "res": {
+          "ok": true,
+          "status": 200,
+          "text": "[{\"id\": \"1\", \"name\": \"Lead cv2_ga\", \"tone\": \"ANALÍTICO\", \"score\": 50, \"region\": \"Sem região\", \"sector\": \"Geral\", \"status\": \"Frio\", \"company\": \"Conta sem nome\", \"scoreIA\": 0, \"location\": \"N/A\", \"openRate\": 0, \"clickRate\": 0, \"dealValue\": 0, \"toneColor\": \"#4A6FA5\", \"statusColor\": \"#6B7280\", \"semanticLayer\": {\"tacitBasis\": [], \"tacticalFormula\": {\"owner\": \"\", \"action\": \"\", \"timing\": \"\", \"expectedOutcome\": \"\"}, \"causalHypotheses\": [], \"executiveSummary\": \"\", \"inflectionPoints\": [], \"relationalConflicts\": [], \"counterintuitiveSignals\": []}, \"semanticSignals\": {\"causalityCount\": 0, \"tacitBasisCount\": 0, \"executiveSummary\": \"\", \"counterintuitiveCount\": 0, \"inflectionPointsCount\": 0, \"relationalConflictCount\": 0}}]",
+          "json": [
+            {
+              "id": "1",
+              "name": "Lead cv2_ga",
+              "tone": "ANALÍTICO",
+              "score": 50,
+              "region": "Sem região",
+              "sector": "Geral",
+              "status": "Frio",
+              "company": "Conta sem nome",
+              "scoreIA": 0,
+              "location": "N/A",
+              "openRate": 0,
+              "clickRate": 0,
+              "dealValue": 0,
+              "toneColor": "#4A6FA5",
+              "statusColor": "#6B7280",
+              "semanticLayer": {
+                "tacitBasis": [],
+                "tacticalFormula": {
+                  "owner": "",
+                  "action": "",
+                  "timing": "",
+                  "expectedOutcome": ""
+                },
+                "causalHypotheses": [],
+                "executiveSummary": "",
+                "inflectionPoints": [],
+                "relationalConflicts": [],
+                "counterintuitiveSignals": []
+              },
+              "semanticSignals": {
+                "causalityCount": 0,
+                "tacitBasisCount": 0,
+                "executiveSummary": "",
+                "counterintuitiveCount": 0,
+                "inflectionPointsCount": 0,
+                "relationalConflictCount": 0
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rpcName": "api_syn_heatmap_v1",
+        "res": {
+          "ok": true,
+          "status": 200,
+          "text": "{\"kpiCards\": [{\"sub\": \"Leads ativos\", \"color\": \"#8B5CF6\", \"label\": \"New Logo\", \"value\": \"1\", \"amount\": \"0\", \"iconKey\": \"star\"}, {\"sub\": \"Contratos vigentes\", \"color\": \"#3B82F6\", \"label\": \"Mapped\", \"value\": \"0\", \"amount\": \"0.00\", \"iconKey\": \"git-branch\"}, {\"sub\": \"Leads em aberto\", \"color\": \"#06B6D4\", \"label\": \"Ongoing\", \"value\": \"1\", \"amount\": \"0.00\", \"iconKey\": \"clock\"}, {\"sub\": \"Taxa de conversão\", \"color\": \"#10B981\", \"label\": \"Committed\", \"value\": \"50%\", \"amount\": \"0.00000000000000000000\", \"iconKey\": \"check-circle\"}, {\"sub\": \"Exposição de risco\", \"color\": \"#F43F5E\", \"label\": \"At Risk\", \"value\": \"0\", \"amount\": \"0\", \"iconKey\": \"alert-triangle\"}], \"heatmapData\": [{\"name\": \"Sem região\", \"metrics\": [{\"value\": 0, \"intensity\": \"critico\"}, {\"value\": 50, \"intensity\": \"atencao\"}, {\"value\": 0, \"intensity\": \"critico\"}, {\"value\": 0, \"intensity\": \"critico\"}, {\"value\": 48, \"intensity\": \"atencao\"}, {\"value\": 53, \"intensity\": \"atencao\"}]}], \"pipelineData\": [{\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Sep\", \"projetado\": 0.0}, {\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Oct\", \"projetado\": 0.0}, {\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Nov\", \"projetado\": 0.0}, {\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Dec\", \"projetado\": 0.0}, {\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Jan\", \"projetado\": 0.0}, {\"meta\": 0.0, \"atual\": 0.0, \"month\": \"Feb\", \"projetado\": 0.0}], \"heatmapMetrics\": [\"Revenue\", \"Growth\", \"Market Share\", \"Innovation\", \"Customer Sat.\", \"Pipeline\"], \"narrativeItems\": [{\"tag\": null, \"desc\": \"Lead cv2_ga — Conta sem nome — 0\", \"time\": \"agora\", \"title\": \"Movimento em Geral\", \"priority\": \"BAIXA\", \"tagColor\": null}], \"semanticSnapshot\": {\"causalitySignals\": 0, \"inflectionPoints\": 0, \"tacitBasisSignals\": 0, \"relationalConflicts\": 0, \"counterintuitiveSignals\": 0}, \"strategicActions\": [{\"date\": \"01/03\", \"color\": \"#F59E0B\", \"owner\": \"Revenue Ops\", \"action\": \"Acionar frente comercial para Conta sem nome\", \"priority\": \"MÉDIA\"}]}",
+          "json": {
+            "kpiCards": [
+              {
+                "sub": "Leads ativos",
+                "color": "#8B5CF6",
+                "label": "New Logo",
+                "value": "1",
+                "amount": "0",
+                "iconKey": "star"
+              },
+              {
+                "sub": "Contratos vigentes",
+                "color": "#3B82F6",
+                "label": "Mapped",
+                "value": "0",
+                "amount": "0.00",
+                "iconKey": "git-branch"
+              },
+              {
+                "sub": "Leads em aberto",
+                "color": "#06B6D4",
+                "label": "Ongoing",
+                "value": "1",
+                "amount": "0.00",
+                "iconKey": "clock"
+              },
+              {
+                "sub": "Taxa de conversão",
+                "color": "#10B981",
+                "label": "Committed",
+                "value": "50%",
+                "amount": "0.00000000000000000000",
+                "iconKey": "check-circle"
+              },
+              {
+                "sub": "Exposição de risco",
+                "color": "#F43F5E",
+                "label": "At Risk",
+                "value": "0",
+                "amount": "0",
+                "iconKey": "alert-triangle"
+              }
+            ],
+            "heatmapData": [
+              {
+                "name": "Sem região",
+                "metrics": [
+                  {
+                    "value": 0,
+                    "intensity": "critico"
+                  },
+                  {
+                    "value": 50,
+                    "intensity": "atencao"
+                  },
+                  {
+                    "value": 0,
+                    "intensity": "critico"
+                  },
+                  {
+                    "value": 0,
+                    "intensity": "critico"
+                  },
+                  {
+                    "value": 48,
+                    "intensity": "atencao"
+                  },
+                  {
+                    "value": 53,
+                    "intensity": "atencao"
+                  }
+                ]
+              }
+            ],
+            "pipelineData": [
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Sep",
+                "projetado": 0
+              },
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Oct",
+                "projetado": 0
+              },
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Nov",
+                "projetado": 0
+              },
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Dec",
+                "projetado": 0
+              },
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Jan",
+                "projetado": 0
+              },
+              {
+                "meta": 0,
+                "atual": 0,
+                "month": "Feb",
+                "projetado": 0
+              }
+            ],
+            "heatmapMetrics": [
+              "Revenue",
+              "Growth",
+              "Market Share",
+              "Innovation",
+              "Customer Sat.",
+              "Pipeline"
+            ],
+            "narrativeItems": [
+              {
+                "tag": null,
+                "desc": "Lead cv2_ga — Conta sem nome — 0",
+                "time": "agora",
+                "title": "Movimento em Geral",
+                "priority": "BAIXA",
+                "tagColor": null
+              }
+            ],
+            "semanticSnapshot": {
+              "causalitySignals": 0,
+              "inflectionPoints": 0,
+              "tacitBasisSignals": 0,
+              "relationalConflicts": 0,
+              "counterintuitiveSignals": 0
+            },
+            "strategicActions": [
+              {
+                "date": "01/03",
+                "color": "#F59E0B",
+                "owner": "Revenue Ops",
+                "action": "Acionar frente comercial para Conta sem nome",
+                "priority": "MÉDIA"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "rpcName": "api_syn_outreach_v1",
+        "res": {
+          "ok": true,
+          "status": 200,
+          "text": "{\"leads\": [{\"name\": \"Lead cv2_ga\", \"tone\": \"ANALÍTICO\", \"sector\": \"Geral\", \"scoreIA\": \"0.0\", \"openRate\": \"0.0%\", \"clickRate\": \"0.0%\", \"toneColor\": \"#4A6FA5\", \"scoreColor\": \"#C64928\", \"executiveSummary\": \"\", \"inflectionPointsCount\": 0}], \"chartData\": [{\"week\": \"Semana 1\", \"value\": 0}], \"radarData\": [{\"A\": 90, \"subject\": \"Analítico\", \"fullMark\": 100}, {\"A\": 75, \"subject\": \"Visionário\", \"fullMark\": 100}, {\"A\": 60, \"subject\": \"Empático\", \"fullMark\": 100}, {\"A\": 50, \"subject\": \"Direto\", \"fullMark\": 100}, {\"A\": 85, \"subject\": \"Provocativo\", \"fullMark\": 100}], \"toneInsights\": [{\"tone\": \"Analítico\", \"color\": \"#4A6FA5\", \"label\": \"Geral\", \"score\": \"(0.0)\"}], \"scriptsGenerated\": \"3\", \"semanticHighlights\": [], \"globalConversionRate\": \"0.0%\", \"globalConversionDelta\": \"0.0%\"}",
+          "json": {
+            "leads": [
+              {
+                "name": "Lead cv2_ga",
+                "tone": "ANALÍTICO",
+                "sector": "Geral",
+                "scoreIA": "0.0",
+                "openRate": "0.0%",
+                "clickRate": "0.0%",
+                "toneColor": "#4A6FA5",
+                "scoreColor": "#C64928",
+                "executiveSummary": "",
+                "inflectionPointsCount": 0
+              }
+            ],
+            "chartData": [
+              {
+                "week": "Semana 1",
+                "value": 0
+              }
+            ],
+            "radarData": [
+              {
+                "A": 90,
+                "subject": "Analítico",
+                "fullMark": 100
+              },
+              {
+                "A": 75,
+                "subject": "Visionário",
+                "fullMark": 100
+              },
+              {
+                "A": 60,
+                "subject": "Empático",
+                "fullMark": 100
+              },
+              {
+                "A": 50,
+                "subject": "Direto",
+                "fullMark": 100
+              },
+              {
+                "A": 85,
+                "subject": "Provocativo",
+                "fullMark": 100
+              }
+            ],
+            "toneInsights": [
+              {
+                "tone": "Analítico",
+                "color": "#4A6FA5",
+                "label": "Geral",
+                "score": "(0.0)"
+              }
+            ],
+            "scriptsGenerated": "3",
+            "semanticHighlights": [],
+            "globalConversionRate": "0.0%",
+            "globalConversionDelta": "0.0%"
+          }
+        }
+      },
+      {
+        "rpcName": "api_syn_sector_v1",
+        "res": {
+          "ok": true,
+          "status": 200,
+          "text": "{\"kpiCards\": [{\"label\": \"Revenue Total por Setor\", \"value\": \"0\", \"change\": \"+15%\"}, {\"label\": \"Deals Ativos Cross-Sector\", \"value\": \"1\", \"change\": \"+1\"}, {\"label\": \"Market Penetration Média\", \"value\": \"50%\", \"change\": \"+0pp\"}, {\"label\": \"Setor com Maior Growth\", \"value\": \"Geral (0.0%)\", \"change\": null, \"isHighlight\": true}], \"radarLegend\": [{\"color\": \"#C64928\", \"label\": \"Varejo\"}, {\"color\": \"#3B82F6\", \"label\": \"Financeiro\"}, {\"color\": \"#6366F1\", \"label\": \"Tecnologia\"}], \"scatterData\": [{\"roi\": 50.0, \"name\": \"Geral\", \"size\": 60, \"color\": \"#C64928\", \"engagement\": 0.0}], \"semanticLens\": {\"sectorsWithInflection\": 0, \"totalInflectionPoints\": 0, \"totalRelationalConflicts\": 0, \"totalCounterintuitiveSignals\": 0}, \"boardSynthesis\": [{\"type\": \"Oportunidade Estratégica\", \"content\": \"A carteira atual mostra concentração em setores com ROI acima de 70%.\", \"typeColor\": \"#2E4C3B\"}, {\"type\": \"Ação Recomendada\", \"content\": \"Priorizar setores com maior receita e maior score para ciclo trimestral.\", \"typeColor\": \"#3B82F6\"}, {\"type\": \"Riscos Mapeados\", \"content\": \"Setores com score abaixo de 60 exigem intervenção tática imediata.\", \"typeColor\": \"#C64928\"}], \"radarComparative\": [{\"Varejo\": 50.0, \"subject\": \"ROI\", \"fullMark\": 100, \"Financeiro\": 0, \"Tecnologia\": 0}, {\"Varejo\": 0.0, \"subject\": \"NPS\", \"fullMark\": 100, \"Financeiro\": 0, \"Tecnologia\": 0}, {\"Varejo\": 0.0, \"subject\": \"Engajamento\", \"fullMark\": 100, \"Financeiro\": 0, \"Tecnologia\": 0}, {\"Varejo\": 78, \"subject\": \"Retenção\", \"fullMark\": 100, \"Financeiro\": 74, \"Tecnologia\": 70}, {\"Varejo\": 62, \"subject\": \"Penetração\", \"fullMark\": 100, \"Financeiro\": 58, \"Tecnologia\": 54}, {\"Varejo\": 80, \"subject\": \"Crescimento\", \"fullMark\": 100, \"Financeiro\": 73, \"Tecnologia\": 68}], \"aiRecommendations\": [{\"desc\": \"Setor com ROI médio de 50.0% e engajamento de 0.0%. Inflexões: 0.\", \"rank\": 1, \"level\": \"Crítico\", \"title\": \"Acelerar frente em Geral\", \"sector\": \"Geral\", \"levelColor\": \"#C64928\"}], \"conversionInsights\": [{\"tags\": [\"Geral\"], \"value\": 0, \"change\": \"+0pp\", \"metric\": \"Taxa de Conversão\", \"sector\": \"Geral\", \"target\": 100, \"barColor\": \"#C64928\", \"changeColor\": \"#2E4C3B\"}], \"sectorReportByName\": {\"Geral\": {\"roi\": \"50.0%\", \"growth\": \"0.0%\", \"revenue\": \"0.00\", \"sentimento\": \"Atenção\", \"dealsAtivos\": \"1\"}}}",
+          "json": {
+            "kpiCards": [
+              {
+                "label": "Revenue Total por Setor",
+                "value": "0",
+                "change": "+15%"
+              },
+              {
+                "label": "Deals Ativos Cross-Sector",
+                "value": "1",
+                "change": "+1"
+              },
+              {
+                "label": "Market Penetration Média",
+                "value": "50%",
+                "change": "+0pp"
+              },
+              {
+                "label": "Setor com Maior Growth",
+                "value": "Geral (0.0%)",
+                "change": null,
+                "isHighlight": true
+              }
+            ],
+            "radarLegend": [
+              {
+                "color": "#C64928",
+                "label": "Varejo"
+              },
+              {
+                "color": "#3B82F6",
+                "label": "Financeiro"
+              },
+              {
+                "color": "#6366F1",
+                "label": "Tecnologia"
+              }
+            ],
+            "scatterData": [
+              {
+                "roi": 50,
+                "name": "Geral",
+                "size": 60,
+                "color": "#C64928",
+                "engagement": 0
+              }
+            ],
+            "semanticLens": {
+              "sectorsWithInflection": 0,
+              "totalInflectionPoints": 0,
+              "totalRelationalConflicts": 0,
+              "totalCounterintuitiveSignals": 0
+            },
+            "boardSynthesis": [
+              {
+                "type": "Oportunidade Estratégica",
+                "content": "A carteira atual mostra concentração em setores com ROI acima de 70%.",
+                "typeColor": "#2E4C3B"
+              },
+              {
+                "type": "Ação Recomendada",
+                "content": "Priorizar setores com maior receita e maior score para ciclo trimestral.",
+                "typeColor": "#3B82F6"
+              },
+              {
+                "type": "Riscos Mapeados",
+                "content": "Setores com score abaixo de 60 exigem intervenção tática imediata.",
+                "typeColor": "#C64928"
+              }
+            ],
+            "radarComparative": [
+              {
+                "Varejo": 50,
+                "subject": "ROI",
+                "fullMark": 100,
+                "Financeiro": 0,
+                "Tecnologia": 0
+              },
+              {
+                "Varejo": 0,
+                "subject": "NPS",
+                "fullMark": 100,
+                "Financeiro": 0,
+                "Tecnologia": 0
+              },
+              {
+                "Varejo": 0,
+                "subject": "Engajamento",
+                "fullMark": 100,
+                "Financeiro": 0,
+                "Tecnologia": 0
+              },
+              {
+                "Varejo": 78,
+                "subject": "Retenção",
+                "fullMark": 100,
+                "Financeiro": 74,
+                "Tecnologia": 70
+              },
+              {
+                "Varejo": 62,
+                "subject": "Penetração",
+                "fullMark": 100,
+                "Financeiro": 58,
+                "Tecnologia": 54
+              },
+              {
+                "Varejo": 80,
+                "subject": "Crescimento",
+                "fullMark": 100,
+                "Financeiro": 73,
+                "Tecnologia": 68
+              }
+            ],
+            "aiRecommendations": [
+              {
+                "desc": "Setor com ROI médio de 50.0% e engajamento de 0.0%. Inflexões: 0.",
+                "rank": 1,
+                "level": "Crítico",
+                "title": "Acelerar frente em Geral",
+                "sector": "Geral",
+                "levelColor": "#C64928"
+              }
+            ],
+            "conversionInsights": [
+              {
+                "tags": [
+                  "Geral"
+                ],
+                "value": 0,
+                "change": "+0pp",
+                "metric": "Taxa de Conversão",
+                "sector": "Geral",
+                "target": 100,
+                "barColor": "#C64928",
+                "changeColor": "#2E4C3B"
+              }
+            ],
+            "sectorReportByName": {
+              "Geral": {
+                "roi": "50.0%",
+                "growth": "0.0%",
+                "revenue": "0.00",
+                "sentimento": "Atenção",
+                "dealsAtivos": "1"
+              }
+            }
+          }
+        }
+      },
+      {
+        "rpcName": "api_syn_kpis_v1",
+        "res": {
+          "ok": true,
+          "status": 200,
+          "text": "{\"winRate\": 50.00, \"arrGrowth\": 15.00, \"atRiskValue\": 0, \"leadsAtivos\": 1, \"leadsEmAberto\": 1, \"pipelineTotal\": 0, \"conversionRate\": 0.00, \"conversionDelta\": 0.00, \"scriptsGenerated\": 3, \"contratosVigentes\": 0, \"eventosMonitorados\": 1}",
+          "json": {
+            "winRate": 50,
+            "arrGrowth": 15,
+            "atRiskValue": 0,
+            "leadsAtivos": 1,
+            "leadsEmAberto": 1,
+            "pipelineTotal": 0,
+            "conversionRate": 0,
+            "conversionDelta": 0,
+            "scriptsGenerated": 3,
+            "contratosVigentes": 0,
+            "eventosMonitorados": 1
+          }
+        }
+      }
+    ],
+    "mitigation": null
+  },
+  "validationUser": {
+    "email": "syn.validation+1772268337326.34fd29be@mapa.local",
+    "userId": "5a53269d-b714-43c6-93cd-29bd39ee9e1a",
+    "mode": "ephemeral"
+  },
+  "finishedAt": "2026-02-28T08:45:39.648Z",
+  "success": true
+}

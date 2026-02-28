@@ -1,0 +1,9 @@
+Attempt to apply migration 20260228053500_state_db_007_api_syn_scope_deals_only.sql to remote failed.
+Primary blocker:
+- Supabase pooler returned: FATAL Circuit breaker open: Too many authentication errors.
+Observed on commands:
+- npx supabase db push --linked
+- npx supabase db push --db-url <direct and pooler variants>
+Current state:
+- Migration implemented locally and committed pending remote apply.
+- GO/NO-GO remains NO-GO until migration is applied and migration list is aligned.

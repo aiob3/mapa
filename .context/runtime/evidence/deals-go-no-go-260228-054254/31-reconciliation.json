@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-02-28T08:46:22.971Z",
+  "source_ids": 173,
+  "published_ids": 174,
+  "overlap_ids": 173,
+  "only_source_ids": 0,
+  "only_published_ids": 1,
+  "classification": "anomalia",
+  "only_source_sample": [],
+  "only_published_sample": [
+    "cv2_gate_test_ok_1771997908"
+  ]
+}

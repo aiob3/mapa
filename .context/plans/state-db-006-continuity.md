@@ -192,7 +192,19 @@ npm run test -- syn-pattern-contracts.test.ts
   - Log/URL da run de CI pos-hardening.
   - Checkpoint `retomar` encerrando pendencia de CI.
   - Registro de proxima acao priorizada apos fechamento do gate.
+- **Latest execution snapshot (`260228-054254`):**
+  - Gate full executado inicialmente com `GO` (`.context/runtime/reports/go-no-go-v1-260228-054547.json`), seguido de ajuste do validador para bloquear migrations pendentes no remoto.
+  - Gate full reexecutado com `NO-GO` (`.context/runtime/reports/go-no-go-v1-260228-054829.json`) por migration local não aplicada no remoto.
+  - Ciclo de ingestão manual controlado executado com sucesso técnico:
+    - dry-run `coverage_percent=100` (`10-raw-dry-run.json`)
+    - ingestão efetiva `rows_valid=173`, `rows_rejected=0`, `rows_inserted=168`, `rows_deduplicated=5` (`20-raw-ingest.json`)
+    - pós-migration `success=true` (`50-post-migration-final.json`)
+  - Reconciliação registrada (`31-reconciliation.json`) com `only_published_ids=1` (`cv2_gate_test_ok_1771997908`) classificado como item de teste histórico.
+  - Bloqueio persistente para fechamento do passo 1 (`GATE-008`):
+    - migration `20260228053500_state_db_007_api_syn_scope_deals_only.sql` criada localmente;
+    - aplicação remota bloqueada por erro de infraestrutura/autenticação no pooler (`Circuit breaker open`), registrada em `15-migration-apply-blocker.txt`.
 - **Follow-up actions:**
-  - Priorizar Phase 1 na proxima iteracao.
-  - Revalidar necessidade de HITL quando houver mudanca visual no consumo Syn.
+  - Desbloquear aplicação remota da migration `20260228053500` e confirmar alinhamento do `migration list` local/remoto.
+  - Reexecutar gate full e atualizar decisão formal no checklist (`GO` apenas se `GATE-008` estiver `PASS`).
+  - Revalidar necessidade de HITL quando houver mudança visual no consumo Syn.
 <!-- agent-update:end -->

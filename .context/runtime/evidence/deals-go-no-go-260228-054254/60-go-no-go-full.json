@@ -1,0 +1,8 @@
+
+> @ai-coders/context@0.4.0 syn:go-no-go:v1
+> node scripts/validate-syn-go-no-go-v1.mjs
+
+{
+  "reportPath": "/home/papa/mapa/.context/runtime/reports/go-no-go-v1-260228-054547.json",
+  "status": "GO"
+}

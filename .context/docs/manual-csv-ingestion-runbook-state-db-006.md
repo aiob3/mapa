@@ -46,7 +46,7 @@ success_criteria:
 | 2 | `npm run syn:go-no-go:v1 -- --static-only` | repo atual | valida docs/migrations/scripts críticos |
 | 3 | `npm run syn:ingest:raw -- --file <csv> --min-coverage 90` | CSV validado em dry-run | JSON com `rows_rejected=0` e `errors=0` |
 | 4 | `npm run syn:validate:post-migration` | estado pós-ingestão | RPCs `api_syn_*_v1` válidos |
-| 5 | `npm run syn:go-no-go:v1` | estado final | relatório de gate `GO\|NO-GO` |
+| 5 | `npm run syn:go-no-go:v1` | estado final | relatório de gate `GO\|NO-GO` (inclui parity de migration remota e validação deal scope) |
 
 ## 4) Reconciliação origem vs disponibilização
 
