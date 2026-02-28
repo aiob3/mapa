@@ -4,6 +4,7 @@
 Welcome to the repository knowledge base. Start with the project overview, then dive into specific guides as needed.
 
 ## Core Guides
+
 - [Project Overview](./project-overview.md)
 - [Architecture Notes](./architecture.md)
 - [Development Workflow](./development-workflow.md)
@@ -20,9 +21,15 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Syn Post-Migration Validation Checklist (STATE-DB-004)](./syn-post-migration-validation-checklist-state-db-004.md)
 - [Syn Canonical Pattern Catalog (STATE-DB-005)](./syn-canonical-pattern-catalog-state-db-005.md)
 - [Architecture Visual Portal (STATE-DB-006)](./architecture-visual-portal-state-db-006.md)
+- [Ingestion Initial Post-Mortem (STATE-DB-006)](./state-db-006-ingestion-initial-postmortem.md)
+- [Eligibility Criteria v1 (STATE-DB-006)](./eligibility-criteria-v1-state-db-006.md)
+- [Canonical Data Norm v1 - Deals (STATE-DB-006)](./canonical-data-norm-deals-v1-state-db-006.md)
+- [Manual CSV Ingestion Runbook (STATE-DB-006)](./manual-csv-ingestion-runbook-state-db-006.md)
+- [GO/NO-GO Rigid Checklist (STATE-DB-006)](./go-no-go-rigid-checklist-state-db-006.md)
 - [UI Components & Pattern Catalog](./patterns/ui-components-catalog.md)
 
 ## Repository Snapshot
+
 - `agents/` — AI agent playbooks and prompts.
 - `docs/` — Living documentation produced by this tool.
 - `mapa-app/` — Main application directory.
@@ -40,6 +47,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - `LICENSE` — Project license information.
 
 ## Document Map
+
 | Guide | File | AI Marker | Primary Inputs |
 | --- | --- | --- | --- |
 | Project Overview | `project-overview.md` | agent-update:project-overview | Roadmap, README, stakeholder notes |
@@ -58,9 +66,15 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Syn Post-Migration Validation Checklist (STATE-DB-004) | `syn-post-migration-validation-checklist-state-db-004.md` | agent-update:syn-post-migration-validation-checklist-state-db-004 | Checklist/script único para validar migrations e RPCs `api_syn_*_v1` com token `authenticated` e mitigação automática de inconsistências |
 | Syn Canonical Pattern Catalog (STATE-DB-005) | `syn-canonical-pattern-catalog-state-db-005.md` | agent-update:syn-canonical-pattern-catalog-state-db-005 | Catálogo PAT-SYN-* versionado, matriz pattern->origem, SSOT de score/status, taxonomia semântica e contratos de RPC |
 | Architecture Visual Portal (STATE-DB-006) | `architecture-visual-portal-state-db-006.md` | agent-update:architecture-visual-portal-state-db-006 | Portal `mapa-visual` com 3 vistas executivas (dados, mapa-app e mapa-app x dados) e snapshot arquitetural gerado por script |
+| Ingestion Initial Post-Mortem (STATE-DB-006) | `state-db-006-ingestion-initial-postmortem.md` | agent-update:state-db-006-ingestion-initial-postmortem | Linha do tempo forense, falhas por taxonomia e ações corretivas obrigatórias para pré-carga real |
+| Eligibility Criteria v1 (STATE-DB-006) | `eligibility-criteria-v1-state-db-006.md` | agent-update:eligibility-criteria-v1-state-db-006 | Hard gates/soft gates de elegibilidade transacional com status por ativo canônico |
+| Canonical Data Norm v1 - Deals (STATE-DB-006) | `canonical-data-norm-deals-v1-state-db-006.md` | agent-update:canonical-data-norm-deals-v1-state-db-006 | SSOT de contrato de dados para ingestão manual de deals, mapeamentos e SLOs |
+| Manual CSV Ingestion Runbook (STATE-DB-006) | `manual-csv-ingestion-runbook-state-db-006.md` | agent-update:manual-csv-ingestion-runbook-state-db-006 | Fluxo operacional completo (pré-check, dry-run, ingestão, reconciliação e contenção) |
+| GO/NO-GO Rigid Checklist (STATE-DB-006) | `go-no-go-rigid-checklist-state-db-006.md` | agent-update:go-no-go-rigid-checklist-state-db-006 | Gate bloqueante para autorização de carga real com evidências e decisão formal |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist
+
 1. Gather context with `git status -sb` plus the latest commits touching `docs/` or `agents/`.
 2. Compare the current directory tree against the table above; add or retire rows accordingly.
 3. Update cross-links if guides moved or were renamed; keep anchor text concise.
@@ -68,6 +82,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 
 <!-- agent-readonly:sources -->
 ## Acceptable Sources
+
 - Repository tree and `package.json` scripts for canonical command names.
 - Maintainer-approved issues, RFCs, or product briefs referenced in the repo.
 - Release notes or changelog entries that announce documentation changes.

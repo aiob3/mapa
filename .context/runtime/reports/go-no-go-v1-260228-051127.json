@@ -1,0 +1,69 @@
+{
+  "ts_sp": "260228-051127",
+  "mode": "static-only",
+  "status": "GO",
+  "staticChecks": [
+    {
+      "check": "file_exists:.context/docs/state-db-006-ingestion-initial-postmortem.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/eligibility-criteria-v1-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/canonical-data-norm-deals-v1-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/manual-csv-ingestion-runbook-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/go-no-go-rigid-checklist-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/syn-ingest-raw-db.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/validate-syn-post-migration.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/validate-security-guardrails.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:supabase/migrations/20260226190000_state_db_006_canonical_source_registry.sql",
+      "ok": true
+    },
+    {
+      "check": "file_exists:supabase/migrations/20260226203000_state_db_006_ingestion_rpcs_backend_only.sql",
+      "ok": true
+    }
+  ],
+  "envChecks": [
+    {
+      "check": "env_present:SUPABASE_PROJECT_URL",
+      "ok": false
+    },
+    {
+      "check": "env_present:SUPABASE_SERVICE_ROLE_KEY",
+      "ok": false
+    },
+    {
+      "check": "env_present:SUPABASE_PUBLISHABLE_KEY|SUPABASE_ANOM_PUBLIC_KEY",
+      "ok": false
+    }
+  ],
+  "commandResults": [],
+  "summary": {
+    "static_ok": true,
+    "command_ok": true,
+    "ok": true,
+    "passed": 0,
+    "failed": 0
+  }
+}
