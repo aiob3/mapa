@@ -1,11 +1,55 @@
+## ⚠️ PROPÓSITO DESTE REPOSITÓRIO
+
+**Este repositório é um Escritório de Agentes (Agentics Development Office).**
+
+Ele atua como uma **fábrica de contexto** que gera scaffolding, documentação e playbooks para alimentar o desenvolvimento do ecossistema MAPA.
+
+---
+
+### 🏗️ ESTRUTURA DO ECOSISTEMA
+
+| Camada | Repositório | Propósito |
+|--------|-------------|-----------|
+| **ESCRITÓRIO** | `mapa/` (este repositório) | Motor de Context Engineering em TypeScript/CLI (`ai-context`). Gera contexto estruturado para agentes e mantenedores. |
+| **PRODUTO** | [`mapa-app/`](./mapa-app) | Plataforma web executiva de Sales Consulting (React/Vite). Importada do Figma, integrada com Supabase (Postgres) + **ClickHouse**. |
+| **GUIA** | [`mapa-visual/`](./mapa-visual) | Portal de evidências arquiteturais. Fornece blueprints visuais para agentes não se perderem durante o desenvolvimento. |
+
+---
+
+### 🎯 PRODUTO: MAPA DE VENDAS
+
+**O que é:** Plataforma estratégica de consultoria de vendas para liderança executiva.
+
+**Público-Alvo:**
+- C-Levels, CROs, Diretores
+- Líderes de Equipe de Vendas
+- Comitês de Decisão Estratégica em Tecnologia e Derivados
+
+**O que NÃO é:**
+- ❌ **NÃO é um CRM** - Não substitui registradores de pipeline tradicionais
+- ❌ **NÃO é operacional** - Não gerencia atividades diárias de SDRs/AEs
+
+**O que faz:**
+- ✅ **Reconciliação de dados** - Correlaciona justificativas cadastradas no CRM com dados fatos de múltiplas fontes
+- ✅ **Previsibilidade** - Gera forecast e projeções de risco fundamentadas em análise fatorial
+- ✅ **SSOT (Single Source of Truth)** - Atua como middleware que valida dados justificativos contra dados reais
+- ✅ **Ingestão incremental** - Importa dados apenas durante análises para vetorização e reconstrução de contexto
+- ✅ **ClickHouse estratégico** - Armazena dados para iteração e retomada de contexto, gerando insumos para inferência e decisão executiva
+
+**Propósito final:** Fornecer embasamento executivo para tomada de decisão assertiva, confrontando dados justificados (subjetivos) com dados observados (objetivos).
+
+---
+
 # MAPA Workspace - Arquitetura Operacional e Diretrizes de UI
 
 Este repositório possui dois contextos técnicos complementares:
 
 1. `mapa/` (raiz): motor de context engineering em TypeScript/CLI (`ai-context`).
-2. `mapa-app/`: aplicação web React/Vite exportada do Figma para validação visual/HITL.
+2. `mapa-app/` (OBJETIVO DESTE PROJETO): aplicação web React/Vite para desenvolvimento das conexões e camadas de dados incluindo validação visual/HITL.
 
 Use este README como referência funcional para agentes de código e mantenedores humanos.
+
+---
 
 ## Topologia Canônica
 
@@ -71,6 +115,7 @@ npm run preview:app
 ```
 
 Observação operacional:
+
 - `npm run dev:app` e `npm run preview:app` iniciam automaticamente o middleware Syn antes do app e validam `GET /health`.
 - `VITE_SYN_MIDDLEWARE_URL` é preenchida automaticamente pelo `sync:env:app` (default local `http://127.0.0.1:8787`).
 
@@ -109,6 +154,7 @@ http://localhost:4273/
 ```
 
 Escopo visual atual:
+
 - Arquitetura de Dados (Supabase + Syn Middleware + ClickHouse)
 - Arquitetura do `mapa-app` (módulos, rotas e menus)
 - Arquitetura `mapa-app` x Dados (bindings e contratos)
@@ -135,12 +181,14 @@ Documento canônico:
 - [`prompts/trigger_protocol.md`](/home/papa/mapa/prompts/trigger_protocol.md)
 
 Uso:
+
 - Interpretar intenção do operador por gatilho (`{{#reiniciar}}`, `{{#atualizar}}`, `{{#salve}}`, `{{#sincronize}}`, etc.).
 - Acionar contratos de leitura obrigatória e skills recomendadas.
 - Padronizar matriz decisória, validação HITL e loop semântico persistente.
 - Aplicar o algoritmo de loopback persistente para medir eficácia (`E`) e decidir `estavel|monitorar|corrigir`.
 
 Matriz de convergência semântica (determinística):
+
 - Intenções canônicas fechadas: `retomar`, `estruturar`, `enriquecer`, `planejar`, `validar`, `persistir`.
 - Toda execução deve mapear primeiro para uma intenção canônica e só depois para comandos.
 - Toda saída operacional deve incluir `ts_sp` no padrão `yyMMdd-HHmmss` com timezone `America/Sao_Paulo`.
@@ -155,6 +203,7 @@ Menu de referência para reduzir deriva e garantir idempotência de retomada:
 3. Template de checkpoint persistente: [`.context/runtime/checkpoint-template.md`](/home/papa/mapa/.context/runtime/checkpoint-template.md)
 
 Regra:
+
 - Reinicialização deve carregar somente os chunks declarados no manifesto conforme `intent_token` e `scope_key`.
 - A execução deve seguir a sequência atômica e registrar checkpoint ao final.
 
