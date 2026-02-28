@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-02-28T10:18:02.520Z",
+  "canonical_events_active": 173,
+  "canonical_events_non_deal": 0,
+  "canonical_ingestion_runs": 173,
+  "canonical_ingestion_statuses": {
+    "inserted": 173
+  },
+  "canonical_source_registry_rows": 173
+}

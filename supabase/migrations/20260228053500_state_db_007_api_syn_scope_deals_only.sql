@@ -12,7 +12,8 @@ with scoped_events as (
     ce.updated_at,
     ce.event_layer,
     ce.iam_layer,
-    ce.raw_payload
+    ce.raw_payload,
+    ce.semantic_layer
   from public.canonical_events ce
   where ce.status = 'active'
     and lower(
@@ -27,6 +28,19 @@ with scoped_events as (
       public.is_administrator(auth.uid())
       or coalesce(nullif(ce.iam_layer ->> 'owner_user_id', ''), auth.uid()::text) = auth.uid()::text
     )
+),
+semantic_enriched as (
+  select
+    se.*,
+    public.syn_normalize_semantic_layer(
+      coalesce(
+        case when jsonb_typeof(se.semantic_layer) = 'object' then se.semantic_layer end,
+        case when jsonb_typeof(se.event_layer -> 'semantic_layer') = 'object' then se.event_layer -> 'semantic_layer' end,
+        case when jsonb_typeof(se.raw_payload -> 'semantic_layer') = 'object' then se.raw_payload -> 'semantic_layer' end,
+        '{}'::jsonb
+      )
+    ) as normalized_semantic
+  from scoped_events se
 )
 select
   se.id::text as id,
@@ -56,8 +70,16 @@ select
   coalesce(nullif(se.event_layer ->> 'tone', ''), nullif(se.raw_payload ->> 'tone', ''), 'ANALÍTICO') as tone,
   coalesce(nullif(se.event_layer ->> 'tone_color', ''), nullif(se.raw_payload ->> 'tone_color', ''), '#4A6FA5') as tone_color,
   greatest(0, least(10, public.parse_numeric_safe(coalesce(se.event_layer ->> 'score_ia', se.raw_payload ->> 'score_ia'), 0))) as score_ia,
-  se.updated_at
-from scoped_events se
+  se.updated_at,
+  se.normalized_semantic as semantic_layer,
+  jsonb_array_length(se.normalized_semantic -> 'causal_hypotheses')::integer as causal_hypotheses_count,
+  jsonb_array_length(se.normalized_semantic -> 'counterintuitive_signals')::integer as counterintuitive_signals_count,
+  jsonb_array_length(se.normalized_semantic -> 'relational_conflicts')::integer as relational_conflicts_count,
+  jsonb_array_length(se.normalized_semantic -> 'inflection_points')::integer as inflection_points_count,
+  jsonb_array_length(se.normalized_semantic -> 'tacit_basis')::integer as tacit_basis_count,
+  coalesce(se.normalized_semantic ->> 'executive_summary', '') as executive_summary,
+  se.normalized_semantic -> 'tactical_formula' as tactical_formula
+from semantic_enriched se
 order by se.updated_at desc;
 
 create or replace view public.api_syn_kpis_view_v1 as

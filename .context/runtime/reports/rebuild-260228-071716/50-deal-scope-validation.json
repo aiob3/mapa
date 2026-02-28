@@ -1,0 +1,7 @@
+{
+  "success": true,
+  "checked_rows": 0,
+  "invalid_rows": 0,
+  "note": "No rows returned from api_syn_leads_view_v1; scope check considered pass for empty dataset.",
+  "checked_at": "2026-02-28T10:17:32.283Z"
+}

@@ -29,6 +29,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 - [Replication Readiness v1 (STATE-DB-007)](./replication-readiness-state-db-007.md)
 - [Replication Runbook v1 Hostinger (STATE-DB-007)](./replication-runbook-v1-hostinger.md)
 - [Replication Reconciliation Contract v1 (STATE-DB-007)](./replication-reconciliation-contract-v1.md)
+- [Local Docker Architecture Snapshot (STATE-DB-007)](./local-docker-architecture-snapshot-state-db-007.md)
 - [UI Components & Pattern Catalog](./patterns/ui-components-catalog.md)
 
 ## Repository Snapshot
@@ -77,6 +78,7 @@ Welcome to the repository knowledge base. Start with the project overview, then 
 | Replication Readiness v1 (STATE-DB-007) | `replication-readiness-state-db-007.md` | agent-update:replication-readiness-state-db-007 | Critérios bloqueantes para elegibilidade de replicação externa (Hostinger VPS) |
 | Replication Runbook v1 Hostinger (STATE-DB-007) | `replication-runbook-v1-hostinger.md` | agent-update:replication-runbook-v1-hostinger | Execução ponta a ponta do ciclo snapshot->import->reconciliação->gate |
 | Replication Reconciliation Contract v1 (STATE-DB-007) | `replication-reconciliation-contract-v1.md` | agent-update:replication-reconciliation-contract-v1 | Métricas/cortes determinísticos para classificar delta de replicação |
+| Local Docker Architecture Snapshot (STATE-DB-007) | `local-docker-architecture-snapshot-state-db-007.md` | agent-update:local-docker-architecture-snapshot-state-db-007 | Snapshot YAML da arquitetura local e bundle docker-compose para replicação |
 
 <!-- agent-readonly:guidance -->
 ## AI Update Checklist

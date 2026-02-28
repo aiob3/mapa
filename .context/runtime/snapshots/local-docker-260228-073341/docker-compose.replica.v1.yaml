@@ -1,0 +1,63 @@
+name: mapa-replica-v1
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mapa}
+      POSTGRES_USER: ${POSTGRES_USER:-mapa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mapa_local_password}
+    ports:
+      - "${POSTGRES_PORT:-54326}:5432"
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+      - ./bootstrap/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mapa} -d ${POSTGRES_DB:-mapa}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-mapa_semantic}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-mapa_app}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-mapa_local_dev_password}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    volumes:
+      - ./volumes/clickhouse-data:/var/lib/clickhouse
+      - ./volumes/clickhouse-logs:/var/log/clickhouse-server
+      - ./bootstrap/clickhouse:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  syn-middleware:
+    image: node:20-alpine
+    restart: unless-stopped
+    working_dir: /workspace
+    command: ["node", "scripts/syn-middleware.mjs"]
+    environment:
+      SYN_MIDDLEWARE_PORT: ${SYN_MIDDLEWARE_PORT:-8787}
+      SYN_MIDDLEWARE_TOKEN: ${SYN_MIDDLEWARE_TOKEN:-change-me}
+      SUPABASE_PROJECT_URL: ${SUPABASE_PROJECT_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: "8123"
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-mapa_semantic}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-mapa_app}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-mapa_local_dev_password}
+    ports:
+      - "${SYN_MIDDLEWARE_PORT:-8787}:8787"
+    volumes:
+      - ../../../../:/workspace:ro
+    depends_on:
+      clickhouse:
+        condition: service_healthy

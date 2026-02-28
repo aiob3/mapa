@@ -1,0 +1,115 @@
+{
+  "ts_sp": "260228-071844",
+  "mode": "full",
+  "status": "NO-GO",
+  "staticChecks": [
+    {
+      "check": "file_exists:.context/docs/state-db-006-ingestion-initial-postmortem.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/eligibility-criteria-v1-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/canonical-data-norm-deals-v1-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/manual-csv-ingestion-runbook-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:.context/docs/go-no-go-rigid-checklist-state-db-006.md",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/syn-ingest-raw-db.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/validate-syn-post-migration.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:scripts/validate-security-guardrails.mjs",
+      "ok": true
+    },
+    {
+      "check": "file_exists:supabase/migrations/20260226190000_state_db_006_canonical_source_registry.sql",
+      "ok": true
+    },
+    {
+      "check": "file_exists:supabase/migrations/20260226203000_state_db_006_ingestion_rpcs_backend_only.sql",
+      "ok": true
+    }
+  ],
+  "envChecks": [
+    {
+      "check": "env_present:SUPABASE_PROJECT_URL",
+      "ok": true
+    },
+    {
+      "check": "env_present:SUPABASE_SERVICE_ROLE_KEY",
+      "ok": true
+    },
+    {
+      "check": "env_present:SUPABASE_PUBLISHABLE_KEY|SUPABASE_ANOM_PUBLIC_KEY",
+      "ok": true
+    }
+  ],
+  "commandResults": [
+    {
+      "command": "npx --yes supabase migration list",
+      "code": 3,
+      "ok": false,
+      "startedAt": "2026-02-28T10:18:36.148Z",
+      "endedAt": "2026-02-28T10:18:39.119Z",
+      "stdout": "\n  \n   Local          | Remote         | Time (UTC)          \n  ----------------|----------------|---------------------\n   20260225023531 | 20260225023531 | 2026-02-25 02:35:31 \n   20260225024110 | 20260225024110 | 2026-02-25 02:41:10 \n   20260226113000 | 20260226113000 | 2026-02-26 11:30:00 \n   20260226153000 | 20260226153000 | 2026-02-26 15:30:00 \n   20260226190000 | 20260226190000 | 2026-02-26 19:00:00 \n   20260226203000 | 20260226203000 | 2026-02-26 20:30:00 \n   20260228053500 |                | 2026-02-28 05:35:00 \n\n",
+      "stderr": "Pending migrations not applied to remote: 20260228053500"
+    },
+    {
+      "command": "npm run security:guardrails",
+      "code": 0,
+      "ok": true,
+      "startedAt": "2026-02-28T10:18:39.119Z",
+      "endedAt": "2026-02-28T10:18:39.288Z",
+      "stdout": "\n> @ai-coders/context@0.4.0 security:guardrails\n> node scripts/validate-security-guardrails.mjs\n\n[security:guardrails] OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "npm run test -- syn-pattern-contracts.test.ts",
+      "code": 0,
+      "ok": true,
+      "startedAt": "2026-02-28T10:18:39.288Z",
+      "endedAt": "2026-02-28T10:18:41.214Z",
+      "stdout": "\n> @ai-coders/context@0.4.0 test\n> jest syn-pattern-contracts.test.ts\n\n",
+      "stderr": "PASS src/canonical/syn-pattern-contracts.test.ts\n  syn pattern contracts\n    ✓ keeps RPC contract catalog aligned with fixtures (3 ms)\n    ✓ validates fixture schema by RPC contract (2 ms)\n    ✓ validates score and signal taxonomy schema (2 ms)\n    ✓ validates source contract schema and pattern mapping (1 ms)\n    ✓ enforces shared normalizer adoption in app and middleware layers (1 ms)\n    ✓ keeps stable snapshot for PAT-SYN catalog and RPC fixtures (3 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       6 passed, 6 total\nSnapshots:   1 passed, 1 total\nTime:        1.528 s, estimated 2 s\nRan all test suites matching syn-pattern-contracts.test.ts.\n"
+    },
+    {
+      "command": "npm run syn:validate:post-migration",
+      "code": 0,
+      "ok": true,
+      "startedAt": "2026-02-28T10:18:41.214Z",
+      "endedAt": "2026-02-28T10:18:44.800Z",
+      "stdout": "\n> @ai-coders/context@0.4.0 syn:validate:post-migration\n> node scripts/validate-syn-post-migration.mjs\n\n{\n  \"startedAt\": \"2026-02-28T10:18:41.346Z\",\n  \"projectUrl\": \"http://127.0.0.1:54321\",\n  \"migrationList\": {\n    \"ok\": true,\n    \"output\": \"\\n  \\n   Local          | Remote         | Time (UTC)          \\n  ----------------|----------------|---------------------\\n   20260225023531 | 20260225023531 | 2026-02-25 02:35:31 \\n   20260225024110 | 20260225024110 | 2026-02-25 02:41:10 \\n   20260226113000 | 20260226113000 | 2026-02-26 11:30:00 \\n   20260226153000 | 20260226153000 | 2026-02-26 15:30:00 \\n   20260226190000 | 20260226190000 | 2026-02-26 19:00:00 \\n   20260226203000 | 20260226203000 | 2026-02-26 20:30:00 \\n   20260228053500 |                | 2026-02-28 05:35:00 \\n\\n\"\n  },\n  \"semanticLayerColumn\": {\n    \"ok\": true,\n    \"status\": 200,\n    \"message\": \"[{\\\"semantic_layer\\\":{\\\"tacit_basis\\\": [], \\\"tactical_formula\\\": {\\\"owner\\\": \\\"\\\", \\\"action\\\": \\\"\\\", \\\"timing\\\": \\\"\\\", \\\"expected_outcome\\\": \\\"\\\"}, \\\"causal_hypotheses\\\": [], \\\"executive_summary\\\": \\\"\\\", \\\"inflection_points\\\": [], \\\"relational_conflic\"\n  },\n  \"authenticatedRpcValidation\": {\n    \"ok\": true,\n    \"cycles\": [\n      {\n        \"attempt\": 1,\n        \"results\": [\n          {\n            \"rpc\": \"api_syn_leads_v1\",\n            \"ok\": true,\n            \"status\": 200,\n            \"message\": \"[]\"\n          },\n          {\n            \"rpc\": \"api_syn_heatmap_v1\",\n            \"ok\": true,\n            \"status\": 200,\n            \"message\": \"{\\\"kpiCards\\\": [{\\\"sub\\\": \\\"Leads ativos\\\", \\\"color\\\": \\\"#8B5CF6\\\", \\\"label\\\": \\\"New Logo\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\": \\\"0\\\", \\\"iconKey\\\": \\\"star\\\"}, {\\\"sub\\\": \\\"Contratos vigentes\\\", \\\"color\\\": \\\"#3B82F6\\\", \\\"label\\\": \\\"Mapped\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\":\"\n          },\n          {\n            \"rpc\": \"api_syn_outreach_v1\",\n            \"ok\": true,\n            \"status\": 200,\n            \"message\": \"{\\\"leads\\\": [], \\\"chartData\\\": [], \\\"radarData\\\": [{\\\"A\\\": 90, \\\"subject\\\": \\\"Analítico\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 75, \\\"subject\\\": \\\"Visionário\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 60, \\\"subject\\\": \\\"Empático\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 50, \\\"subject\\\"\"\n          },\n          {\n            \"rpc\": \"api_syn_sector_v1\",\n            \"ok\": true,\n            \"status\": 200,\n            \"message\": \"{\\\"kpiCards\\\": [{\\\"label\\\": \\\"Revenue Total por Setor\\\", \\\"value\\\": \\\"0\\\", \\\"change\\\": \\\"+0%\\\"}, {\\\"label\\\": \\\"Deals Ativos Cross-Sector\\\", \\\"value\\\": \\\"0\\\", \\\"change\\\": \\\"+1\\\"}, {\\\"label\\\": \\\"Market Penetration Média\\\", \\\"value\\\": \\\"0%\\\", \\\"change\\\": \\\"+0p\"\n          },\n          {\n            \"rpc\": \"api_syn_kpis_v1\",\n            \"ok\": true,\n            \"status\": 200,\n            \"message\": \"{\\\"winRate\\\": 0, \\\"arrGrowth\\\": 0, \\\"atRiskValue\\\": 0, \\\"leadsAtivos\\\": 0, \\\"leadsEmAberto\\\": 0, \\\"pipelineTotal\\\": 0, \\\"conversionRate\\\": 0, \\\"conversionDelta\\\": 0, \\\"scriptsGenerated\\\": 0, \\\"contratosVigentes\\\": 0, \\\"eventosMonitorados\\\": 0\"\n          }\n        ],\n        \"schemaCacheMisses\": []\n      }\n    ],\n    \"finalResults\": [\n      {\n        \"rpcName\": \"api_syn_leads_v1\",\n        \"res\": {\n          \"ok\": true,\n          \"status\": 200,\n          \"text\": \"[]\",\n          \"json\": []\n        }\n      },\n      {\n        \"rpcName\": \"api_syn_heatmap_v1\",\n        \"res\": {\n          \"ok\": true,\n          \"status\": 200,\n          \"text\": \"{\\\"kpiCards\\\": [{\\\"sub\\\": \\\"Leads ativos\\\", \\\"color\\\": \\\"#8B5CF6\\\", \\\"label\\\": \\\"New Logo\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\": \\\"0\\\", \\\"iconKey\\\": \\\"star\\\"}, {\\\"sub\\\": \\\"Contratos vigentes\\\", \\\"color\\\": \\\"#3B82F6\\\", \\\"label\\\": \\\"Mapped\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\": \\\"0.00\\\", \\\"iconKey\\\": \\\"git-branch\\\"}, {\\\"sub\\\": \\\"Leads em aberto\\\", \\\"color\\\": \\\"#06B6D4\\\", \\\"label\\\": \\\"Ongoing\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\": \\\"0.00\\\", \\\"iconKey\\\": \\\"clock\\\"}, {\\\"sub\\\": \\\"Taxa de conversão\\\", \\\"color\\\": \\\"#10B981\\\", \\\"label\\\": \\\"Committed\\\", \\\"value\\\": \\\"0%\\\", \\\"amount\\\": \\\"0.00000000000000000000\\\", \\\"iconKey\\\": \\\"check-circle\\\"}, {\\\"sub\\\": \\\"Exposição de risco\\\", \\\"color\\\": \\\"#F43F5E\\\", \\\"label\\\": \\\"At Risk\\\", \\\"value\\\": \\\"0\\\", \\\"amount\\\": \\\"0\\\", \\\"iconKey\\\": \\\"alert-triangle\\\"}], \\\"heatmapData\\\": [], \\\"pipelineData\\\": [{\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Sep\\\", \\\"projetado\\\": 0.0}, {\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Oct\\\", \\\"projetado\\\": 0.0}, {\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Nov\\\", \\\"projetado\\\": 0.0}, {\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Dec\\\", \\\"projetado\\\": 0.0}, {\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Jan\\\", \\\"projetado\\\": 0.0}, {\\\"meta\\\": 0.0, \\\"atual\\\": 0.0, \\\"month\\\": \\\"Feb\\\", \\\"projetado\\\": 0.0}], \\\"heatmapMetrics\\\": [\\\"Revenue\\\", \\\"Growth\\\", \\\"Market Share\\\", \\\"Innovation\\\", \\\"Customer Sat.\\\", \\\"Pipeline\\\"], \\\"narrativeItems\\\": [], \\\"semanticSnapshot\\\": {\\\"causalitySignals\\\": 0, \\\"inflectionPoints\\\": 0, \\\"tacitBasisSignals\\\": 0, \\\"relationalConflicts\\\": 0, \\\"counterintuitiveSignals\\\": 0}, \\\"strategicActions\\\": []}\",\n          \"json\": {\n            \"kpiCards\": [\n              {\n                \"sub\": \"Leads ativos\",\n                \"color\": \"#8B5CF6\",\n                \"label\": \"New Logo\",\n                \"value\": \"0\",\n                \"amount\": \"0\",\n                \"iconKey\": \"star\"\n              },\n              {\n                \"sub\": \"Contratos vigentes\",\n                \"color\": \"#3B82F6\",\n                \"label\": \"Mapped\",\n                \"value\": \"0\",\n                \"amount\": \"0.00\",\n                \"iconKey\": \"git-branch\"\n              },\n              {\n                \"sub\": \"Leads em aberto\",\n                \"color\": \"#06B6D4\",\n                \"label\": \"Ongoing\",\n                \"value\": \"0\",\n                \"amount\": \"0.00\",\n                \"iconKey\": \"clock\"\n              },\n              {\n                \"sub\": \"Taxa de conversão\",\n                \"color\": \"#10B981\",\n                \"label\": \"Committed\",\n                \"value\": \"0%\",\n                \"amount\": \"0.00000000000000000000\",\n                \"iconKey\": \"check-circle\"\n              },\n              {\n                \"sub\": \"Exposição de risco\",\n                \"color\": \"#F43F5E\",\n                \"label\": \"At Risk\",\n                \"value\": \"0\",\n                \"amount\": \"0\",\n                \"iconKey\": \"alert-triangle\"\n              }\n            ],\n            \"heatmapData\": [],\n            \"pipelineData\": [\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Sep\",\n                \"projetado\": 0\n              },\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Oct\",\n                \"projetado\": 0\n              },\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Nov\",\n                \"projetado\": 0\n              },\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Dec\",\n                \"projetado\": 0\n              },\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Jan\",\n                \"projetado\": 0\n              },\n              {\n                \"meta\": 0,\n                \"atual\": 0,\n                \"month\": \"Feb\",\n                \"projetado\": 0\n              }\n            ],\n            \"heatmapMetrics\": [\n              \"Revenue\",\n              \"Growth\",\n              \"Market Share\",\n              \"Innovation\",\n              \"Customer Sat.\",\n              \"Pipeline\"\n            ],\n            \"narrativeItems\": [],\n            \"semanticSnapshot\": {\n              \"causalitySignals\": 0,\n              \"inflectionPoints\": 0,\n              \"tacitBasisSignals\": 0,\n              \"relationalConflicts\": 0,\n              \"counterintuitiveSignals\": 0\n            },\n            \"strategicActions\": []\n          }\n        }\n      },\n      {\n        \"rpcName\": \"api_syn_outreach_v1\",\n        \"res\": {\n          \"ok\": true,\n          \"status\": 200,\n          \"text\": \"{\\\"leads\\\": [], \\\"chartData\\\": [], \\\"radarData\\\": [{\\\"A\\\": 90, \\\"subject\\\": \\\"Analítico\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 75, \\\"subject\\\": \\\"Visionário\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 60, \\\"subject\\\": \\\"Empático\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 50, \\\"subject\\\": \\\"Direto\\\", \\\"fullMark\\\": 100}, {\\\"A\\\": 85, \\\"subject\\\": \\\"Provocativo\\\", \\\"fullMark\\\": 100}], \\\"toneInsights\\\": [], \\\"scriptsGenerated\\\": \\\"0\\\", \\\"semanticHighlights\\\": [], \\\"globalConversionRate\\\": \\\"0.0%\\\", \\\"globalConversionDelta\\\": \\\"0.0%\\\"}\",\n          \"json\": {\n            \"leads\": [],\n            \"chartData\": [],\n            \"radarData\": [\n              {\n                \"A\": 90,\n                \"subject\": \"Analítico\",\n                \"fullMark\": 100\n              },\n              {\n                \"A\": 75,\n                \"subject\": \"Visionário\",\n                \"fullMark\": 100\n              },\n              {\n                \"A\": 60,\n                \"subject\": \"Empático\",\n                \"fullMark\": 100\n              },\n              {\n                \"A\": 50,\n                \"subject\": \"Direto\",\n                \"fullMark\": 100\n              },\n              {\n                \"A\": 85,\n                \"subject\": \"Provocativo\",\n                \"fullMark\": 100\n              }\n            ],\n            \"toneInsights\": [],\n            \"scriptsGenerated\": \"0\",\n            \"semanticHighlights\": [],\n            \"globalConversionRate\": \"0.0%\",\n            \"globalConversionDelta\": \"0.0%\"\n          }\n        }\n      },\n      {\n        \"rpcName\": \"api_syn_sector_v1\",\n        \"res\": {\n          \"ok\": true,\n          \"status\": 200,\n          \"text\": \"{\\\"kpiCards\\\": [{\\\"label\\\": \\\"Revenue Total por Setor\\\", \\\"value\\\": \\\"0\\\", \\\"change\\\": \\\"+0%\\\"}, {\\\"label\\\": \\\"Deals Ativos Cross-Sector\\\", \\\"value\\\": \\\"0\\\", \\\"change\\\": \\\"+1\\\"}, {\\\"label\\\": \\\"Market Penetration Média\\\", \\\"value\\\": \\\"0%\\\", \\\"change\\\": \\\"+0pp\\\"}, {\\\"label\\\": \\\"Setor com Maior Growth\\\", \\\"value\\\": \\\"N/A (0%)\\\", \\\"change\\\": null, \\\"isHighlight\\\": true}], \\\"radarLegend\\\": [{\\\"color\\\": \\\"#C64928\\\", \\\"label\\\": \\\"Varejo\\\"}, {\\\"color\\\": \\\"#3B82F6\\\", \\\"label\\\": \\\"Financeiro\\\"}, {\\\"color\\\": \\\"#6366F1\\\", \\\"label\\\": \\\"Tecnologia\\\"}], \\\"scatterData\\\": [], \\\"semanticLens\\\": {\\\"sectorsWithInflection\\\": 0, \\\"totalInflectionPoints\\\": 0, \\\"totalRelationalConflicts\\\": 0, \\\"totalCounterintuitiveSignals\\\": 0}, \\\"boardSynthesis\\\": [{\\\"type\\\": \\\"Oportunidade Estratégica\\\", \\\"content\\\": \\\"A carteira atual mostra concentração em setores com ROI acima de 70%.\\\", \\\"typeColor\\\": \\\"#2E4C3B\\\"}, {\\\"type\\\": \\\"Ação Recomendada\\\", \\\"content\\\": \\\"Priorizar setores com maior receita e maior score para ciclo trimestral.\\\", \\\"typeColor\\\": \\\"#3B82F6\\\"}, {\\\"type\\\": \\\"Riscos Mapeados\\\", \\\"content\\\": \\\"Setores com score abaixo de 60 exigem intervenção tática imediata.\\\", \\\"typeColor\\\": \\\"#C64928\\\"}], \\\"radarComparative\\\": [{\\\"Varejo\\\": 0, \\\"subject\\\": \\\"ROI\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 0, \\\"Tecnologia\\\": 0}, {\\\"Varejo\\\": 0, \\\"subject\\\": \\\"NPS\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 0, \\\"Tecnologia\\\": 0}, {\\\"Varejo\\\": 0, \\\"subject\\\": \\\"Engajamento\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 0, \\\"Tecnologia\\\": 0}, {\\\"Varejo\\\": 78, \\\"subject\\\": \\\"Retenção\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 74, \\\"Tecnologia\\\": 70}, {\\\"Varejo\\\": 62, \\\"subject\\\": \\\"Penetração\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 58, \\\"Tecnologia\\\": 54}, {\\\"Varejo\\\": 80, \\\"subject\\\": \\\"Crescimento\\\", \\\"fullMark\\\": 100, \\\"Financeiro\\\": 73, \\\"Tecnologia\\\": 68}], \\\"aiRecommendations\\\": [], \\\"conversionInsights\\\": [], \\\"sectorReportByName\\\": {}}\",\n          \"json\": {\n            \"kpiCards\": [\n              {\n                \"label\": \"Revenue Total por Setor\",\n                \"value\": \"0\",\n                \"change\": \"+0%\"\n              },\n              {\n                \"label\": \"Deals Ativos Cross-Sector\",\n                \"value\": \"0\",\n                \"change\": \"+1\"\n              },\n              {\n                \"label\": \"Market Penetration Média\",\n                \"value\": \"0%\",\n                \"change\": \"+0pp\"\n              },\n              {\n                \"label\": \"Setor com Maior Growth\",\n                \"value\": \"N/A (0%)\",\n                \"change\": null,\n                \"isHighlight\": true\n              }\n            ],\n            \"radarLegend\": [\n              {\n                \"color\": \"#C64928\",\n                \"label\": \"Varejo\"\n              },\n              {\n                \"color\": \"#3B82F6\",\n                \"label\": \"Financeiro\"\n              },\n              {\n                \"color\": \"#6366F1\",\n                \"label\": \"Tecnologia\"\n              }\n            ],\n            \"scatterData\": [],\n            \"semanticLens\": {\n              \"sectorsWithInflection\": 0,\n              \"totalInflectionPoints\": 0,\n              \"totalRelationalConflicts\": 0,\n              \"totalCounterintuitiveSignals\": 0\n            },\n            \"boardSynthesis\": [\n              {\n                \"type\": \"Oportunidade Estratégica\",\n                \"content\": \"A carteira atual mostra concentração em setores com ROI acima de 70%.\",\n                \"typeColor\": \"#2E4C3B\"\n              },\n              {\n                \"type\": \"Ação Recomendada\",\n                \"content\": \"Priorizar setores com maior receita e maior score para ciclo trimestral.\",\n                \"typeColor\": \"#3B82F6\"\n              },\n              {\n                \"type\": \"Riscos Mapeados\",\n                \"content\": \"Setores com score abaixo de 60 exigem intervenção tática imediata.\",\n                \"typeColor\": \"#C64928\"\n              }\n            ],\n            \"radarComparative\": [\n              {\n                \"Varejo\": 0,\n                \"subject\": \"ROI\",\n                \"fullMark\": 100,\n                \"Financeiro\": 0,\n                \"Tecnologia\": 0\n              },\n              {\n                \"Varejo\": 0,\n                \"subject\": \"NPS\",\n                \"fullMark\": 100,\n                \"Financeiro\": 0,\n                \"Tecnologia\": 0\n              },\n              {\n                \"Varejo\": 0,\n                \"subject\": \"Engajamento\",\n                \"fullMark\": 100,\n                \"Financeiro\": 0,\n                \"Tecnologia\": 0\n              },\n              {\n                \"Varejo\": 78,\n                \"subject\": \"Retenção\",\n                \"fullMark\": 100,\n                \"Financeiro\": 74,\n                \"Tecnologia\": 70\n              },\n              {\n                \"Varejo\": 62,\n                \"subject\": \"Penetração\",\n                \"fullMark\": 100,\n                \"Financeiro\": 58,\n                \"Tecnologia\": 54\n              },\n              {\n                \"Varejo\": 80,\n                \"subject\": \"Crescimento\",\n                \"fullMark\": 100,\n                \"Financeiro\": 73,\n                \"Tecnologia\": 68\n              }\n            ],\n            \"aiRecommendations\": [],\n            \"conversionInsights\": [],\n            \"sectorReportByName\": {}\n          }\n        }\n      },\n      {\n        \"rpcName\": \"api_syn_kpis_v1\",\n        \"res\": {\n          \"ok\": true,\n          \"status\": 200,\n          \"text\": \"{\\\"winRate\\\": 0, \\\"arrGrowth\\\": 0, \\\"atRiskValue\\\": 0, \\\"leadsAtivos\\\": 0, \\\"leadsEmAberto\\\": 0, \\\"pipelineTotal\\\": 0, \\\"conversionRate\\\": 0, \\\"conversionDelta\\\": 0, \\\"scriptsGenerated\\\": 0, \\\"contratosVigentes\\\": 0, \\\"eventosMonitorados\\\": 0}\",\n          \"json\": {\n            \"winRate\": 0,\n            \"arrGrowth\": 0,\n            \"atRiskValue\": 0,\n            \"leadsAtivos\": 0,\n            \"leadsEmAberto\": 0,\n            \"pipelineTotal\": 0,\n            \"conversionRate\": 0,\n            \"conversionDelta\": 0,\n            \"scriptsGenerated\": 0,\n            \"contratosVigentes\": 0,\n            \"eventosMonitorados\": 0\n          }\n        }\n      }\n    ],\n    \"mitigation\": null\n  },\n  \"validationUser\": {\n    \"email\": \"syn.validation+1772273924419.2ca99b0d@mapa.local\",\n    \"userId\": \"3efb71de-57ae-4593-a581-44b18e693281\",\n    \"mode\": \"ephemeral\"\n  },\n  \"finishedAt\": \"2026-02-28T10:18:44.790Z\",\n  \"success\": true\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": "node scripts/validate-syn-deal-scope.mjs",
+      "code": 0,
+      "ok": true,
+      "startedAt": "2026-02-28T10:18:44.800Z",
+      "endedAt": "2026-02-28T10:18:44.902Z",
+      "stdout": "{\n  \"success\": true,\n  \"checked_rows\": 0,\n  \"invalid_rows\": 0,\n  \"note\": \"No rows returned from api_syn_leads_view_v1; scope check considered pass for empty dataset.\",\n  \"checked_at\": \"2026-02-28T10:18:44.865Z\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "summary": {
+    "static_ok": true,
+    "command_ok": false,
+    "ok": false,
+    "passed": 4,
+    "failed": 1
+  }
+}

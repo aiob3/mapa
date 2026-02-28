@@ -1,0 +1,21 @@
+version: "1"
+kind: "docker_env_template"
+required:
+  postgres:
+    POSTGRES_DB: "mapa"
+    POSTGRES_USER: "mapa"
+    POSTGRES_PASSWORD: "<definir>"
+    POSTGRES_PORT: "54326"
+  clickhouse:
+    CLICKHOUSE_DB: "mapa_semantic"
+    CLICKHOUSE_USER: "mapa_app"
+    CLICKHOUSE_PASSWORD: "<definir>"
+    CLICKHOUSE_HTTP_PORT: "18123"
+    CLICKHOUSE_NATIVE_PORT: "19000"
+  middleware:
+    SYN_MIDDLEWARE_PORT: "8787"
+    SYN_MIDDLEWARE_TOKEN: "<definir>"
+  supabase_source:
+    SUPABASE_PROJECT_URL: "http://127.0.0.1:54321"
+    SUPABASE_SERVICE_ROLE_KEY: "<definir>"
+    SUPABASE_PUBLISHABLE_KEY: "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"

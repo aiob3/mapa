@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Date: Sat, 28 Feb 2026 10:17:34 GMT
+Connection: Keep-Alive
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Keep-Alive: timeout=10, max=9999
+X-ClickHouse-Summary: {"read_rows":"0","read_bytes":"0","written_rows":"0","written_bytes":"0","total_rows_to_read":"0","result_rows":"0","result_bytes":"0","elapsed_ns":"123234"}
+
+Ok.

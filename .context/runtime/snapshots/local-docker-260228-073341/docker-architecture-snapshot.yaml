@@ -1,0 +1,25 @@
+version: "1"
+kind: "local_docker_architecture_snapshot"
+ts_sp: "260228-073341"
+generated_at: "2026-02-28T10:33:45.039Z"
+local_stack:
+  supabase:
+    api_url: "http://127.0.0.1:54321"
+    rest_url: "http://127.0.0.1:54321/rest/v1"
+    graphql_url: "http://127.0.0.1:54321/graphql/v1"
+    db_url: "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+    studio_url: "http://127.0.0.1:54323"
+  clickhouse:
+    host: "127.0.0.1"
+    http_port: "18123"
+    database: "mapa_semantic"
+    user: "mapa_app"
+gate_context:
+  migration_parity: "pending_remote"
+  pending_remote_migrations:
+    - 20260228053500
+secrets_masked:
+  publishable_key: "sb_pub...xAaH"
+  secret_key: "sb_sec...MPvz"
+  service_role_key: "eyJhbG...81IU"
+  clickhouse_password: "mapa_l...word"

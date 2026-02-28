@@ -16,6 +16,7 @@ success_criteria:
 2. [Atomic Actions](./atomic-actions.md)
 3. [Checkpoint Template](./checkpoint-template.md)
 4. [Validação MCP Docker (Agente)](#validacao-mcp-docker-camada-do-agente)
+5. [Snapshots Docker Locais](./snapshots/)
 
 Fluxo mínimo:
 `normalize_input -> resolve_intent -> idempotency_guard -> execute_bundle -> write_checkpoint`.

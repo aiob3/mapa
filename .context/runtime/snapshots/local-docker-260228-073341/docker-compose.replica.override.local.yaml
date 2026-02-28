@@ -1,0 +1,5 @@
+services:
+  clickhouse:
+    ports:
+      - "18123:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-19000}:9000"
