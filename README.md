@@ -281,7 +281,7 @@ Sem essa parada, a iteração não é considerada válida para continuidade evol
 | Contrato | Leitura mínima obrigatória | Quando aciona | Objetivo |
 |---|---|---|---|
 | `READ-CORE-001` | `AGENTS.md` + este `README.md` | Todo início de iteração | Alinhar regras operacionais e topologia canônica |
-| `READ-DESIGN-002` | seção "MAPA UI Design System" deste `README.md` | Mudanças em UI/UX/components | Preservar linguagem visual e tokens canônicos |
+| `READ-DESIGN-002` | [`mapa-app/guidelines/Guidelines.md`](./mapa-app/guidelines/Guidelines.md) | Mudanças em UI/UX/components | Preservar linguagem visual e tokens canônicos |
 | `READ-CONTRACTS-003` | seção "Contratos de Integração (`mapa` x `mapa-app`)" | Mudanças cross-layer | Garantir input/output/ownership explícitos |
 | `READ-HITL-004` | seção "Checklist HITL Padronizado" | Entregas com validação visual | Padronizar evidência e aceite |
 | `READ-TRIGGER-005` | `prompts/trigger_protocol.md` | Mensagens com gatilhos de prompt | Padronizar roteamento semântico e acionamento de skills |
