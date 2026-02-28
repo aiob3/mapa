@@ -1,25 +1,44 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Background,
   Controls,
-  MarkerType,
-  Position,
   ReactFlow,
   useEdgesState,
   useNodesState,
   type Edge,
   type Node,
+  type ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import type { ArchitectureSnapshotV1 } from '@/types/architecture';
+import {
+  buildMindmapLayout,
+  type L4LayoutVariant,
+  type TechnicalLevel,
+  type TechnicalOrientation,
+} from '@/components/mindmapLayout';
+import {
+  buildHitlLayoutMetrics,
+  buildHitlSummary,
+  compareCheckpoints,
+  createHitlTraceEvent,
+  formatNodePositions,
+  formatTraceEventForConsole,
+  toNodePositionArray,
+  toNodePositionMap,
+  type HitlCheckpointV2,
+  type HitlPersistedStateV2,
+  type HitlTraceEventTypeV2,
+  type HitlTraceEventV2,
+} from '@/components/hitlMetrics';
 
-export type TechnicalLevel = 'L1' | 'L2' | 'L3';
-export type TechnicalOrientation = 'horizontal' | 'vertical';
+export type { L4LayoutVariant, TechnicalLevel, TechnicalOrientation } from '@/components/mindmapLayout';
 
 interface TechnicalMindmapProps {
   snapshot: ArchitectureSnapshotV1;
   level: TechnicalLevel;
   orientation: TechnicalOrientation;
+  l4Variant?: L4LayoutVariant;
 }
 
 interface Point {
@@ -27,329 +46,412 @@ interface Point {
   y: number;
 }
 
-type NodeKind = 'root' | 'module' | 'area' | 'sidebar' | 'route';
+type OrientationPositionMemory = Record<TechnicalOrientation, Record<TechnicalLevel, Record<string, Point>>>;
 
-const nodeStyleByKind: Record<NodeKind, CSSProperties> = {
-  root: {
-    border: '2px solid #c64928',
-    background: '#fff4ef',
-    borderRadius: '12px',
-    color: '#7f2f1a',
-    fontWeight: 700,
-    boxShadow: '0 10px 24px rgba(198, 73, 40, 0.15)',
-  },
-  module: {
-    border: '1.8px solid #3f4653',
-    background: '#eef1f5',
-    borderRadius: '12px',
-    color: '#2f3848',
-    fontWeight: 600,
-  },
-  area: {
-    border: '2px solid #c64928',
-    background: '#fff8ec',
-    borderRadius: '12px',
-    color: '#7f2f1a',
-    fontWeight: 700,
-  },
-  sidebar: {
-    border: '1.5px solid #d8d8dc',
-    background: '#ffffff',
-    borderRadius: '12px',
-    color: '#3f4653',
-    fontWeight: 600,
-  },
-  route: {
-    border: '1.5px dashed #5b6170',
-    background: '#f6f7f9',
-    borderRadius: '12px',
-    color: '#2f3848',
-    fontFamily: 'var(--font-data)',
-    fontSize: '12px',
-    fontWeight: 600,
-  },
+const FIT_VIEW_OPTIONS = {
+  padding: 0.22,
+  minZoom: 0.4,
+  maxZoom: 1.35,
+  duration: 320,
 };
 
-function uniqueBy<T>(values: T[], keySelector: (value: T) => string) {
-  const map = new Map<string, T>();
-  values.forEach((value) => {
-    const key = keySelector(value);
-    if (!map.has(key)) {
-      map.set(key, value);
-    }
-  });
-  return [...map.values()];
+const TRACE_LIMIT = 100;
+const EDGE_PAGE_SIZE = 8;
+const STORAGE_PREFIX = 'mapa_visual_hitl_v4::';
+const STORAGE_PREFIX_FAMILY = 'mapa_visual_hitl_';
+const RESET_PERSISTENCE_ON_BOOT = true;
+
+function canUseLocalStorage() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  try {
+    const probe = '__mapa_hitl_probe__';
+    window.localStorage.setItem(probe, '1');
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-function labelNode(title: string, subtitle?: string) {
-  return (
-    <div className="text-left leading-5">
-      <p className="text-sm font-semibold">{title}</p>
-      {subtitle ? <p className="text-xs opacity-75">{subtitle}</p> : null}
-    </div>
+function readPersistedState(storageKey: string): HitlPersistedStateV2 | null {
+  if (!canUseLocalStorage()) {
+    return null;
+  }
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) {
+      return null;
+    }
+    const parsed = JSON.parse(raw) as HitlPersistedStateV2;
+    if (parsed.version !== 'HITL-V2') {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedState(storageKey: string, state: HitlPersistedStateV2) {
+  if (!canUseLocalStorage()) {
+    return;
+  }
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch {
+    // Ignore quota/unavailable storage errors in degraded mode.
+  }
+}
+
+export function TechnicalMindmap({
+  snapshot,
+  level,
+  orientation,
+  l4Variant = 'top-down',
+}: TechnicalMindmapProps) {
+  const effectiveL4Variant: L4LayoutVariant = orientation === 'horizontal' ? 'top-down' : l4Variant;
+  const graph = useMemo(
+    () => buildMindmapLayout(snapshot, level, orientation, { l4Variant: effectiveL4Variant }),
+    [snapshot, level, orientation, effectiveL4Variant],
   );
-}
-
-function axisPositions(orientation: TechnicalOrientation) {
-  if (orientation === 'horizontal') {
-    return {
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
-    };
-  }
-  return {
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-  };
-}
-
-function createNode(
-  id: string,
-  title: string,
-  subtitle: string | undefined,
-  kind: NodeKind,
-  position: Point,
-  orientation: TechnicalOrientation,
-): Node {
-  const { sourcePosition, targetPosition } = axisPositions(orientation);
-  return {
-    id,
-    position,
-    draggable: true,
-    sourcePosition,
-    targetPosition,
-    data: { label: labelNode(title, subtitle) },
-    style: {
-      ...nodeStyleByKind[kind],
-      width: kind === 'sidebar' ? 240 : 220,
-      padding: kind === 'root' ? '12px' : '10px',
-    },
-  };
-}
-
-function createEdge(id: string, source: string, target: string, color: string, dashed = false): Edge {
-  return {
-    id,
-    source,
-    target,
-    type: 'smoothstep',
-    markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14, color },
-    style: {
-      stroke: color,
-      strokeWidth: color === '#c64928' ? 2 : 1.7,
-      strokeDasharray: dashed ? '5 4' : undefined,
-    },
-  };
-}
-
-function gridPoint(index: number, columns: number, startX: number, startY: number, gapX: number, gapY: number): Point {
-  return {
-    x: startX + (index % columns) * gapX,
-    y: startY + Math.floor(index / columns) * gapY,
-  };
-}
-
-function buildMindmapGraph(
-  snapshot: ArchitectureSnapshotV1,
-  level: TechnicalLevel,
-  orientation: TechnicalOrientation,
-): { nodes: Node[]; edges: Edge[] } {
-  const nodes: Node[] = [];
-  const edges: Edge[] = [];
-  const modules = snapshot.appArchitecture.modules;
-  const uniqueSidebars = uniqueBy(snapshot.appArchitecture.sidebars, (item) => `${item.context}:${item.path}`);
-  const synSidebars = uniqueSidebars.filter((item) => item.context === 'mapa-syn').slice(0, 6);
-  const teamSidebars = uniqueSidebars.filter((item) => item.context === 'team-hub').slice(0, 6);
-  const modulePaths = new Set(modules.map((module) => module.path));
-  const sidebarPaths = new Set(uniqueSidebars.map((item) => item.path));
-  const technicalRoutes = [...new Set(snapshot.appArchitecture.routes)]
-    .filter((route) => route !== '/' && route !== '*' && !modulePaths.has(route) && !sidebarPaths.has(route))
-    .filter((route) => route.startsWith('/syn') || route.startsWith('/analytics') || route.startsWith('/team'))
-    .slice(0, 8);
-
-  if (orientation === 'horizontal') {
-    const rootPos = { x: 80, y: 320 };
-    const moduleX = 360;
-    const moduleStartY = 70;
-    const moduleGap = 128;
-
-    nodes.push(createNode('ROOT', 'MAPA-App', 'Top-menu', 'root', rootPos, orientation));
-
-    modules.forEach((module, index) => {
-      const id = `M-${module.id}`;
-      const position = { x: moduleX, y: moduleStartY + index * moduleGap };
-      nodes.push(createNode(id, module.label, level === 'L3' ? module.path : undefined, 'module', position, orientation));
-      edges.push(createEdge(`E-ROOT-${id}`, 'ROOT', id, '#7b8394'));
-    });
-
-    const synModuleIndex = modules.findIndex((item) => item.path === '/syn');
-    const teamModuleIndex = modules.findIndex((item) => item.path === '/team');
-    const synY = moduleStartY + (synModuleIndex >= 0 ? synModuleIndex : 1) * moduleGap;
-    const teamY = moduleStartY + (teamModuleIndex >= 0 ? teamModuleIndex : 3) * moduleGap;
-
-    nodes.push(createNode('SYN_AREAS', 'MAPA Syn', 'Sub-áreas', 'area', { x: 710, y: synY }, orientation));
-    nodes.push(createNode('TEAM_AREAS', 'Team Hub', 'Sub-áreas', 'area', { x: 710, y: teamY }, orientation));
-
-    if (synModuleIndex >= 0) {
-      edges.push(createEdge('E-SYN', `M-${modules[synModuleIndex].id}`, 'SYN_AREAS', '#c64928'));
-    }
-    if (teamModuleIndex >= 0) {
-      edges.push(createEdge('E-TEAM', `M-${modules[teamModuleIndex].id}`, 'TEAM_AREAS', '#c64928'));
-    }
-
-    if (level === 'L2' || level === 'L3') {
-      const sidebarX = 1040;
-      synSidebars.forEach((item, index) => {
-        const nodeId = `SS-${index}`;
-        nodes.push(
-          createNode(
-            nodeId,
-            item.subLabel || item.label,
-            level === 'L3' ? item.path : undefined,
-            'sidebar',
-            { x: sidebarX, y: synY - 160 + index * 94 },
-            orientation,
-          ),
-        );
-        edges.push(createEdge(`E-SYN-S-${index}`, 'SYN_AREAS', nodeId, '#7b8394'));
-      });
-
-      teamSidebars.forEach((item, index) => {
-        const nodeId = `TS-${index}`;
-        nodes.push(
-          createNode(
-            nodeId,
-            item.subLabel || item.label,
-            level === 'L3' ? item.path : undefined,
-            'sidebar',
-            { x: sidebarX, y: teamY - 160 + index * 94 },
-            orientation,
-          ),
-        );
-        edges.push(createEdge(`E-TEAM-S-${index}`, 'TEAM_AREAS', nodeId, '#7b8394'));
-      });
-    }
-
-    if (level === 'L3') {
-      technicalRoutes.forEach((route, index) => {
-        const routeId = `R-${index}`;
-        nodes.push(createNode(routeId, route, undefined, 'route', { x: 1390, y: 110 + index * 92 }, orientation));
-        edges.push(createEdge(`E-R-${index}`, route.startsWith('/team') ? 'TEAM_AREAS' : 'SYN_AREAS', routeId, '#5b6170', true));
-      });
-    }
-    return { nodes, edges };
-  }
-
-  const rootPos = { x: 640, y: 60 };
-  nodes.push(createNode('ROOT', 'MAPA-App', 'Top-menu', 'root', rootPos, orientation));
-
-  const moduleStartX = 190;
-  const moduleY = 250;
-  const moduleGap = 260;
-
-  modules.forEach((module, index) => {
-    const id = `M-${module.id}`;
-    const position = { x: moduleStartX + index * moduleGap, y: moduleY };
-    nodes.push(createNode(id, module.label, level === 'L3' ? module.path : undefined, 'module', position, orientation));
-    edges.push(createEdge(`E-ROOT-${id}`, 'ROOT', id, '#7b8394'));
-  });
-
-  const synModuleIndex = modules.findIndex((item) => item.path === '/syn');
-  const teamModuleIndex = modules.findIndex((item) => item.path === '/team');
-  const synAreaX = moduleStartX + (synModuleIndex >= 0 ? synModuleIndex : 1) * moduleGap;
-  const teamAreaX = moduleStartX + (teamModuleIndex >= 0 ? teamModuleIndex : 3) * moduleGap;
-  const areaY = 520;
-
-  nodes.push(createNode('SYN_AREAS', 'MAPA Syn', 'Sub-áreas', 'area', { x: synAreaX, y: areaY }, orientation));
-  nodes.push(createNode('TEAM_AREAS', 'Team Hub', 'Sub-áreas', 'area', { x: teamAreaX, y: areaY }, orientation));
-
-  if (synModuleIndex >= 0) {
-    edges.push(createEdge('E-SYN', `M-${modules[synModuleIndex].id}`, 'SYN_AREAS', '#c64928'));
-  }
-  if (teamModuleIndex >= 0) {
-    edges.push(createEdge('E-TEAM', `M-${modules[teamModuleIndex].id}`, 'TEAM_AREAS', '#c64928'));
-  }
-
-  if (level === 'L2' || level === 'L3') {
-    const synSidebarStartX = synAreaX - 240;
-    const teamSidebarStartX = teamAreaX - 240;
-    const sidebarsY = 790;
-
-    synSidebars.forEach((item, index) => {
-      const nodeId = `SS-${index}`;
-      const position = gridPoint(index, 3, synSidebarStartX, sidebarsY, 220, 120);
-      nodes.push(createNode(nodeId, item.subLabel || item.label, level === 'L3' ? item.path : undefined, 'sidebar', position, orientation));
-      edges.push(createEdge(`E-SYN-S-${index}`, 'SYN_AREAS', nodeId, '#7b8394'));
-    });
-
-    teamSidebars.forEach((item, index) => {
-      const nodeId = `TS-${index}`;
-      const position = gridPoint(index, 3, teamSidebarStartX, sidebarsY, 220, 120);
-      nodes.push(createNode(nodeId, item.subLabel || item.label, level === 'L3' ? item.path : undefined, 'sidebar', position, orientation));
-      edges.push(createEdge(`E-TEAM-S-${index}`, 'TEAM_AREAS', nodeId, '#7b8394'));
-    });
-  }
-
-  if (level === 'L3') {
-    const routesY = 1120;
-    technicalRoutes.forEach((route, index) => {
-      const routeId = `R-${index}`;
-      const position = gridPoint(index, 4, 130, routesY, 300, 110);
-      nodes.push(createNode(routeId, route, undefined, 'route', position, orientation));
-      edges.push(createEdge(`E-R-${index}`, route.startsWith('/team') ? 'TEAM_AREAS' : 'SYN_AREAS', routeId, '#5b6170', true));
-    });
-  }
-
-  return { nodes, edges };
-}
-
-export function TechnicalMindmap({ snapshot, level, orientation }: TechnicalMindmapProps) {
-  const graph = useMemo(() => buildMindmapGraph(snapshot, level, orientation), [snapshot, level, orientation]);
   const [nodes, setNodes, onNodesChange] = useNodesState(graph.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(graph.edges);
-  const [traceLines, setTraceLines] = useState<string[]>([]);
-  const [livePositionState, setLivePositionState] = useState<string>('');
+  const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node, Edge> | null>(null);
+  const [fitViewRequestId, setFitViewRequestId] = useState(0);
+  const [debugEnabled, setDebugEnabled] = useState(false);
+  const [traceEvents, setTraceEvents] = useState<HitlTraceEventV2[]>([]);
+  const [checkpointDE, setCheckpointDE] = useState<HitlCheckpointV2 | null>(null);
+  const [checkpointPARA, setCheckpointPARA] = useState<HitlCheckpointV2 | null>(null);
+  const [edgePage, setEdgePage] = useState(0);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const [bootReady, setBootReady] = useState(!RESET_PERSISTENCE_ON_BOOT);
+  const positionMemoryRef = useRef<OrientationPositionMemory>({
+    horizontal: { L1: {}, L2: {}, L3: {} },
+    vertical: { L1: {}, L2: {}, L3: {} },
+  });
+  const didBootstrapResetRef = useRef(false);
+  const persistedSnapshotRef = useRef<HitlPersistedStateV2 | null>(null);
+  const latestNodesRef = useRef<Node[]>(nodes);
+  const storageKey = useMemo(
+    () => `${STORAGE_PREFIX}${orientation}::${level}::${effectiveL4Variant}`,
+    [orientation, level, effectiveL4Variant],
+  );
 
-  function toPositionLog(currentNodes: Node[]) {
-    const ordered = [...currentNodes].sort((a, b) => a.id.localeCompare(b.id));
-    return ordered
-      .map((node) => `${node.id}: (${Math.round(node.position.x)}, ${Math.round(node.position.y)})`)
-      .join('\n');
+  const layoutMetrics = useMemo(() => buildHitlLayoutMetrics(nodes, edges, graph.meta), [nodes, edges, graph.meta]);
+  const livePositionState = useMemo(() => formatNodePositions(toNodePositionArray(nodes)), [nodes]);
+  const traceConsoleText = useMemo(
+    () => traceEvents.map((event) => formatTraceEventForConsole(event)).join('\n\n--------------------\n\n'),
+    [traceEvents],
+  );
+  const edgeRows = useMemo(() => edges.map((edge) => `${edge.source} -> ${edge.target}`), [edges]);
+  const edgePageCount = Math.max(1, Math.ceil(edgeRows.length / EDGE_PAGE_SIZE));
+  const pagedEdgeRows = useMemo(() => {
+    const start = edgePage * EDGE_PAGE_SIZE;
+    return edgeRows.slice(start, start + EDGE_PAGE_SIZE);
+  }, [edgePage, edgeRows]);
+  const diffResult = useMemo(() => compareCheckpoints(checkpointDE, checkpointPARA), [checkpointDE, checkpointPARA]);
+  const attentionEvents = useMemo(() => traceEvents.filter((event) => event.attention).length, [traceEvents]);
+  const viewportHeightRem = useMemo(() => {
+    if (level === 'L3' && orientation === 'horizontal') {
+      return 58;
+    }
+    if (level === 'L3') {
+      return 56;
+    }
+    if (level === 'L2' && orientation === 'horizontal') {
+      return 52;
+    }
+    if (level === 'L2') {
+      return 50;
+    }
+    return 44;
+  }, [level, orientation]);
+  const carryoverSummary = useMemo(() => {
+    const lastAutoLoad = traceEvents.find((event) => event.eventType === 'AutoLoad');
+    if (!lastAutoLoad?.details) {
+      return 'n/a';
+    }
+    const carryoverChunk = lastAutoLoad.details
+      .split('|')
+      .map((chunk) => chunk.trim())
+      .find((chunk) => chunk.startsWith('carryover='));
+    return carryoverChunk ?? 'n/a';
+  }, [traceEvents]);
+
+  const appendTrace = useCallback(
+    (eventType: HitlTraceEventTypeV2, currentNodes: Node[], attention = false, details?: string) => {
+      const event = createHitlTraceEvent(eventType, level, orientation, currentNodes, attention, details);
+      setTraceEvents((prev) => [event, ...prev].slice(0, TRACE_LIMIT));
+    },
+    [level, orientation],
+  );
+
+  function toMetricsDetails() {
+    return `overlap=${layoutMetrics.nodeOverlapCount} | crossings=${layoutMetrics.edgeCrossingEstimate} | laneViolations=${layoutMetrics.laneViolationCount} | density=${layoutMetrics.clusterDensityScore}`;
   }
 
-  function appendTrace(tag: string, currentNodes: Node[], attention = false) {
-    const stamp = new Date().toLocaleTimeString('pt-BR', { hour12: false });
-    const flag = attention ? '[ATENCAO] ' : '';
-    const header = `${flag}[${stamp}] ${tag} | level=${level} | orientation=${orientation} | nodes=${currentNodes.length}`;
-    const payload = toPositionLog(currentNodes);
-    const entry = `${header}\n${payload}`;
-    setTraceLines((prev) => [entry, ...prev].slice(0, 18));
+  function createCheckpoint(label: 'DE' | 'PARA', currentNodes: Node[]): HitlCheckpointV2 {
+    return {
+      label,
+      nodes: toNodePositionArray(currentNodes),
+      metrics: buildHitlLayoutMetrics(currentNodes, edges, graph.meta),
+    };
   }
 
   useEffect(() => {
-    setNodes(graph.nodes);
+    if (!RESET_PERSISTENCE_ON_BOOT || didBootstrapResetRef.current) {
+      setBootReady(true);
+      return;
+    }
+    didBootstrapResetRef.current = true;
+    if (canUseLocalStorage()) {
+      Object.keys(window.localStorage)
+        .filter((key) => key.startsWith(STORAGE_PREFIX_FAMILY))
+        .forEach((key) => window.localStorage.removeItem(key));
+    }
+    positionMemoryRef.current = {
+      horizontal: { L1: {}, L2: {}, L3: {} },
+      vertical: { L1: {}, L2: {}, L3: {} },
+    };
+    persistedSnapshotRef.current = null;
+    setBootReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!bootReady) {
+      return;
+    }
+    const persisted = readPersistedState(storageKey);
+    persistedSnapshotRef.current = persisted;
+    setTraceEvents(persisted?.trace?.slice(0, TRACE_LIMIT) ?? []);
+    setCheckpointDE(persisted?.checkpointDE ?? null);
+    setCheckpointPARA(persisted?.checkpointPARA ?? null);
+    setEdgePage(0);
+    setCopyStatus('idle');
+  }, [bootReady, storageKey]);
+
+  useEffect(() => {
+    if (!bootReady) {
+      return;
+    }
+    const persistedPositions = persistedSnapshotRef.current?.positions ?? {};
+    const allowCrossLevelCarryover = false;
+    const persistedL3Positions: Record<string, Point> = {};
+    const checkpointParaPositions: Record<string, Point> = {};
+    let reusedPersisted = 0;
+    let reusedL3 = 0;
+    let reusedL3Checkpoint = 0;
+    const hydratedNodes = graph.nodes.map((node) => {
+      if (allowCrossLevelCarryover && level !== 'L3') {
+        const fromL3Checkpoint = checkpointParaPositions[node.id];
+        if (fromL3Checkpoint) {
+          reusedL3Checkpoint += 1;
+          return {
+            ...node,
+            position: fromL3Checkpoint,
+          };
+        }
+        const fromL3 = persistedL3Positions[node.id];
+        if (fromL3) {
+          reusedL3 += 1;
+          return {
+            ...node,
+            position: { x: fromL3.x, y: fromL3.y },
+          };
+        }
+      }
+
+      const persistedPosition = persistedPositions[node.id];
+      if (persistedPosition) {
+        reusedPersisted += 1;
+        return {
+          ...node,
+          position: { x: persistedPosition.x, y: persistedPosition.y },
+        };
+      }
+      return node;
+    });
+
+    const loadMetrics = buildHitlLayoutMetrics(hydratedNodes, graph.edges, graph.meta);
+    setNodes(hydratedNodes);
     setEdges(graph.edges);
-  }, [graph, setEdges, setNodes]);
+    setFitViewRequestId((prev) => prev + 1);
+    appendTrace(
+      'AutoLoad',
+      hydratedNodes,
+      false,
+      `carryover=${reusedPersisted + reusedL3 + reusedL3Checkpoint}/${
+        hydratedNodes.length
+      } | canonicalV1=0 | canonicalCarryover=disabled | persisted=${reusedPersisted} | session=0 | fromL3=${reusedL3} | fromL3Checkpoint=${reusedL3Checkpoint} | crossLevelCarryover=disabled | l3Canonical=layout-physics | horizontalProfile=${
+        orientation === 'horizontal' ? 'layout-current' : 'n/a'
+      } | l4Variant=${effectiveL4Variant} | fitView=queued | viewportHeight=${viewportHeightRem}rem`,
+    );
+    appendTrace(
+      'CollisionScan',
+      hydratedNodes,
+      loadMetrics.nodeOverlapCount > 0,
+      `overlap=${loadMetrics.nodeOverlapCount} | crossings=${loadMetrics.edgeCrossingEstimate}`,
+    );
+    appendTrace(
+      'LaneValidation',
+      hydratedNodes,
+      loadMetrics.laneViolationCount > 0,
+      `laneViolations=${loadMetrics.laneViolationCount} | density=${loadMetrics.clusterDensityScore}`,
+    );
+
+    if (!persistedSnapshotRef.current?.checkpointDE) {
+      const autoCheckpoint = createCheckpoint('DE', hydratedNodes);
+      setCheckpointDE(autoCheckpoint);
+      appendTrace('CheckpointDE', hydratedNodes, false, 'auto-baseline=initial-load');
+    }
+  }, [appendTrace, bootReady, effectiveL4Variant, graph, orientation, setEdges, setNodes, viewportHeightRem]);
 
   useEffect(() => {
-    const live = toPositionLog(nodes);
-    setLivePositionState(live);
+    latestNodesRef.current = nodes;
   }, [nodes]);
 
   useEffect(() => {
-    appendTrace('AutoLoad', graph.nodes);
-  }, [graph.nodes, level, orientation]);
+    if (!flowInstance || fitViewRequestId === 0) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void flowInstance.fitView(FIT_VIEW_OPTIONS);
+      appendTrace('AutoFitView', latestNodesRef.current, false, `request=${fitViewRequestId}`);
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [appendTrace, flowInstance, fitViewRequestId]);
+
+  useEffect(() => {
+    setEdgePage((current) => Math.min(current, Math.max(0, edgePageCount - 1)));
+  }, [edgePageCount]);
+
+  useEffect(() => {
+    if (!bootReady) {
+      return;
+    }
+    const persistedState: HitlPersistedStateV2 = {
+      version: 'HITL-V2',
+      level,
+      orientation,
+      positions: toNodePositionMap(nodes),
+      trace: traceEvents.slice(0, TRACE_LIMIT),
+      checkpointDE: checkpointDE ?? undefined,
+      checkpointPARA: checkpointPARA ?? undefined,
+    };
+    writePersistedState(storageKey, persistedState);
+    persistedSnapshotRef.current = persistedState;
+  }, [bootReady, checkpointDE, checkpointPARA, level, nodes, orientation, storageKey, traceEvents]);
+
+  function handleCheckpointDE() {
+    const checkpoint = createCheckpoint('DE', nodes);
+    setCheckpointDE(checkpoint);
+    appendTrace('CheckpointDE', nodes, false, toMetricsDetails());
+  }
+
+  function handlePositionLog() {
+    const checkpoint = createCheckpoint('PARA', nodes);
+    setCheckpointPARA(checkpoint);
+    appendTrace('ManualPositionLog', nodes, true, 'operator-intervention');
+    appendTrace('CheckpointPARA', nodes, true, toMetricsDetails());
+  }
+
+  function handleClearTrace() {
+    setTraceEvents([]);
+  }
+
+  function handleResetPersistence() {
+    if (canUseLocalStorage()) {
+      Object.keys(window.localStorage)
+        .filter((key) => key.startsWith(STORAGE_PREFIX_FAMILY))
+        .forEach((key) => window.localStorage.removeItem(key));
+    }
+    positionMemoryRef.current = {
+      horizontal: { L1: {}, L2: {}, L3: {} },
+      vertical: { L1: {}, L2: {}, L3: {} },
+    };
+    persistedSnapshotRef.current = null;
+    setTraceEvents([]);
+    setCheckpointDE(null);
+    setCheckpointPARA(null);
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+    setFitViewRequestId((prev) => prev + 1);
+  }
+
+  function handleExportJson() {
+    const payload = {
+      version: 'HITL-V2',
+      exportedAt: new Date().toISOString(),
+      level,
+      orientation,
+      metrics: layoutMetrics,
+      diff: diffResult,
+      checkpointDE,
+      checkpointPARA,
+      trace: traceEvents.slice(0, TRACE_LIMIT),
+      positions: toNodePositionMap(nodes),
+      edges: edgeRows,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `hitl-${level}-${orientation}-${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleCopySummary() {
+    const summary = buildHitlSummary({
+      generatedAt: new Date().toISOString(),
+      level,
+      orientation,
+      carryover: carryoverSummary,
+      metrics: layoutMetrics,
+      diff: diffResult,
+      traceCount: traceEvents.length,
+      attentionEvents,
+    });
+    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+      setCopyStatus('error');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopyStatus('copied');
+      window.setTimeout(() => setCopyStatus('idle'), 1800);
+    } catch {
+      setCopyStatus('error');
+    }
+  }
 
   return (
     <div className="space-y-3">
-      <div className="relative h-[44rem] overflow-hidden rounded-xl border border-white/80 bg-white/70">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/70 px-3 py-2">
+        <p className="text-xs/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">HITL Debug Mode</p>
+        <button
+          type="button"
+          className={`rounded-lg px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] uppercase transition ${debugEnabled ? 'bg-accent text-white' : 'border border-white/80 bg-white/80 text-foreground hover:bg-white'}`}
+          onClick={() => setDebugEnabled((prev) => !prev)}
+        >
+          {debugEnabled ? 'ON' : 'OFF'}
+        </button>
+      </div>
+
+      <div
+        className="relative overflow-hidden rounded-xl border border-white/80 bg-white/70"
+        style={{ height: `${viewportHeightRem}rem` }}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          fitView
-          fitViewOptions={{ padding: 0.22, minZoom: 0.4, maxZoom: 1.35 }}
+          onInit={setFlowInstance}
           minZoom={0.3}
           maxZoom={1.9}
           nodesDraggable
@@ -364,48 +466,177 @@ export function TechnicalMindmap({ snapshot, level, orientation }: TechnicalMind
         </ReactFlow>
       </div>
 
-      <section className="rounded-xl border border-white/80 bg-white/70 p-3">
-        <header className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm/6 font-semibold tracking-[0.06em] text-foreground uppercase">
-            HITL Console - Trace Dialog
-          </h3>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="rounded-lg bg-accent px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-white uppercase transition hover:brightness-105"
-              onClick={() => appendTrace('Manual Position Log', nodes, true)}
-            >
-              Position Log
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
-              onClick={() => setTraceLines([])}
-            >
-              Clear
-            </button>
-          </div>
-        </header>
+      {debugEnabled ? (
+        <section className="space-y-3 rounded-xl border border-white/80 bg-white/70 p-3">
+          <header className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm/6 font-semibold tracking-[0.06em] text-foreground uppercase">
+              HITL Console - Trace Dialog
+            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
+                onClick={handleCheckpointDE}
+              >
+                Checkpoint DE
+              </button>
+              <button
+                type="button"
+                className="rounded-lg bg-accent px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-white uppercase transition hover:brightness-105"
+                onClick={handlePositionLog}
+              >
+                Position Log
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
+                onClick={handleClearTrace}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
+                onClick={handleResetPersistence}
+              >
+                Reset Persistência
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
+                onClick={handleExportJson}
+              >
+                Export HITL JSON
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-white/80 bg-white/80 px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] text-foreground uppercase transition hover:bg-white"
+                onClick={() => void handleCopySummary()}
+              >
+                Copy HITL Summary
+              </button>
+            </div>
+          </header>
 
-        <div className="mt-2 grid gap-2 lg:grid-cols-2">
-          <article className="rounded-lg border border-white/80 bg-white/80 p-2">
-            <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
-              Estado Atual (Realtime)
-            </p>
-            <pre className="mt-1 max-h-52 overflow-auto font-mono text-[11px]/4 text-foreground">
-              {livePositionState || 'Aguardando nodes...'}
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Node overlap</p>
+              <p className="text-sm/6 font-semibold text-foreground">{layoutMetrics.nodeOverlapCount}</p>
+            </article>
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Edge crossings</p>
+              <p className="text-sm/6 font-semibold text-foreground">{layoutMetrics.edgeCrossingEstimate}</p>
+            </article>
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Lane violations</p>
+              <p className="text-sm/6 font-semibold text-foreground">{layoutMetrics.laneViolationCount}</p>
+            </article>
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Cluster density</p>
+              <p className="text-sm/6 font-semibold text-foreground">{layoutMetrics.clusterDensityScore}</p>
+            </article>
+          </div>
+
+          <div className="rounded-lg border border-white/80 bg-white/80 p-2">
+            <header className="flex items-center justify-between">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                Arestas ativas
+              </p>
+              <p className="text-[11px]/5 text-muted-foreground">
+                Página {edgePage + 1}/{edgePageCount}
+              </p>
+            </header>
+            <pre className="mt-1 max-h-28 overflow-auto whitespace-pre-wrap font-mono text-[11px]/4 text-foreground">
+              {pagedEdgeRows.length > 0 ? pagedEdgeRows.join('\n') : 'Sem arestas.'}
             </pre>
-          </article>
-          <article className="rounded-lg border border-white/80 bg-white/80 p-2">
-            <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
-              Histórico de Trace
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                className="rounded-md border border-white/80 bg-white px-2 py-1 text-[10px]/4 font-semibold uppercase disabled:opacity-50"
+                onClick={() => setEdgePage((prev) => Math.max(0, prev - 1))}
+                disabled={edgePage === 0}
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                className="rounded-md border border-white/80 bg-white px-2 py-1 text-[10px]/4 font-semibold uppercase disabled:opacity-50"
+                onClick={() => setEdgePage((prev) => Math.min(edgePageCount - 1, prev + 1))}
+                disabled={edgePage >= edgePageCount - 1}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-white/80 bg-white/80 p-2">
+            <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Compare DE / PARA</p>
+            <p className="text-[11px]/5 text-muted-foreground">
+              moved={diffResult.movedCount} | avgDelta={diffResult.avgDelta} | maxDelta={diffResult.maxDelta}
             </p>
-            <pre className="mt-1 max-h-52 overflow-auto whitespace-pre-wrap font-mono text-[11px]/4 text-foreground">
-              {traceLines.length > 0 ? traceLines.join('\n\n--------------------\n\n') : 'Sem registros ainda.'}
-            </pre>
-          </article>
-        </div>
-      </section>
+            <div className="mt-2 max-h-40 overflow-auto rounded-md border border-white/80 bg-white/80">
+              <table className="w-full border-collapse text-left text-[11px]/4">
+                <thead className="sticky top-0 bg-white/95 text-muted-foreground">
+                  <tr>
+                    <th className="px-2 py-1">Node</th>
+                    <th className="px-2 py-1">DE (x,y)</th>
+                    <th className="px-2 py-1">PARA (x,y)</th>
+                    <th className="px-2 py-1">Δ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diffResult.rows.length > 0 ? (
+                    diffResult.rows.map((row) => (
+                      <tr key={row.nodeId} className="border-t border-white/80">
+                        <td className="px-2 py-1 font-semibold text-foreground">{row.nodeId}</td>
+                        <td className="px-2 py-1 text-foreground">
+                          ({row.xBefore}, {row.yBefore})
+                        </td>
+                        <td className="px-2 py-1 text-foreground">
+                          ({row.xAfter}, {row.yAfter})
+                        </td>
+                        <td className="px-2 py-1 text-foreground">{row.delta}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="px-2 py-1 text-muted-foreground" colSpan={4}>
+                        Defina checkpoints DE e PARA para habilitar comparação.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="grid gap-2 lg:grid-cols-2">
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                Estado Atual (Realtime)
+              </p>
+              <pre className="mt-1 max-h-52 overflow-auto font-mono text-[11px]/4 text-foreground">
+                {livePositionState || 'Aguardando nodes...'}
+              </pre>
+            </article>
+            <article className="rounded-lg border border-white/80 bg-white/80 p-2">
+              <p className="text-[11px]/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+                Histórico de Trace
+              </p>
+              <pre className="mt-1 max-h-52 overflow-auto whitespace-pre-wrap font-mono text-[11px]/4 text-foreground">
+                {traceConsoleText || 'Sem registros ainda.'}
+              </pre>
+            </article>
+          </div>
+
+          {copyStatus === 'copied' ? (
+            <p className="text-xs/5 text-emerald-700">Resumo HITL copiado para a área de transferência.</p>
+          ) : null}
+          {copyStatus === 'error' ? (
+            <p className="text-xs/5 text-red-700">Não foi possível copiar automaticamente; tente novamente.</p>
+          ) : null}
+        </section>
+      ) : null}
     </div>
   );
 }

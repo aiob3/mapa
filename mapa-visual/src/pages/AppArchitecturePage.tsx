@@ -1,7 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArchitectureCanvas } from '@/components/ArchitectureCanvas';
 import { MermaidDiagram } from '@/components/MermaidDiagram';
-import { TechnicalMindmap, type TechnicalLevel, type TechnicalOrientation } from '@/components/TechnicalMindmap';
+import {
+  TechnicalMindmap,
+  type L4LayoutVariant,
+  type TechnicalLevel,
+  type TechnicalOrientation,
+} from '@/components/TechnicalMindmap';
 import { snapshot } from '@/data/snapshot';
 
 type TechnicalRenderer = 'mindmap' | 'mermaid';
@@ -64,8 +69,7 @@ function buildTechnicalFlow(level: TechnicalLevel, orientation: 'LR' | 'TB') {
 
   modules.forEach((module, index) => {
     const nodeId = `TM${index}`;
-    const label = level === 'L3' ? `${module.label}<br/>${module.path}` : module.label;
-    lines.push(`  ${nodeId}["${label}"]`);
+    lines.push(`  ${nodeId}["${module.label}"]`);
     lines.push(`  APP --> ${nodeId}`);
   });
 
@@ -81,8 +85,7 @@ function buildTechnicalFlow(level: TechnicalLevel, orientation: 'LR' | 'TB') {
 
   if (level === 'L2' || level === 'L3') {
     uniqueSidebars.slice(0, 10).forEach((item, index) => {
-      const label = level === 'L3' ? `${item.subLabel || item.label}<br/>${item.path}` : item.subLabel || item.label;
-      lines.push(`  TS${index}["${label}"]`);
+      lines.push(`  TS${index}["${item.subLabel || item.label}"]`);
       if (item.context === 'mapa-syn') {
         lines.push(`  SYN_AREAS --> TS${index}`);
       } else {
@@ -116,6 +119,16 @@ export function AppArchitecturePage() {
   const [technicalLevel, setTechnicalLevel] = useState<TechnicalLevel>('L1');
   const [technicalRenderer, setTechnicalRenderer] = useState<TechnicalRenderer>('mindmap');
   const [technicalOrientation, setTechnicalOrientation] = useState<TechnicalOrientation>('horizontal');
+  const [l4Variant, setL4Variant] = useState<L4LayoutVariant>('centered');
+
+  useEffect(() => {
+    if (technicalOrientation === 'horizontal' && l4Variant !== 'top-down') {
+      setL4Variant('top-down');
+    }
+    if (technicalOrientation === 'vertical' && l4Variant === 'top-down') {
+      setL4Variant('centered');
+    }
+  }, [technicalOrientation, l4Variant]);
   const executiveFlow = useMemo(() => buildExecutiveFlow('LR'), []);
   const executiveFlowVertical = useMemo(() => buildExecutiveFlow('TB'), []);
   const technicalFlow = useMemo(
@@ -230,6 +243,26 @@ export function AppArchitecturePage() {
                 Vertical
               </button>
             </div>
+
+            {technicalRenderer === 'mindmap' && technicalLevel === 'L3' && technicalOrientation === 'vertical' ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs/5 font-semibold tracking-[0.08em] text-muted-foreground uppercase">Variante L4 (Vertical)</p>
+                <button
+                  type="button"
+                  className={`rounded-lg px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] uppercase transition ${l4Variant === 'top-down' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
+                  onClick={() => setL4Variant('top-down')}
+                >
+                  Top-down
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-lg px-3 py-1.5 text-xs/5 font-semibold tracking-[0.06em] uppercase transition ${l4Variant === 'centered' ? 'bg-accent text-white' : 'bg-white/80 text-foreground hover:bg-white'}`}
+                  onClick={() => setL4Variant('centered')}
+                >
+                  Centered
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <p className="mt-3 text-xs/5 text-muted-foreground">
@@ -238,7 +271,12 @@ export function AppArchitecturePage() {
 
           <div className="mt-4">
             {technicalRenderer === 'mindmap' ? (
-              <TechnicalMindmap snapshot={snapshot} level={technicalLevel} orientation={technicalOrientation} />
+              <TechnicalMindmap
+                snapshot={snapshot}
+                level={technicalLevel}
+                orientation={technicalOrientation}
+                l4Variant={l4Variant}
+              />
             ) : (
               <MermaidDiagram
                 title={`Mapa técnico (${technicalLevel})`}

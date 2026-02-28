@@ -1,0 +1,1284 @@
+{
+    "version": "HITL-V2",
+    "exportedAt": "2026-02-27T21:14:41.639Z",
+    "level": "L3",
+    "orientation": "horizontal",
+    "metrics": {
+      "nodeOverlapCount": 6,
+      "edgeCrossingEstimate": 0,
+      "laneViolationCount": 9,
+      "clusterDensityScore": 34.5
+    },
+    "diff": {
+      "rows": [
+        {
+          "nodeId": "M-dashboard",
+          "xBefore": 360,
+          "yBefore": 70,
+          "xAfter": 360,
+          "yAfter": 70,
+          "delta": 0
+        },
+        {
+          "nodeId": "M-mapa-syn",
+          "xBefore": 360,
+          "yBefore": 198,
+          "xAfter": 360,
+          "yAfter": 198,
+          "delta": 0
+        },
+        {
+          "nodeId": "M-team-hub",
+          "xBefore": 360,
+          "yBefore": 454,
+          "xAfter": 360,
+          "yAfter": 454,
+          "delta": 0
+        },
+        {
+          "nodeId": "M-the-vault",
+          "xBefore": 360,
+          "yBefore": 582,
+          "xAfter": 360,
+          "yAfter": 582,
+          "delta": 0
+        },
+        {
+          "nodeId": "M-war-room",
+          "xBefore": 360,
+          "yBefore": 326,
+          "xAfter": 360,
+          "yAfter": 326,
+          "delta": 0
+        },
+        {
+          "nodeId": "R-0",
+          "xBefore": 1600,
+          "yBefore": 78,
+          "xAfter": 1306,
+          "yAfter": 30,
+          "delta": 298
+        },
+        {
+          "nodeId": "R-1",
+          "xBefore": 1840,
+          "yBefore": 334,
+          "xAfter": 1303,
+          "yAfter": 519,
+          "delta": 568
+        },
+        {
+          "nodeId": "R-2",
+          "xBefore": 1720,
+          "yBefore": 78,
+          "xAfter": 1307,
+          "yAfter": 81,
+          "delta": 413
+        },
+        {
+          "nodeId": "R-3",
+          "xBefore": 1720,
+          "yBefore": 173,
+          "xAfter": 1309,
+          "yAfter": 133,
+          "delta": 413
+        },
+        {
+          "nodeId": "ROOT",
+          "xBefore": 80,
+          "yBefore": 320,
+          "xAfter": 80,
+          "yAfter": 320,
+          "delta": 0
+        },
+        {
+          "nodeId": "SS-0",
+          "xBefore": 1040,
+          "yBefore": 58,
+          "xAfter": 1041,
+          "yAfter": -83,
+          "delta": 141
+        },
+        {
+          "nodeId": "SS-1",
+          "xBefore": 1040,
+          "yBefore": 158,
+          "xAfter": 1041,
+          "yAfter": -26,
+          "delta": 184
+        },
+        {
+          "nodeId": "SS-2",
+          "xBefore": 1040,
+          "yBefore": 258,
+          "xAfter": 1040,
+          "yAfter": 176,
+          "delta": 82
+        },
+        {
+          "nodeId": "SS-3",
+          "xBefore": 1040,
+          "yBefore": 358,
+          "xAfter": 1041,
+          "yAfter": 243,
+          "delta": 115
+        },
+        {
+          "nodeId": "SS-4",
+          "xBefore": 1040,
+          "yBefore": 458,
+          "xAfter": 1042,
+          "yAfter": 307,
+          "delta": 151
+        },
+        {
+          "nodeId": "SYN_AREAS",
+          "xBefore": 720,
+          "yBefore": 198,
+          "xAfter": 632,
+          "yAfter": 133,
+          "delta": 109
+        },
+        {
+          "nodeId": "TEAM_AREAS",
+          "xBefore": 720,
+          "yBefore": 454,
+          "xAfter": 626,
+          "yAfter": 519,
+          "delta": 114
+        },
+        {
+          "nodeId": "TS-0",
+          "xBefore": 1320,
+          "yBefore": 314,
+          "xAfter": 1040,
+          "yAfter": 403,
+          "delta": 294
+        },
+        {
+          "nodeId": "TS-1",
+          "xBefore": 1320,
+          "yBefore": 414,
+          "xAfter": 1039,
+          "yAfter": 465,
+          "delta": 286
+        },
+        {
+          "nodeId": "TS-2",
+          "xBefore": 1320,
+          "yBefore": 514,
+          "xAfter": 1040,
+          "yAfter": 566,
+          "delta": 285
+        },
+        {
+          "nodeId": "TS-3",
+          "xBefore": 1320,
+          "yBefore": 614,
+          "xAfter": 1040,
+          "yAfter": 642,
+          "delta": 281
+        },
+        {
+          "nodeId": "TS-4",
+          "xBefore": 1320,
+          "yBefore": 714,
+          "xAfter": 1039,
+          "yAfter": 719,
+          "delta": 281
+        }
+      ],
+      "movedCount": 16,
+      "avgDelta": 250.94,
+      "maxDelta": 568
+    },
+    "checkpointDE": {
+      "label": "DE",
+      "nodes": [
+        {
+          "id": "M-dashboard",
+          "x": 360,
+          "y": 70
+        },
+        {
+          "id": "M-mapa-syn",
+          "x": 360,
+          "y": 198
+        },
+        {
+          "id": "M-team-hub",
+          "x": 360,
+          "y": 454
+        },
+        {
+          "id": "M-the-vault",
+          "x": 360,
+          "y": 582
+        },
+        {
+          "id": "M-war-room",
+          "x": 360,
+          "y": 326
+        },
+        {
+          "id": "R-0",
+          "x": 1600,
+          "y": 78
+        },
+        {
+          "id": "R-1",
+          "x": 1840,
+          "y": 334
+        },
+        {
+          "id": "R-2",
+          "x": 1720,
+          "y": 78
+        },
+        {
+          "id": "R-3",
+          "x": 1720,
+          "y": 173
+        },
+        {
+          "id": "ROOT",
+          "x": 80,
+          "y": 320
+        },
+        {
+          "id": "SS-0",
+          "x": 1040,
+          "y": 58
+        },
+        {
+          "id": "SS-1",
+          "x": 1040,
+          "y": 158
+        },
+        {
+          "id": "SS-2",
+          "x": 1040,
+          "y": 258
+        },
+        {
+          "id": "SS-3",
+          "x": 1040,
+          "y": 358
+        },
+        {
+          "id": "SS-4",
+          "x": 1040,
+          "y": 458
+        },
+        {
+          "id": "SYN_AREAS",
+          "x": 720,
+          "y": 198
+        },
+        {
+          "id": "TEAM_AREAS",
+          "x": 720,
+          "y": 454
+        },
+        {
+          "id": "TS-0",
+          "x": 1320,
+          "y": 314
+        },
+        {
+          "id": "TS-1",
+          "x": 1320,
+          "y": 414
+        },
+        {
+          "id": "TS-2",
+          "x": 1320,
+          "y": 514
+        },
+        {
+          "id": "TS-3",
+          "x": 1320,
+          "y": 614
+        },
+        {
+          "id": "TS-4",
+          "x": 1320,
+          "y": 714
+        }
+      ],
+      "metrics": {
+        "nodeOverlapCount": 1,
+        "edgeCrossingEstimate": 3,
+        "laneViolationCount": 0,
+        "clusterDensityScore": 29.5
+      }
+    },
+    "checkpointPARA": {
+      "label": "PARA",
+      "nodes": [
+        {
+          "id": "M-dashboard",
+          "x": 360,
+          "y": 70
+        },
+        {
+          "id": "M-mapa-syn",
+          "x": 360,
+          "y": 198
+        },
+        {
+          "id": "M-team-hub",
+          "x": 360,
+          "y": 454
+        },
+        {
+          "id": "M-the-vault",
+          "x": 360,
+          "y": 582
+        },
+        {
+          "id": "M-war-room",
+          "x": 360,
+          "y": 326
+        },
+        {
+          "id": "R-0",
+          "x": 1306,
+          "y": 30
+        },
+        {
+          "id": "R-1",
+          "x": 1303,
+          "y": 519
+        },
+        {
+          "id": "R-2",
+          "x": 1307,
+          "y": 81
+        },
+        {
+          "id": "R-3",
+          "x": 1309,
+          "y": 133
+        },
+        {
+          "id": "ROOT",
+          "x": 80,
+          "y": 320
+        },
+        {
+          "id": "SS-0",
+          "x": 1041,
+          "y": -83
+        },
+        {
+          "id": "SS-1",
+          "x": 1041,
+          "y": -26
+        },
+        {
+          "id": "SS-2",
+          "x": 1040,
+          "y": 176
+        },
+        {
+          "id": "SS-3",
+          "x": 1041,
+          "y": 243
+        },
+        {
+          "id": "SS-4",
+          "x": 1042,
+          "y": 307
+        },
+        {
+          "id": "SYN_AREAS",
+          "x": 632,
+          "y": 133
+        },
+        {
+          "id": "TEAM_AREAS",
+          "x": 626,
+          "y": 519
+        },
+        {
+          "id": "TS-0",
+          "x": 1040,
+          "y": 403
+        },
+        {
+          "id": "TS-1",
+          "x": 1039,
+          "y": 465
+        },
+        {
+          "id": "TS-2",
+          "x": 1040,
+          "y": 566
+        },
+        {
+          "id": "TS-3",
+          "x": 1040,
+          "y": 642
+        },
+        {
+          "id": "TS-4",
+          "x": 1039,
+          "y": 719
+        }
+      ],
+      "metrics": {
+        "nodeOverlapCount": 6,
+        "edgeCrossingEstimate": 0,
+        "laneViolationCount": 9,
+        "clusterDensityScore": 34.5
+      }
+    },
+    "trace": [
+      {
+        "id": "1772226821672-58bk5o",
+        "ts": "18:13:41",
+        "eventType": "CheckpointPARA",
+        "attention": true,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "overlap=6 | crossings=0 | laneViolations=9 | density=34.5",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1306,
+            "y": 30
+          },
+          {
+            "id": "R-1",
+            "x": 1303,
+            "y": 519
+          },
+          {
+            "id": "R-2",
+            "x": 1307,
+            "y": 81
+          },
+          {
+            "id": "R-3",
+            "x": 1309,
+            "y": 133
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1041,
+            "y": -83
+          },
+          {
+            "id": "SS-1",
+            "x": 1041,
+            "y": -26
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 176
+          },
+          {
+            "id": "SS-3",
+            "x": 1041,
+            "y": 243
+          },
+          {
+            "id": "SS-4",
+            "x": 1042,
+            "y": 307
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 632,
+            "y": 133
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 626,
+            "y": 519
+          },
+          {
+            "id": "TS-0",
+            "x": 1040,
+            "y": 403
+          },
+          {
+            "id": "TS-1",
+            "x": 1039,
+            "y": 465
+          },
+          {
+            "id": "TS-2",
+            "x": 1040,
+            "y": 566
+          },
+          {
+            "id": "TS-3",
+            "x": 1040,
+            "y": 642
+          },
+          {
+            "id": "TS-4",
+            "x": 1039,
+            "y": 719
+          }
+        ]
+      },
+      {
+        "id": "1772226821671-flovcm",
+        "ts": "18:13:41",
+        "eventType": "ManualPositionLog",
+        "attention": true,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "operator-intervention",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1306,
+            "y": 30
+          },
+          {
+            "id": "R-1",
+            "x": 1303,
+            "y": 519
+          },
+          {
+            "id": "R-2",
+            "x": 1307,
+            "y": 81
+          },
+          {
+            "id": "R-3",
+            "x": 1309,
+            "y": 133
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1041,
+            "y": -83
+          },
+          {
+            "id": "SS-1",
+            "x": 1041,
+            "y": -26
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 176
+          },
+          {
+            "id": "SS-3",
+            "x": 1041,
+            "y": 243
+          },
+          {
+            "id": "SS-4",
+            "x": 1042,
+            "y": 307
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 632,
+            "y": 133
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 626,
+            "y": 519
+          },
+          {
+            "id": "TS-0",
+            "x": 1040,
+            "y": 403
+          },
+          {
+            "id": "TS-1",
+            "x": 1039,
+            "y": 465
+          },
+          {
+            "id": "TS-2",
+            "x": 1040,
+            "y": 566
+          },
+          {
+            "id": "TS-3",
+            "x": 1040,
+            "y": 642
+          },
+          {
+            "id": "TS-4",
+            "x": 1039,
+            "y": 719
+          }
+        ]
+      },
+      {
+        "id": "1772226807317-zk5weu",
+        "ts": "18:13:27",
+        "eventType": "CheckpointPARA",
+        "attention": true,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "overlap=6 | crossings=0 | laneViolations=9 | density=34.7",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1306,
+            "y": 30
+          },
+          {
+            "id": "R-1",
+            "x": 1303,
+            "y": 519
+          },
+          {
+            "id": "R-2",
+            "x": 1307,
+            "y": 81
+          },
+          {
+            "id": "R-3",
+            "x": 1309,
+            "y": 133
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1041,
+            "y": -83
+          },
+          {
+            "id": "SS-1",
+            "x": 1041,
+            "y": -26
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 176
+          },
+          {
+            "id": "SS-3",
+            "x": 1041,
+            "y": 243
+          },
+          {
+            "id": "SS-4",
+            "x": 1042,
+            "y": 307
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 632,
+            "y": 133
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 626,
+            "y": 519
+          },
+          {
+            "id": "TS-0",
+            "x": 1040,
+            "y": 403
+          },
+          {
+            "id": "TS-1",
+            "x": 1039,
+            "y": 465
+          },
+          {
+            "id": "TS-2",
+            "x": 1040,
+            "y": 566
+          },
+          {
+            "id": "TS-3",
+            "x": 1040,
+            "y": 642
+          },
+          {
+            "id": "TS-4",
+            "x": 1039,
+            "y": 716
+          }
+        ]
+      },
+      {
+        "id": "1772226807317-zk9qrw",
+        "ts": "18:13:27",
+        "eventType": "ManualPositionLog",
+        "attention": true,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "operator-intervention",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1306,
+            "y": 30
+          },
+          {
+            "id": "R-1",
+            "x": 1303,
+            "y": 519
+          },
+          {
+            "id": "R-2",
+            "x": 1307,
+            "y": 81
+          },
+          {
+            "id": "R-3",
+            "x": 1309,
+            "y": 133
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1041,
+            "y": -83
+          },
+          {
+            "id": "SS-1",
+            "x": 1041,
+            "y": -26
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 176
+          },
+          {
+            "id": "SS-3",
+            "x": 1041,
+            "y": 243
+          },
+          {
+            "id": "SS-4",
+            "x": 1042,
+            "y": 307
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 632,
+            "y": 133
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 626,
+            "y": 519
+          },
+          {
+            "id": "TS-0",
+            "x": 1040,
+            "y": 403
+          },
+          {
+            "id": "TS-1",
+            "x": 1039,
+            "y": 465
+          },
+          {
+            "id": "TS-2",
+            "x": 1040,
+            "y": 566
+          },
+          {
+            "id": "TS-3",
+            "x": 1040,
+            "y": 642
+          },
+          {
+            "id": "TS-4",
+            "x": 1039,
+            "y": 716
+          }
+        ]
+      },
+      {
+        "id": "1772226657708-68kurk",
+        "ts": "18:10:57",
+        "eventType": "CheckpointDE",
+        "attention": false,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "overlap=1 | crossings=3 | laneViolations=0 | density=29.5",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1600,
+            "y": 78
+          },
+          {
+            "id": "R-1",
+            "x": 1840,
+            "y": 334
+          },
+          {
+            "id": "R-2",
+            "x": 1720,
+            "y": 78
+          },
+          {
+            "id": "R-3",
+            "x": 1720,
+            "y": 173
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1040,
+            "y": 58
+          },
+          {
+            "id": "SS-1",
+            "x": 1040,
+            "y": 158
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 258
+          },
+          {
+            "id": "SS-3",
+            "x": 1040,
+            "y": 358
+          },
+          {
+            "id": "SS-4",
+            "x": 1040,
+            "y": 458
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 720,
+            "y": 198
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 720,
+            "y": 454
+          },
+          {
+            "id": "TS-0",
+            "x": 1320,
+            "y": 314
+          },
+          {
+            "id": "TS-1",
+            "x": 1320,
+            "y": 414
+          },
+          {
+            "id": "TS-2",
+            "x": 1320,
+            "y": 514
+          },
+          {
+            "id": "TS-3",
+            "x": 1320,
+            "y": 614
+          },
+          {
+            "id": "TS-4",
+            "x": 1320,
+            "y": 714
+          }
+        ]
+      },
+      {
+        "id": "1772226655409-u499dt",
+        "ts": "18:10:55",
+        "eventType": "AutoFitView",
+        "attention": false,
+        "level": "L3",
+        "orientation": "horizontal",
+        "nodeCount": 22,
+        "details": "request=14",
+        "positions": [
+          {
+            "id": "M-dashboard",
+            "x": 360,
+            "y": 70
+          },
+          {
+            "id": "M-mapa-syn",
+            "x": 360,
+            "y": 198
+          },
+          {
+            "id": "M-team-hub",
+            "x": 360,
+            "y": 454
+          },
+          {
+            "id": "M-the-vault",
+            "x": 360,
+            "y": 582
+          },
+          {
+            "id": "M-war-room",
+            "x": 360,
+            "y": 326
+          },
+          {
+            "id": "R-0",
+            "x": 1600,
+            "y": 78
+          },
+          {
+            "id": "R-1",
+            "x": 1840,
+            "y": 334
+          },
+          {
+            "id": "R-2",
+            "x": 1720,
+            "y": 78
+          },
+          {
+            "id": "R-3",
+            "x": 1720,
+            "y": 173
+          },
+          {
+            "id": "ROOT",
+            "x": 80,
+            "y": 320
+          },
+          {
+            "id": "SS-0",
+            "x": 1040,
+            "y": 58
+          },
+          {
+            "id": "SS-1",
+            "x": 1040,
+            "y": 158
+          },
+          {
+            "id": "SS-2",
+            "x": 1040,
+            "y": 258
+          },
+          {
+            "id": "SS-3",
+            "x": 1040,
+            "y": 358
+          },
+          {
+            "id": "SS-4",
+            "x": 1040,
+            "y": 458
+          },
+          {
+            "id": "SYN_AREAS",
+            "x": 720,
+            "y": 198
+          },
+          {
+            "id": "TEAM_AREAS",
+            "x": 720,
+            "y": 454
+          },
+          {
+            "id": "TS-0",
+            "x": 1320,
+            "y": 314
+          },
+          {
+            "id": "TS-1",
+            "x": 1320,
+            "y": 414
+          },
+          {
+            "id": "TS-2",
+            "x": 1320,
+            "y": 514
+          },
+          {
+            "id": "TS-3",
+            "x": 1320,
+            "y": 614
+          },
+          {
+            "id": "TS-4",
+            "x": 1320,
+            "y": 714
+          }
+        ]
+      }
+    ],
+    "positions": {
+      "M-dashboard": {
+        "x": 360,
+        "y": 70
+      },
+      "M-mapa-syn": {
+        "x": 360,
+        "y": 198
+      },
+      "M-team-hub": {
+        "x": 360,
+        "y": 454
+      },
+      "M-the-vault": {
+        "x": 360,
+        "y": 582
+      },
+      "M-war-room": {
+        "x": 360,
+        "y": 326
+      },
+      "R-0": {
+        "x": 1306,
+        "y": 30
+      },
+      "R-1": {
+        "x": 1303,
+        "y": 519
+      },
+      "R-2": {
+        "x": 1307,
+        "y": 81
+      },
+      "R-3": {
+        "x": 1309,
+        "y": 133
+      },
+      "ROOT": {
+        "x": 80,
+        "y": 320
+      },
+      "SS-0": {
+        "x": 1041,
+        "y": -83
+      },
+      "SS-1": {
+        "x": 1041,
+        "y": -26
+      },
+      "SS-2": {
+        "x": 1040,
+        "y": 176
+      },
+      "SS-3": {
+        "x": 1041,
+        "y": 243
+      },
+      "SS-4": {
+        "x": 1042,
+        "y": 307
+      },
+      "SYN_AREAS": {
+        "x": 632,
+        "y": 133
+      },
+      "TEAM_AREAS": {
+        "x": 626,
+        "y": 519
+      },
+      "TS-0": {
+        "x": 1040,
+        "y": 403
+      },
+      "TS-1": {
+        "x": 1039,
+        "y": 465
+      },
+      "TS-2": {
+        "x": 1040,
+        "y": 566
+      },
+      "TS-3": {
+        "x": 1040,
+        "y": 642
+      },
+      "TS-4": {
+        "x": 1039,
+        "y": 719
+      }
+    },
+    "edges": [
+      "ROOT -> M-dashboard",
+      "ROOT -> M-mapa-syn",
+      "ROOT -> M-war-room",
+      "ROOT -> M-team-hub",
+      "ROOT -> M-the-vault",
+      "M-mapa-syn -> SYN_AREAS",
+      "M-team-hub -> TEAM_AREAS",
+      "SYN_AREAS -> SS-0",
+      "SYN_AREAS -> SS-1",
+      "SYN_AREAS -> SS-2",
+      "SYN_AREAS -> SS-3",
+      "SYN_AREAS -> SS-4",
+      "TEAM_AREAS -> TS-0",
+      "TEAM_AREAS -> TS-1",
+      "TEAM_AREAS -> TS-2",
+      "TEAM_AREAS -> TS-3",
+      "TEAM_AREAS -> TS-4",
+      "SYN_AREAS -> R-0",
+      "TEAM_AREAS -> R-1",
+      "SYN_AREAS -> R-2",
+      "SYN_AREAS -> R-3"
+    ]
+  }
